@@ -1,7 +1,6 @@
 import { requestNewsletterAction, stopMyNewsletterAction } from "@/features/newsletter/newsletterActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
-type T = (key: string, values?: Record<string, string | number>) => string;
 export type NewsletterState = "none" | "pending" | "confirmed" | "unsubscribed";
 
 /**

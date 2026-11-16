@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { runProgramUpdateReminders } from "@/features/advisor/programUpdateReminders";
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
+import { runNewsletterSend } from "@/features/newsletter/newsletterSend";
 import { runOnboardingReminders } from "@/features/onboarding/onboardingReminders";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
 import { runEcosystemEventImport } from "@/features/events/eventsImport";
@@ -75,14 +76,17 @@ export async function GET(request: NextRequest) {
   const introductions = await closeStaleIntroductions().catch(() => ({ ok: false as const }));
   // Erinnerungen nach dem Einstieg (20270421120000): nur mit ausdruecklicher Zustimmung, hoechstens zwei Mails je Person.
   const onboarding = await runOnboardingReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
+  // Newsletter (20270428120000): faellige Ausgaben, ein Paket je Lauf. Ohne geplante Ausgabe passiert nichts.
+  const newsletter = await runNewsletterSend().catch(() => ({ ok: false as const, reason: "send_failed" }));
+  const newsletterOk = newsletter.ok || ("reason" in newsletter && newsletter.reason === "not_configured");
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok && onboarding.ok);
-  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok || !onboarding.ok) {
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok && onboarding.ok && newsletterOk);
+  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok || !onboarding.ok || !newsletterOk) {
     const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
-    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks, events, onboarding };
+    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks, events, onboarding, newsletter };
     await sendCronFailureAlert("connect-suggestions", status, body);
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events, introductions, onboarding }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events, introductions, onboarding, newsletter }, { status: 200 });
 }

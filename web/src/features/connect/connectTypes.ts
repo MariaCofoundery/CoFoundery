@@ -57,6 +57,7 @@ export type ConnectProfile = {
   published_at: string | null; updated_at: string;
 };
 export type ConnectListing = {
+  allow_in_mails?: boolean;
   id: string; owner_user_id: string; direction: ConnectDirection; category: ConnectCategory;
   title: string; summary: string; topics: string[]; industries: string[];
   locations: string[]; geographic_scope: ConnectGeographicScope | null; remote_mode: string | null;
@@ -236,6 +237,7 @@ export const PROBLEM_INTEREST_NOTE_MIN = 10;
 export const PROBLEM_INTEREST_NOTE_MAX = 500;
 
 export type ConnectProblem = {
+  allow_in_mails?: boolean;
   moderation_blocked?: boolean;
   id: string;
   /**

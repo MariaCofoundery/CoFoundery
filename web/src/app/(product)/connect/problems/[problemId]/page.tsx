@@ -1,5 +1,6 @@
 import { ProblemLifecycleControls } from "@/features/connect/ProblemLifecycleControls";
 import Link from "next/link";
+import { AllowInMailsToggle } from "@/features/newsletter/AllowInMailsToggle";
 import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
@@ -156,6 +157,8 @@ export default async function ConnectProblemPage({
           {t(`errors.${errorKey}`)}
         </p>
       ) : null}
+
+      {isAuthor && isPublished ? <div className="mt-5"><AllowInMailsToggle kind="problem" id={problem.id} allowed={problem.allow_in_mails === true} t={t} /></div> : null}
 
       <header className="problem-hero" data-intent={problem.author_intent}>
         <p className="problem-hero__eyebrow">

@@ -1587,5 +1587,12 @@
     "heartHint": "Danke sagen",
     "forVia": "für „{label}“",
     "thankedOk": "Danke verschickt."
+  },
+  "mails": {
+    "title": "Im Newsletter erwähnen?",
+    "off": "Dein Eintrag kommt in keinem Newsletter vor. Wenn du es erlaubst, kann er (ohne deinen Namen) in „Aus dem Netzwerk“ erscheinen, damit mehr Menschen ihn sehen.",
+    "on": "Dein Eintrag darf, ohne deinen Namen, im Newsletter „Aus dem Netzwerk“ erscheinen. Das kannst du jederzeit wieder ausschalten.",
+    "allow": "Ja, darf erscheinen",
+    "stop": "Nicht mehr erlauben"
   }
 }

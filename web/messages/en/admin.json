@@ -115,7 +115,8 @@
       "text": "Everything platform admins manage, with the numbers in front.",
       "announcements": "Announcements",
       "events": "Review events",
-      "recommendations": "Review recommendations"
+      "recommendations": "Review recommendations",
+      "newsletter": "Newsletter"
     },
     "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
     "teamChecks": {
@@ -208,5 +209,144 @@
     "showMe": "Show it to me",
     "showMeHint": "“Show it to me” places the announcement on this page for you only, at real size. Nothing is published and nothing is recorded as seen.",
     "englishOptional": "English version (optional)"
+  },
+  "newsletter": {
+    "back": "Back to admin",
+    "title": "Newsletter",
+    "intro": "\"From the network\": build issues, check them and send them to everyone who explicitly signed up and confirmed. Nothing is ever sent on its own.",
+    "new": "New issue",
+    "issues": "Issues",
+    "empty": "No issue yet.",
+    "untitled": "Untitled",
+    "sentOn": "sent on {date} to {count}",
+    "sendingProgress": "running: {count} emails sent",
+    "stats": {
+      "title": "Subscriptions",
+      "confirmed": "confirmed",
+      "pending": "waiting for confirmation",
+      "unsubscribed": "unsubscribed"
+    },
+    "status": {
+      "draft": "Draft",
+      "scheduled": "Scheduled",
+      "sending": "Sending",
+      "sent": "Sent"
+    },
+    "locked": {
+      "scheduled": "This issue is scheduled and locked. Use \"Back to draft\" to edit it again.",
+      "sending": "This issue is being sent and can no longer be changed.",
+      "sent": "This issue was sent and can no longer be changed."
+    },
+    "basics": {
+      "title": "Subject",
+      "subject": "Subject (up to 60 characters is ideal)",
+      "preheader": "Preview text in the inbox",
+      "internal": "Internal title (only you see it)"
+    },
+    "look": {
+      "title": "Look",
+      "light": "Light",
+      "night": "Night",
+      "plain": "Plain",
+      "accent": "Accent color",
+      "header": "Header",
+      "headerModes": {
+        "gradient": "Gradient",
+        "image": "Own image",
+        "none": "None"
+      },
+      "upload": "Upload image (JPG or PNG, up to 1 MB)",
+      "alt": "Image description (for screen readers)",
+      "uploadHint": "The image should be about 1200 x 300 pixels. Without a description it is invisible to some people.",
+      "font": "Font",
+      "fonts": {
+        "serif": "Serif (Georgia)",
+        "sans": "Sans (Arial)"
+      },
+      "button": "Button",
+      "buttons": {
+        "round": "Round",
+        "square": "Square",
+        "outline": "Outlined"
+      },
+      "headings": "Headings",
+      "headingCases": {
+        "normal": "Normal",
+        "upper": "UPPERCASE"
+      }
+    },
+    "toolbar": {
+      "title": "Formatting",
+      "bold": "Bold",
+      "italic": "Italic",
+      "h1": "Heading",
+      "h2": "Small heading",
+      "list": "List",
+      "link": "Link",
+      "placeholder": "Text",
+      "hint": "Select text in the field and press a button. Aa turns the selection into UPPERCASE."
+    },
+    "blocks": {
+      "title": "Blocks",
+      "text": "Text",
+      "entries": "Entries",
+      "button": "Button",
+      "quote": "Quote",
+      "image": "Image",
+      "divider": "Divider",
+      "up": "Move up",
+      "down": "Move down",
+      "remove": "Remove",
+      "entriesDefault": "New in the network",
+      "entriesTitle": "Heading of the entries",
+      "itemTitle": "Text of the entry",
+      "candidates": "To choose from (new, with \"may appear in emails\"):",
+      "noCandidates": "There are no entries with permission right now.",
+      "entriesHint": "No names appear. Check that titles contain none, and edit them if needed.",
+      "quoteBy": "Who (e.g. first name, only with permission)",
+      "quoteHint": "Only use words the person has released for this.",
+      "buttonLabel": "Label"
+    },
+    "send": {
+      "title": "Check and send",
+      "save": "Save",
+      "test": "Send me a test email",
+      "recipients": "Recipients: {count} (only those who confirmed).",
+      "when": "Schedule for (Berlin time)",
+      "schedule": "Schedule",
+      "now": "Send now",
+      "sure": "Really send to {count} people?",
+      "sureYes": "Yes, send",
+      "sureNo": "Cancel",
+      "unschedule": "Back to draft",
+      "nextBatch": "Send next batch",
+      "limitHint": "Sending runs in batches of at most 90 emails. If your email plan has a daily limit, the rest goes out the next morning."
+    },
+    "preview": {
+      "title": "Preview",
+      "phone": "Phone",
+      "desktop": "Desktop",
+      "hint": "This is the email that arrives. Some programs recolor in dark mode, so send yourself a test email first."
+    },
+    "messages": {
+      "saved": "Saved.",
+      "testSent": "Test email is on its way.",
+      "scheduled": "Scheduled.",
+      "unscheduled": "Back to draft.",
+      "uploaded": "Image uploaded.",
+      "sentBatch": "{count} emails sent.",
+      "error_save": "That did not work. Please try again.",
+      "error_locked": "This issue is locked.",
+      "error_send": "Sending failed. Check the email service.",
+      "error_not_configured": "The email service or the secret is not set up.",
+      "error_time": "Please choose a time in the future.",
+      "error_incomplete": "The issue needs a subject and at least one block.",
+      "error_schedule": "Scheduling did not work.",
+      "error_unschedule": "That did not work.",
+      "error_no_file": "Please choose a file.",
+      "error_too_big": "The image is larger than 1 MB.",
+      "error_type": "JPG or PNG only.",
+      "error_upload": "The upload did not work."
+    }
   }
 }

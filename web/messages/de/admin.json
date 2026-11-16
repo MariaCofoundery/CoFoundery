@@ -115,7 +115,8 @@
       "text": "Alles, was Plattform-Admins verwalten, mit den Zahlen davor.",
       "announcements": "Mitteilungen",
       "events": "Events prüfen",
-      "recommendations": "Empfehlungen prüfen"
+      "recommendations": "Empfehlungen prüfen",
+      "newsletter": "Newsletter"
     },
     "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
     "teamChecks": {
@@ -208,5 +209,144 @@
     "showMe": "Mir selbst zeigen",
     "showMeHint": "„Mir selbst zeigen“ legt die Mitteilung nur für dich auf diese Seite, in echter Größe. Es wird nichts veröffentlicht und nichts als gesehen vermerkt.",
     "englishOptional": "Englische Fassung (freiwillig)"
+  },
+  "newsletter": {
+    "back": "Zurück zum Admin",
+    "title": "Newsletter",
+    "intro": "„Aus dem Netzwerk“: Ausgaben bauen, prüfen und an alle schicken, die sich ausdrücklich angemeldet und bestätigt haben. Abgeschickt wird nie von allein.",
+    "new": "Neue Ausgabe",
+    "issues": "Ausgaben",
+    "empty": "Noch keine Ausgabe.",
+    "untitled": "Ohne Titel",
+    "sentOn": "gesendet am {date} an {count}",
+    "sendingProgress": "läuft: {count} Mails raus",
+    "stats": {
+      "title": "Anmeldungen",
+      "confirmed": "bestätigt",
+      "pending": "warten auf Bestätigung",
+      "unsubscribed": "abgemeldet"
+    },
+    "status": {
+      "draft": "Entwurf",
+      "scheduled": "eingeplant",
+      "sending": "wird gesendet",
+      "sent": "gesendet"
+    },
+    "locked": {
+      "scheduled": "Diese Ausgabe ist eingeplant und gesperrt. Mit „Zurück zum Entwurf“ kannst du sie wieder bearbeiten.",
+      "sending": "Diese Ausgabe wird gerade gesendet und lässt sich nicht mehr ändern.",
+      "sent": "Diese Ausgabe ist gesendet und lässt sich nicht mehr ändern."
+    },
+    "basics": {
+      "title": "Betreff",
+      "subject": "Betreff (höchstens 60 Zeichen sind ideal)",
+      "preheader": "Vorschautext im Postfach",
+      "internal": "Interner Titel (siehst nur du)"
+    },
+    "look": {
+      "title": "Look",
+      "light": "Hell",
+      "night": "Nacht",
+      "plain": "Schlicht",
+      "accent": "Akzentfarbe",
+      "header": "Kopf",
+      "headerModes": {
+        "gradient": "Verlauf",
+        "image": "Eigenes Bild",
+        "none": "Ohne"
+      },
+      "upload": "Bild hochladen (JPG oder PNG, bis 1 MB)",
+      "alt": "Bildbeschreibung (für Screenreader)",
+      "uploadHint": "Das Bild sollte etwa 1200 × 300 Pixel haben. Ohne Beschreibung ist es für manche Menschen unsichtbar.",
+      "font": "Schrift",
+      "fonts": {
+        "serif": "Serif (Georgia)",
+        "sans": "Sans (Arial)"
+      },
+      "button": "Knopf",
+      "buttons": {
+        "round": "Rund",
+        "square": "Eckig",
+        "outline": "Umrandet"
+      },
+      "headings": "Überschriften",
+      "headingCases": {
+        "normal": "Normal",
+        "upper": "GROSSBUCHSTABEN"
+      }
+    },
+    "toolbar": {
+      "title": "Formatierung",
+      "bold": "Fett",
+      "italic": "Kursiv",
+      "h1": "Überschrift",
+      "h2": "Kleine Überschrift",
+      "list": "Liste",
+      "link": "Link",
+      "placeholder": "Text",
+      "hint": "Markiere Text im Feld und drücke einen Knopf. Aa macht die Auswahl zu GROSSBUCHSTABEN."
+    },
+    "blocks": {
+      "title": "Bausteine",
+      "text": "Text",
+      "entries": "Einträge",
+      "button": "Knopf",
+      "quote": "Zitat",
+      "image": "Bild",
+      "divider": "Trennlinie",
+      "up": "Nach oben",
+      "down": "Nach unten",
+      "remove": "Entfernen",
+      "entriesDefault": "Neu im Netzwerk",
+      "entriesTitle": "Überschrift der Einträge",
+      "itemTitle": "Text des Eintrags",
+      "candidates": "Zur Auswahl (neu, mit „darf in Mails erscheinen“):",
+      "noCandidates": "Gerade gibt es keine Einträge mit Erlaubnis.",
+      "entriesHint": "Es erscheinen keine Namen. Prüfe, dass in den Titeln keine stehen, und ändere sie bei Bedarf.",
+      "quoteBy": "Wer (z. B. Vorname, nur mit Erlaubnis)",
+      "quoteHint": "Nur Worte verwenden, die die Person dafür freigegeben hat.",
+      "buttonLabel": "Beschriftung"
+    },
+    "send": {
+      "title": "Prüfen und senden",
+      "save": "Speichern",
+      "test": "Testmail an mich",
+      "recipients": "Empfänger: {count} (nur wer bestätigt hat).",
+      "when": "Einplanen für (Berliner Zeit)",
+      "schedule": "Einplanen",
+      "now": "Jetzt senden",
+      "sure": "Wirklich an {count} Personen senden?",
+      "sureYes": "Ja, senden",
+      "sureNo": "Abbrechen",
+      "unschedule": "Zurück zum Entwurf",
+      "nextBatch": "Nächstes Paket senden",
+      "limitHint": "Der Versand läuft in Paketen von höchstens 90 Mails. Wenn dein Mail-Tarif ein Tageslimit hat, geht der Rest am nächsten Morgen raus."
+    },
+    "preview": {
+      "title": "Vorschau",
+      "phone": "Handy",
+      "desktop": "Rechner",
+      "hint": "Das ist die Mail, die ankommt. Manche Programme färben im Dunkelmodus Farben um, schick dir deshalb vorher eine Testmail."
+    },
+    "messages": {
+      "saved": "Gespeichert.",
+      "testSent": "Testmail ist unterwegs.",
+      "scheduled": "Eingeplant.",
+      "unscheduled": "Zurück im Entwurf.",
+      "uploaded": "Bild hochgeladen.",
+      "sentBatch": "{count} Mails gesendet.",
+      "error_save": "Das hat nicht geklappt. Bitte versuch es noch einmal.",
+      "error_locked": "Diese Ausgabe ist gesperrt.",
+      "error_send": "Der Versand hat nicht geklappt. Prüfe den Mail-Dienst.",
+      "error_not_configured": "Der Mail-Dienst oder das Geheimnis ist nicht eingerichtet.",
+      "error_time": "Bitte wähle einen Zeitpunkt in der Zukunft.",
+      "error_incomplete": "Die Ausgabe braucht einen Betreff und mindestens einen Baustein.",
+      "error_schedule": "Einplanen hat nicht geklappt.",
+      "error_unschedule": "Das hat nicht geklappt.",
+      "error_no_file": "Bitte wähle eine Datei.",
+      "error_too_big": "Das Bild ist größer als 1 MB.",
+      "error_type": "Nur JPG oder PNG.",
+      "error_upload": "Das Hochladen hat nicht geklappt."
+    }
   }
 }

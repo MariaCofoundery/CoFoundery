@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AllowInMailsToggle } from "@/features/newsletter/AllowInMailsToggle";
 import { ThanksHeart } from "@/features/connect/thanks/ThanksBits"; import { notFound } from "next/navigation"; import { getLocale, getTranslations } from "next-intl/server";
 import { doorTitle } from "@/features/connect/doors/doorLabels";
 import { listDoorsOf } from "@/features/connect/doors/doorsData";
@@ -97,6 +98,7 @@ export default async function ListingDetail({ params, searchParams }: { params: 
               <p className="text-[#5f5e7a]">{listing.industries.join(" · ")}</p>
             </section>
           ) : null}
+          {ownActive ? <AllowInMailsToggle kind="listing" id={listing.id} allowed={listing.allow_in_mails === true} t={t} /> : null}
           {ownActive && aiAvailable ? <ListingAiSection listingId={listing.id} jobState={aiJobState} /> : null}
           <DisclosedCapability
             rows={disclosedCapability}
