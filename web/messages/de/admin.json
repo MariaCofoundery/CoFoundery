@@ -348,7 +348,13 @@
       "error_too_big": "Das Bild ist größer als 1 MB.",
       "error_type": "Nur JPG oder PNG.",
       "error_upload": "Das Hochladen hat nicht geklappt."
-    }
+    },
+    "welcomeTitle": "Willkommensmail",
+    "welcomeText": "Geht einmal direkt nach der Bestätigung an jede neue Abonnentin und jeden neuen Abonnenten, in der Sprache des Kontos. Wer schon bestätigt hat, bekommt sie nicht automatisch. Hier schickst du dir eine Testmail.",
+    "welcomeDe": "Testmail Deutsch an mich",
+    "welcomeEn": "Testmail Englisch an mich",
+    "welcomeSent": "Testmail ist unterwegs.",
+    "welcomeError": "Der Versand hat nicht geklappt. Prüfe den Mail-Dienst."
   },
   "eventsQr": {
     "back": "Zurück zum Admin",

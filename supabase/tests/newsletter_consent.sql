@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(12);
+select extensions.plan(18);
 
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at) values
 ('00000000-0000-0000-0000-000000000000','f4300000-0000-4000-8000-000000000001','authenticated','authenticated','news-a@example.com','',now(),'{}','{}',now(),now()),
@@ -30,6 +30,17 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"f4300000-0000-4000-8000-000000000001","role":"authenticated"}';
 select extensions.is(public.request_newsletter('dashboard'), true, 'after unsubscribing, a new yes starts again and asks for confirmation');
 select extensions.is((select status from public.newsletter_subscriptions where user_id = 'f4300000-0000-4000-8000-000000000001'), 'pending', 'it is pending again, not confirmed');
+
+reset role;
+set local role service_role;
+select extensions.is(public.claim_newsletter_welcome('f4300000-0000-4000-8000-000000000002'), false, 'no welcome for someone who has not confirmed');
+select extensions.is(public.confirm_newsletter('f4300000-0000-4000-8000-000000000001'), true, 'confirming again after the new yes');
+select extensions.is(public.claim_newsletter_welcome('f4300000-0000-4000-8000-000000000001'), true, 'the first claim gets the welcome mail');
+select extensions.is(public.claim_newsletter_welcome('f4300000-0000-4000-8000-000000000001'), false, 'a second claim gets nothing: the mail goes out once');
+select extensions.is(public.release_newsletter_welcome('f4300000-0000-4000-8000-000000000001') and public.claim_newsletter_welcome('f4300000-0000-4000-8000-000000000001'), true, 'a failed send can be released and tried again');
+reset role;
+set local role authenticated;
+select extensions.throws_ok($$select public.claim_newsletter_welcome('f4300000-0000-4000-8000-000000000001')$$, '42501', null, 'members cannot claim it');
 
 select * from extensions.finish();
 rollback;

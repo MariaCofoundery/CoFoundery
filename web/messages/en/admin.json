@@ -348,7 +348,13 @@
       "error_too_big": "The image is larger than 1 MB.",
       "error_type": "JPG or PNG only.",
       "error_upload": "The upload did not work."
-    }
+    },
+    "welcomeTitle": "Welcome email",
+    "welcomeText": "Goes out once, right after confirming, to every new subscriber, in the language of their account. People who already confirmed do not get it automatically. Here you send yourself a test email.",
+    "welcomeDe": "Send German test to me",
+    "welcomeEn": "Send English test to me",
+    "welcomeSent": "Test email is on its way.",
+    "welcomeError": "Sending did not work. Check the mail service."
   },
   "eventsQr": {
     "back": "Back to admin",

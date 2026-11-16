@@ -1,6 +1,7 @@
 import { createClient } from "@supabase/supabase-js";
 import { getTranslations } from "next-intl/server";
 import { isValidNewsletterToken } from "@/features/newsletter/newsletterToken";
+import { sendWelcomeAfterConfirm } from "@/features/newsletter/newsletterWelcome";
 
 export const dynamic = "force-dynamic";
 
@@ -19,7 +20,9 @@ async function apply(formData: FormData) {
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
   if (!url || !key || !isValidNewsletterToken(userId, "confirm", token, secret)) return;
   const client = createClient(url, key, { auth: { autoRefreshToken: false, persistSession: false } });
-  await client.rpc("confirm_newsletter", { p_user_id: userId });
+  const { data: confirmed } = await client.rpc("confirm_newsletter", { p_user_id: userId });
+  // Direkt danach die Willkommensmail (einmalig; ein Fehler dabei kippt die Zusage nicht).
+  if (confirmed === true) await sendWelcomeAfterConfirm(client, userId, secret);
 }
 
 export default async function Page({ searchParams }: { searchParams: Promise<{ u?: string; t?: string; fertig?: string }> }) {
