@@ -354,7 +354,16 @@
     "welcomeDe": "Send German test to me",
     "welcomeEn": "Send English test to me",
     "welcomeSent": "Test email is on its way.",
-    "welcomeError": "Sending did not work. Check the mail service."
+    "welcomeError": "Sending did not work. Check the mail service.",
+    "importTitle": "Paste a draft",
+    "importText": "The newsletter skill writes an issue as JSON text. Paste it here: it becomes a new issue in draft that you review in the editor. Nothing is sent.",
+    "importLabel": "Draft (JSON)",
+    "importButton": "Create as draft",
+    "importEmpty": "Please paste the draft first.",
+    "importInvalid": "That is not valid JSON. Please copy the whole draft from the skill.",
+    "importTooBig": "The draft is too long.",
+    "importNoContent": "The draft needs a subject and at least one block.",
+    "importSave": "Creating it did not work. Please try again."
   },
   "eventsQr": {
     "back": "Back to admin",

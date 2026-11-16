@@ -354,7 +354,16 @@
     "welcomeDe": "Testmail Deutsch an mich",
     "welcomeEn": "Testmail Englisch an mich",
     "welcomeSent": "Testmail ist unterwegs.",
-    "welcomeError": "Der Versand hat nicht geklappt. Prüfe den Mail-Dienst."
+    "welcomeError": "Der Versand hat nicht geklappt. Prüfe den Mail-Dienst.",
+    "importTitle": "Entwurf einfügen",
+    "importText": "Der Newsletter-Skill schreibt eine Ausgabe als Text im JSON-Format. Füge ihn hier ein: Daraus wird eine neue Ausgabe im Entwurf, die du im Editor prüfst. Gesendet wird nichts.",
+    "importLabel": "Entwurf (JSON)",
+    "importButton": "Als Entwurf anlegen",
+    "importEmpty": "Bitte füge zuerst den Entwurf ein.",
+    "importInvalid": "Das ist kein gültiges JSON. Bitte kopiere den ganzen Entwurf vom Skill.",
+    "importTooBig": "Der Entwurf ist zu lang.",
+    "importNoContent": "Der Entwurf braucht einen Betreff und mindestens einen Baustein.",
+    "importSave": "Das Anlegen hat nicht geklappt. Bitte versuch es noch einmal."
   },
   "eventsQr": {
     "back": "Zurück zum Admin",

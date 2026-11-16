@@ -2,7 +2,7 @@ import Link from "next/link";
 import type { Metadata } from "next";
 import { getLocale, getTranslations } from "next-intl/server";
 import { requirePlatformAdmin } from "@/features/moderation/access";
-import { createNewsletterIssueAction } from "@/features/newsletter/newsletterAdminActions";
+import { createNewsletterIssueAction, importNewsletterDraftAction } from "@/features/newsletter/newsletterAdminActions";
 import { sendWelcomeTestAction } from "@/features/newsletter/newsletterWelcomeAdminActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -12,7 +12,7 @@ type Row = { id: string; title: string; subject: string; status: "draft" | "sche
 
 const PILL: Record<Row["status"], string> = { draft: "bg-amber-100 text-amber-900", scheduled: "bg-sky-100 text-sky-900", sending: "bg-violet-100 text-violet-900", sent: "bg-emerald-100 text-emerald-900" };
 
-export default async function NewsletterAdminPage({ searchParams }: { searchParams: Promise<{ error?: string; welcome?: string }> }) {
+export default async function NewsletterAdminPage({ searchParams }: { searchParams: Promise<{ error?: string; welcome?: string; import?: string }> }) {
   const client = await requirePlatformAdmin();
   const params = await searchParams;
   const [t, locale, issues, stats] = await Promise.all([
@@ -28,6 +28,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
       <h1 className="mt-4 text-3xl font-semibold text-slate-950">{t("title")}</h1>
       <p className="mt-2 max-w-2xl text-base leading-7 text-slate-600">{t("intro")}</p>
       {params.error ? <p role="alert" className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t("messages.error_save")}</p> : null}
+      {params.import ? <p role="alert" className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(({ empty: "importEmpty", invalid: "importInvalid", too_big: "importTooBig", no_content: "importNoContent" } as Record<string, string>)[params.import] ?? "importSave")}</p> : null}
       {params.welcome === "sent" ? <p role="status" className="mt-4 rounded-2xl bg-emerald-50 p-3 text-sm text-emerald-900">{t("welcomeSent")}</p> : null}
       {params.welcome === "error" ? <p role="alert" className="mt-4 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t("welcomeError")}</p> : null}
       <section className="mt-6 grid gap-3 sm:grid-cols-3" aria-label={t("stats.title")}>
@@ -47,6 +48,15 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
             </form>
           ))}
         </div>
+      </section>
+      <section className="mt-6 rounded-2xl border border-[#d9dcec] bg-white p-4" aria-labelledby="import-title">
+        <h2 id="import-title" className="text-lg font-semibold">{t("importTitle")}</h2>
+        <p className="mt-1 max-w-2xl text-sm leading-6 text-slate-600">{t("importText")}</p>
+        <form action={importNewsletterDraftAction} className="mt-3 space-y-3">
+          <label className="block text-sm font-semibold text-slate-900" htmlFor="draft">{t("importLabel")}</label>
+          <textarea id="draft" name="draft" rows={6} spellCheck={false} className="w-full rounded-xl border border-[#c9ccdf] bg-white p-3 font-mono text-sm" />
+          <SubmitButton label={t("importButton")} pendingLabel="…" className="min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white" />
+        </form>
       </section>
       <h2 className="mt-8 text-lg font-semibold">{t("issues")}</h2>
       {rows.length === 0 ? <p className="mt-2 text-sm text-slate-600">{t("empty")}</p> : (

@@ -5,6 +5,7 @@ import { randomUUID } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePlatformAdmin } from "@/features/moderation/access";
+import { parseDraftJson } from "@/features/newsletter/newsletterDraftImport";
 import { emptyIssue, issueToPayload, normalizeIssue } from "@/features/newsletter/newsletterModel";
 import { renderNewsletterHtml, renderNewsletterText } from "@/features/newsletter/newsletterRender";
 import { renderContextFor, runNewsletterSend } from "@/features/newsletter/newsletterSend";
@@ -28,6 +29,24 @@ export async function createNewsletterIssueAction() {
   }
   const { data: id, error } = await client.rpc("admin_save_newsletter_issue", { p_id: null, p: issueToPayload(emptyIssue(base)) });
   if (error || !id) redirect(`${BASE}?error=create`);
+  redirect(`${BASE}/${id}`);
+}
+
+/** Einen vom Skill geschriebenen Entwurf (JSON) einfuegen: wird eine neue Ausgabe im Entwurf, nie ein Versand. */
+export async function importNewsletterDraftAction(formData: FormData) {
+  const client = await requirePlatformAdmin();
+  const { data: last } = await client.rpc("admin_list_newsletter_issues");
+  const lastId = ((last ?? []) as { id: string }[])[0]?.id;
+  let base = {};
+  if (lastId) {
+    const { data } = await client.rpc("admin_get_newsletter_issue", { p_id: lastId });
+    const row = (data as Record<string, unknown>[] | null)?.[0];
+    if (row) base = { look: row.look, accent: row.accent, headerMode: row.header_mode, font: row.font, buttonStyle: row.button_style, headingCase: row.heading_case };
+  }
+  const parsed = parseDraftJson(String(formData.get("draft") ?? ""), base);
+  if (!parsed.ok) redirect(`${BASE}?import=${parsed.error}`);
+  const { data: id, error } = await client.rpc("admin_save_newsletter_issue", { p_id: null, p: issueToPayload(parsed.issue) });
+  if (error || !id) redirect(`${BASE}?import=save`);
   redirect(`${BASE}/${id}`);
 }
 
