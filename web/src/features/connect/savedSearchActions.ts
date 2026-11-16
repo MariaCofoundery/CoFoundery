@@ -102,3 +102,29 @@ export async function deleteConnectSearchAction(formData: FormData) {
   revalidatePath("/connect/searches");
   redirect("/connect/searches?saved=deleted");
 }
+
+/**
+ * Die einfache Form der Suche: ein Wort, ein Ort. Gedacht fuer die Startkarte und den leeren Treffer ("nichts passt - sag uns, was du suchst").
+ * Der Name entsteht aus den Angaben, die Mails sind angeschaltet - wer die Karte ausfuellt, hat darum gebeten.
+ */
+export async function quickSaveConnectSearchAction(formData: FormData) {
+  const { client, user } = await requireConnectMember("/connect");
+  const topic = String(formData.get("topic") ?? "").trim().slice(0, 60);
+  const location = String(formData.get("location") ?? "").trim().slice(0, 60);
+  if (topic.length < 2) redirect("/connect?error=search_empty");
+  const { error } = await client.from("saved_searches").insert({
+    user_id: user.id,
+    context: "connect",
+    label: (location ? `${topic} · ${location}` : topic).slice(0, 80),
+    query: topic,
+    topics: [],
+    industries: [],
+    locations: location ? [location] : [],
+    capability_area_ids: [],
+    include_listings: true,
+    include_problems: true,
+  });
+  if (error) redirect(`/connect?error=${error.message.includes("not_empty") ? "search_empty" : "save"}`);
+  revalidatePath("/connect/searches");
+  redirect("/connect/searches?saved=created");
+}

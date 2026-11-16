@@ -18,6 +18,8 @@ import { hasProfileRole } from "@/features/profile/profileRoles";
 import { CapabilityAreaPicker } from "@/features/capability/CapabilityAreaPicker";
 import { getCapabilityVocabulary } from "@/features/capability/capabilityData";
 import { generateConnectSuggestions, getOwnConnectSuggestions } from "@/features/connect/connectSuggestionData";
+import { SearchStarter } from "@/features/connect/SearchStarter";
+import { getOwnSavedSearches } from "@/features/connect/savedSearchData";
 import { saveConnectSearchAction } from "@/features/connect/savedSearchActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 
@@ -60,6 +62,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
     selectedKinds.join() !== DEFAULT_FEED_KINDS.join(), (filters.topic ?? "").trim().length > 0,
     (filters.location ?? "").trim().length > 0, selectedWork.length > 0,
   ].filter(Boolean).length;
+  const savedSearchCount = (await getOwnSavedSearches(client, "connect").catch(() => [])).length;
   const connectAttentionCount = getConnectAttentionCount(incomingContacts, unreadMessages);
   const cofounderHref = coFounderBridgeHref(hasProfileRole(baseProfile?.roles, "founder"));
   return <main className="min-h-screen bg-[radial-gradient(circle_at_top_left,rgba(103,232,249,.13),transparent_30%),linear-gradient(180deg,#fff,#f8fafc)] px-5 py-8 text-slate-950 md:px-8">
@@ -88,6 +91,9 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
           <Link href="/connect/suggestions" className="inline-flex min-h-11 items-center rounded-xl bg-[#f1f0f7] px-4 text-sm font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t("suggestions.all")}</Link>
         </section>
       ) : null}
+
+      {/* Die Suche ganz vorn, solange es keine gibt: ein Wort, ein Ort, und Connect meldet sich. */}
+      {savedSearchCount === 0 && !isFiltered ? <SearchStarter t={t} topics={topicSuggestions} places={placeSuggestions} /> : null}
 
       {/* Suche und Einstellen in einer Zeile. Das Suchfeld liegt ausserhalb des
           Formulars und gehoert ueber `form` dazu; "Eintrag erstellen" klappt
@@ -204,6 +210,7 @@ export default async function ConnectPage({ searchParams }: { searchParams: Prom
             Mensch hier - "kein Eintrag passt zu allen Kriterien" und ein
             Knopf "Filter zuruecksetzen", der nichts tut, liest sich dann
             wie eine Stoerung. */}
+        {isFiltered ? <div className="mb-6 text-left"><SearchStarter t={t} compact topic={filters.topic || filters.q || ""} location={filters.location || ""} topics={topicSuggestions} places={placeSuggestions} /></div> : null}
         <h2 className="text-xl font-semibold">{t(isFiltered ? "empty.title" : "empty.firstTitle")}</h2>
         <p className="mt-2 text-sm text-slate-600">{t(isFiltered ? "empty.text" : "empty.firstText")}</p>
         <div className="mt-5 flex flex-wrap justify-center gap-3">

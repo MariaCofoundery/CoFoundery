@@ -760,7 +760,19 @@
     },
     "capabilitiesTitle": "Require particular capabilities",
     "capabilitiesText": "Only entries from people who have disclosed at least one of these areas will trigger a notification. Anyone keeping their capabilities private never shows up here.",
-    "unknownCapability": "Additional capability area"
+    "unknownCapability": "Additional capability area",
+    "starter": {
+      "title": "Tell us what you are looking for",
+      "titleEmpty": "Nothing fits? Tell us what you are looking for",
+      "text": "We will let you know when someone posts something that fits. You do not have to check every day.",
+      "what": "What are you looking for?",
+      "whatPlaceholder": "For example: tax advice",
+      "where": "Where? (optional)",
+      "wherePlaceholder": "For example: Leipzig",
+      "save": "Save search",
+      "note": "You get a short email, only when something new fits. You can switch it off any time under \"My searches\". The email contains no names.",
+      "manage": "See my searches ({count})"
+    }
   },
   "ventures": {
     "title": "What you have built",

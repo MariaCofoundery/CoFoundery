@@ -108,3 +108,15 @@ test("direct thanks have limits in the database: once per person per 90 days, fi
   assert.match(sql, /is_network_interaction_blocked/);
   assert.match(sql, /p_helper_user_id = v_me/);
 });
+
+test("the search starter sits at the front of Connect and in the empty result, and its mails carry no names", () => {
+  const page = read("src/app/(product)/connect/page.tsx");
+  assert.match(page, /savedSearchCount === 0 && !isFiltered \? <SearchStarter/);
+  assert.match(page, /<SearchStarter t=\{t\} compact/);
+  const action = read("src/features/connect/savedSearchActions.ts");
+  assert.match(action, /quickSaveConnectSearchAction/);
+  for (const lang of ["de", "en"]) {
+    const note = JSON.parse(read(`messages/${lang}/connect.json`)).searches.starter.note;
+    assert.match(note, /Namen|names/);
+  }
+});

@@ -760,7 +760,19 @@
     },
     "capabilitiesTitle": "Bestimmte Fähigkeiten verlangen",
     "capabilitiesText": "Nur Einträge von Menschen, die mindestens einen dieser Bereiche freigegeben haben, lösen eine Meldung aus. Wer seine Fähigkeiten privat hält, taucht hier nie auf.",
-    "unknownCapability": "Weiterer Fähigkeitsbereich"
+    "unknownCapability": "Weiterer Fähigkeitsbereich",
+    "starter": {
+      "title": "Sag uns, was du suchst",
+      "titleEmpty": "Nichts Passendes? Sag uns, was du suchst",
+      "text": "Wir melden uns, wenn jemand etwas einstellt, das dazu passt. Du musst nicht jeden Tag nachsehen.",
+      "what": "Wonach suchst du?",
+      "whatPlaceholder": "Zum Beispiel: Steuerberatung",
+      "where": "Wo? (freiwillig)",
+      "wherePlaceholder": "Zum Beispiel: Leipzig",
+      "save": "Suche speichern",
+      "note": "Du bekommst eine kurze Mail, höchstens wenn etwas Neues passt. Jederzeit unter „Meine Suchen“ abstellbar. In der Mail stehen keine Namen.",
+      "manage": "Meine Suchen ansehen ({count})"
+    }
   },
   "ventures": {
     "title": "Was du aufgebaut hast",

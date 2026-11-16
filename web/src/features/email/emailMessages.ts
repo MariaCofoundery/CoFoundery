@@ -470,8 +470,8 @@ export function getNetworkNotificationEmailCopy(
         // Made2Found - nicht in einem Postfach, dessen Weg wir nicht kennen.
         intro:
           count === 1
-            ? "Something in Connect overlaps with what you wrote about yourself. Every suggestion shows you the word that triggered it."
-            : `${count} things in Connect overlap with what you wrote about yourself. Every suggestion shows you the word that triggered it.`,
+            ? "Someone in the community posted something that fits what you wrote about yourself. Do you have an idea, or can it help you? Every suggestion shows you the word that triggered it."
+            : `${count} things from the community fit what you wrote about yourself. Do you have an idea, or can one of them help you? Every suggestion shows you the word that triggered it.`,
         cta: "Open suggestions",
       },
       program_update: {
@@ -560,8 +560,8 @@ export function getNetworkNotificationEmailCopy(
       // Made2Found - nicht in einem Postfach, dessen Weg wir nicht kennen.
       intro:
         count === 1
-          ? "In Connect gibt es etwas, das sich mit deinen eigenen Angaben überschneidet. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat."
-          : `In Connect gibt es ${count} Dinge, die sich mit deinen eigenen Angaben überschneiden. Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.`,
+          ? "Jemand aus der Community hat etwas eingestellt, das zu deinen Angaben passt. Hast du eine Idee, oder kann es dir helfen? Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat."
+          : `Aus der Community gibt es ${count} Dinge, die zu deinen Angaben passen. Hast du eine Idee, oder kann eines davon dir helfen? Jeder Vorschlag zeigt dir das Wort, das ihn ausgelöst hat.`,
       cta: "Vorschläge öffnen",
     },
     program_update: {
