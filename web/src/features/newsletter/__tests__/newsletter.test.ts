@@ -51,3 +51,12 @@ test("the question appears in settings, on the dashboard and after 'no time' - a
   assert.match(read("src/features/dashboard/DashboardAside.tsx"), /newsletter !== "confirmed" \? <NewsletterAsk/);
   assert.match(read("src/app/welcome/morgen/page.tsx"), /source="welcome"/);
 });
+
+import { ACCOUNT_EXPORT_PAIR_TABLES, ACCOUNT_EXPORT_TABLES } from "@/features/account/accountExport";
+
+test("the data export contains the newsletter consent, reminders, mail opt-ins and both sides of a thanks", () => {
+  const tables = ACCOUNT_EXPORT_TABLES.map((entry) => entry.table) as string[];
+  for (const name of ["newsletter_subscriptions", "onboarding_reminders", "notification_opt_ins"]) assert.ok(tables.includes(name), name);
+  const pair = ACCOUNT_EXPORT_PAIR_TABLES.find((entry) => entry.table === "network_thanks");
+  assert.deepEqual(pair?.columns, ["thanker_user_id", "helper_user_id"]);
+});

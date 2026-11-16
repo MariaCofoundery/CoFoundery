@@ -23,6 +23,10 @@ const EXPORTED_TABLES = [
   { table: "profiles", column: "user_id" },
   { table: "research_consent_preferences", column: "user_id" },
   { table: "notification_opt_outs", column: "user_id" },
+  // Zustimmungen fuer Mails (Vorschlaege, Check-in, Programm-Updates), Newsletter mit Nachweis (Anfrage, Bestaetigung, Abmeldung) und die Erinnerung nach dem Einstieg (seit 20270430).
+  { table: "notification_opt_ins", column: "user_id" },
+  { table: "newsletter_subscriptions", column: "user_id" },
+  { table: "onboarding_reminders", column: "user_id" },
   // Feierabend-Zeiten (seit 20270317120000).
   { table: "notification_quiet_hours", column: "user_id" },
   // Welche Mitteilungen der Plattform diese Person gesehen oder weggeklickt hat.
@@ -134,6 +138,8 @@ const EXPORTED_TABLES = [
 const PAIR_TABLES = [
   { table: "invitations", columns: ["inviter_user_id", "invitee_user_id"] },
   { table: "relationships", columns: ["user_a_id", "user_b_id"] },
+  // Dank in Connect: was ich ausgesprochen habe und was mir gesagt wurde (beide Seiten sehen ihren Dank).
+  { table: "network_thanks", columns: ["thanker_user_id", "helper_user_id"] },
 ] as const;
 
 /**
