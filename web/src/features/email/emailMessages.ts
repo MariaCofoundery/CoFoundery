@@ -382,6 +382,8 @@ export type NetworkNotificationCopyKind =
   | "message"
   | "discovery_intro_request"
   | "discovery_intro_accepted"
+  // Dank in Connect (20270429): nennt nur den Vornamen, nie die Worte.
+  | "connect_thanks"
   // DAZUGEKOMMEN AM 21.09.2026 und die erste Art, hinter der KEIN Mensch
   // steht: Alle uebrigen entstehen, weil jemand sich gemeldet hat. Diese
   // entsteht, weil eine Mengenschnittmenge etwas gefunden hat - deshalb geht
@@ -456,6 +458,12 @@ export function getNetworkNotificationEmailCopy(
         headline: "A request to be introduced",
         intro: `${name} found your profile in Find and would like to get to know you. Your answer decides whether the two of you get in touch.`,
         cta: "Open the request",
+      },
+      connect_thanks: {
+        subject: `${name} thanked you`,
+        headline: "Someone said thank you",
+        intro: `${name} thanked you for your help. Have a look at what it was for.`,
+        cta: "See the thanks",
       },
       discovery_intro_accepted: {
         subject: `${name} said yes`,
@@ -546,6 +554,12 @@ export function getNetworkNotificationEmailCopy(
       headline: "Eine Vorstellungsanfrage",
       intro: `${name} hat dein Profil in Find gefunden und möchte dich kennenlernen. Deine Antwort entscheidet, ob ihr in Kontakt kommt.`,
       cta: "Anfrage öffnen",
+    },
+    connect_thanks: {
+      subject: `${name} hat sich bei dir bedankt`,
+      headline: "Jemand sagt Danke",
+      intro: `${name} hat sich für deine Hilfe bei dir bedankt. Schau, wobei du geholfen hast.`,
+      cta: "Dank ansehen",
     },
     discovery_intro_accepted: {
       subject: `${name} hat zugesagt`,

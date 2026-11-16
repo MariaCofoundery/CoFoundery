@@ -469,6 +469,10 @@
         "org_chat": {
           "title": "Chat im Teamraum",
           "text": "Neue Nachrichten im Teamchat und in deinen Direktchats – als Mitteilung aufs Gerät, ohne den Text. Einzelne Chats kannst du auch dort stummschalten."
+        },
+        "connect_thanks": {
+          "title": "Jemand sagt Danke",
+          "text": "Wenn sich jemand für deine Hilfe bei dir bedankt. Die Mail nennt nur den Vornamen, nie die Worte."
         }
       },
       "alwaysSent": "Einladungen schicken wir immer. Sie sind nicht eine Nachricht über eine Sache, sondern die Sache selbst – ohne sie käme die Einladung nicht an.",

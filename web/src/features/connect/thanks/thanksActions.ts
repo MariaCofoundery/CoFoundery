@@ -2,6 +2,7 @@
 import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requireConnectMember } from "@/features/connect/connectAccess";
+import { runThanksNotifications } from "./thanksNotifications";
 import { parseDirectThanksForm, parseThanksForm, thanksHref } from "./thanksModel";
 
 const CONTACTS = "/connect/contacts";
@@ -15,6 +16,7 @@ export async function sendThanksAction(formData: FormData) {
     p_conversation_id: parsed.conversationId, p_help_types: parsed.helpTypes, p_outcome: parsed.outcome ?? "", p_body: parsed.body ?? "", p_show: parsed.show,
   });
   if (error) redirect(`${CONTACTS}?error=thanks`);
+  await runThanksNotifications().catch(() => null);
   revalidatePath(CONTACTS);
   redirect(`${CONTACTS}?changed=thanked`);
 }
@@ -47,6 +49,7 @@ export async function sendDirectThanksAction(formData: FormData) {
     p_outcome: parsed!.outcome ?? "", p_body: parsed!.body ?? "", p_show: parsed!.show,
   });
   if (error) back(error.message.includes("thanks_recent") ? "recent" : error.message.includes("thanks_limit") ? "limit" : "failed");
+  await runThanksNotifications().catch(() => null);
   revalidatePath(CONTACTS);
   redirect(`/connect/people/${encodeURIComponent(parsed!.helperUserId)}?thanked=1`);
 }

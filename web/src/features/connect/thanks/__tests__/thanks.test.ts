@@ -120,3 +120,24 @@ test("the search starter sits at the front of Connect and in the empty result, a
     assert.match(note, /Namen|names/);
   }
 });
+
+import { getNetworkNotificationEmailCopy } from "@/features/email/emailMessages";
+
+test("the thanks mail names the first name and never the words, in German and English", () => {
+  const de = getNetworkNotificationEmailCopy("de", { kind: "connect_thanks", senderName: "Jonas" });
+  assert.match(de.subject, /Jonas hat sich bei dir bedankt/);
+  assert.equal(getNetworkNotificationEmailCopy("de", { kind: "connect_thanks", senderName: null }).subject, "Jemand hat sich bei dir bedankt");
+  const en = getNetworkNotificationEmailCopy("en", { kind: "connect_thanks", senderName: "Jonas" });
+  assert.match(en.subject, /Jonas thanked you/);
+  assert.doesNotMatch(JSON.stringify(en), /[äöüÄÖÜß]/);
+});
+
+test("the mail goes out right after the thanks and again in the daily run (stamped once in the database)", () => {
+  const actions = read("src/features/connect/thanks/thanksActions.ts");
+  assert.equal((actions.match(/runThanksNotifications\(\)/g) ?? []).length, 2);
+  assert.match(read("src/app/api/cron/connect-suggestions/route.ts"), /runThanksNotifications\(50\)/);
+  const sql = read("../supabase/migrations/20270429120000_connect_thanks_mail.sql");
+  assert.match(sql, /'connect_thanks'/);
+  assert.match(sql, /revoke all on function public\.prepare_thanks_notifications\(integer\) from public, anon, authenticated/);
+  assert.doesNotMatch(read("src/features/connect/thanks/thanksNotifications.ts"), /\.body\b/, "the words are never part of the mail");
+});

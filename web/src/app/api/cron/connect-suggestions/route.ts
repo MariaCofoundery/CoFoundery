@@ -3,6 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { runProgramUpdateReminders } from "@/features/advisor/programUpdateReminders";
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
+import { runThanksNotifications } from "@/features/connect/thanks/thanksNotifications";
 import { runNewsletterSend } from "@/features/newsletter/newsletterSend";
 import { runOnboardingReminders } from "@/features/onboarding/onboardingReminders";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
@@ -78,6 +79,8 @@ export async function GET(request: NextRequest) {
   const onboarding = await runOnboardingReminders().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   // Newsletter (20270428120000): faellige Ausgaben, ein Paket je Lauf. Ohne geplante Ausgabe passiert nichts.
   const newsletter = await runNewsletterSend().catch(() => ({ ok: false as const, reason: "send_failed" }));
+  // Danks, deren Mail beim Danke nicht rausging (Mail-Dienst kurz weg): hier nachgeholt, hoechstens 7 Tage zurueck.
+  await runThanksNotifications(50).catch(() => null);
   const newsletterOk = newsletter.ok || ("reason" in newsletter && newsletter.reason === "not_configured");
   const result = await runSuggestionNotifications(BATCH);
   await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok && onboarding.ok && newsletterOk);

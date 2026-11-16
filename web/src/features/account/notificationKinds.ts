@@ -26,6 +26,7 @@
 export const NOTIFICATION_KINDS = [
   { kind: "contact_request", area: "connect" },
   { kind: "message", area: "connect" },
+  { kind: "connect_thanks", area: "connect" },
   { kind: "problem_interest", area: "connect" },
   { kind: "connect_saved_search", area: "connect" },
   { kind: "connect_suggestions", area: "connect" },

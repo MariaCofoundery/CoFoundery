@@ -43,7 +43,8 @@ export type NetworkNotificationKind =
   | "approach_interest"
   | "message"
   | "discovery_intro_request"
-  | "discovery_intro_accepted";
+  | "discovery_intro_accepted"
+  | "connect_thanks";
 
 async function claim(
   client: SupabaseClient,

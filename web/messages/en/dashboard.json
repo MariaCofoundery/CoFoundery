@@ -469,6 +469,10 @@
         "org_chat": {
           "title": "Chat in the team space",
           "text": "New messages in the team chat and your direct chats – as a notification on your device, without the text. You can also mute single chats there."
+        },
+        "connect_thanks": {
+          "title": "Someone says thank you",
+          "text": "When someone thanks you for your help. The email only names the first name, never the words."
         }
       },
       "alwaysSent": "We always send invitations. They aren't a message about a thing – they are the thing; without them the invitation wouldn't reach you.",

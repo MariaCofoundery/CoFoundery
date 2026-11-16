@@ -2,7 +2,7 @@
 
 begin;
 create extension if not exists pgtap with schema extensions;
-select extensions.plan(22);
+select extensions.plan(25);
 
 -- 1 Geholfene, 2 Dankende, 3 Fremde, 4 Dritte mit offener (nicht angenommener) Anfrage.
 insert into auth.users(instance_id,id,aud,role,email,encrypted_password,email_confirmed_at,raw_app_meta_data,raw_user_meta_data,created_at,updated_at)
@@ -60,6 +60,12 @@ select extensions.is(public.has_network_heart('f4200000-0000-4000-8000-000000000
 
 reset role;
 select extensions.is((select count(*)::int from public.in_app_notices where recipient_user_id = 'f4200000-0000-4000-8000-000000000001' and kind = 'connect_thanks' and path = '/connect/contacts'), 2, 'the helped person gets one notice per thanks');
+-- Mail und Push: je Dank einmal gestempelt, mit dem Vornamen der dankenden Person.
+set local role service_role;
+select extensions.is((select count(*)::int from public.prepare_thanks_notifications(10)), 2, 'both thanks are picked up for a mail');
+select extensions.is((select count(*)::int from public.prepare_thanks_notifications(10)), 0, 'and never a second time');
+reset role;
+select extensions.is((select count(*)::int from public.network_notification_claims where kind = 'connect_thanks'), 2, 'each thanks is stamped once');
 delete from public.network_contact_requests where id = 'f4200000-0000-4000-8000-0000000000c1';
 select extensions.is((select count(*)::int from public.in_app_notices where kind = 'connect_thanks'), 1, 'deleting the request removes the notice of its thanks, the direct one stays');
 
