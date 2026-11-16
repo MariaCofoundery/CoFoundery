@@ -7,8 +7,13 @@ import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendNewsletterBatch, type NewsletterMail } from "@/lib/email/sendNewsletterIssueEmail";
 import { getPublicAppOrigin, toPublicAppUrl } from "@/lib/publicAppOrigin";
 
-/** Wie viele Mails ein Lauf hoechstens verschickt (ein Paket). Das Tageslimit des Mail-Tarifs gilt zusaetzlich. */
-export const NEWSLETTER_RUN_LIMIT = 90;
+/**
+ * Wie viele Mails ein Lauf hoechstens verschickt (ein Paket). Das Tageslimit des Mail-Tarifs (Resend Free: 100 am Tag, geteilt mit Login-
+ * und Systemmails) gilt zusaetzlich - darum bleibt der Standard bei 50 und laesst Platz fuer alles andere. Mit einem Tarif ohne Tageslimit
+ * hebt man ihn ueber NEWSLETTER_DAILY_LIMIT an.
+ */
+const configured = Number(process.env.NEWSLETTER_DAILY_LIMIT);
+export const NEWSLETTER_RUN_LIMIT = Number.isFinite(configured) && configured >= 1 ? Math.min(Math.floor(configured), 100) : 50;
 
 export function newsletterImageUrl(path: string): string {
   const base = process.env.NEXT_PUBLIC_SUPABASE_URL?.replace(/\/$/, "") ?? "";

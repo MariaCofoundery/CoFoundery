@@ -320,7 +320,7 @@
       "sureNo": "Cancel",
       "unschedule": "Back to draft",
       "nextBatch": "Send next batch",
-      "limitHint": "Sending runs in batches of at most 90 emails. If your email plan has a daily limit, the rest goes out the next morning."
+      "limitHint": "Sending runs in batches, 50 emails a day by default, so login and system emails do not hit the daily limit of your email plan. The rest goes out on the following days."
     },
     "preview": {
       "title": "Preview",

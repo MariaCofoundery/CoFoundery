@@ -320,7 +320,7 @@
       "sureNo": "Abbrechen",
       "unschedule": "Zurück zum Entwurf",
       "nextBatch": "Nächstes Paket senden",
-      "limitHint": "Der Versand läuft in Paketen von höchstens 90 Mails. Wenn dein Mail-Tarif ein Tageslimit hat, geht der Rest am nächsten Morgen raus."
+      "limitHint": "Der Versand läuft in Paketen, standardmäßig 50 Mails am Tag, damit Login- und Systemmails nicht ins Tageslimit deines Mail-Tarifs geraten. Der Rest geht an den folgenden Tagen raus."
     },
     "preview": {
       "title": "Vorschau",
