@@ -128,6 +128,7 @@ test("Migrationsreihenfolge: Workbook-Migration bereits remote, drei DB-first-Mi
   "20270505120000_blog.sql",
   "20270506120000_blog_categories_seo_attention.sql",
   "20270507120000_newsletter_public.sql",
-  "20270508120000_admin_attention_areas.sql"];
+  "20270508120000_admin_attention_areas.sql",
+  "20270509120000_newsletter_public_purge.sql"];
   assert.deepEqual(files.slice(files.indexOf("20261117120000_retire_active_workbook_writes.sql") + 1), pending);
 });

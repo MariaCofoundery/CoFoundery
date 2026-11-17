@@ -1,6 +1,11 @@
 import Link from "next/link";
 
 /*
+ * ERGÄNZT AM 17.11.2026 (gegen den Code geprüft): Abschnitte 15b (Newsletter, mit und ohne Konto)
+ * und 15c (öffentlicher Blog), dazu Zeilen in 3, 21, 22, 23 und 24. NOCH NICHT in diesem Text und
+ * vor dem Livegang zu prüfen: Erinnerungs-Mails, Danke-Herz, Wertemodul. Was nicht belegbar ist
+ * (Resend-Einstellungen, Einordnung durch die Rechtsberatung), steht als LEGAL REVIEW REQUIRED.
+ *
  * DATENSCHUTZERKLÄRUNG – Stand 20.10.2026, gegen den Code geprüft (Änderungen seit 13.10.2026:
  * LinkedIn nur noch für Verbundene oder niemanden sichtbar, Absicht „Wofür ich hier bin“,
  * Löschung abgeschlossener KI-Aufgaben und alter Hinweise).
@@ -20,6 +25,8 @@ import Link from "next/link";
  *     ends_at (20261125120000), gleicher Cron -> innerhalb von rund zwei Tagen.
  *   - Abgeschlossene KI-Aufgaben (90 Tage) und Hinweise in der Anwendung (180 Tage):
  *     purge_stale_operational_rows (Migration 20261213120000), gleicher Cron.
+ *   - Newsletter ohne Konto: nie bestätigte Anmeldungen nach 14 Tagen,
+ *     purge_stale_newsletter_public (Migration 20270509120000), gleicher Cron.
  *   - Cookies und Browserspeicher: Laufzeiten aus dem Code (siehe Abschnitt 21).
  * Alle anderen Daten: bis zur Löschung des Kontos bzw. solange erforderlich.
  */
@@ -71,7 +78,7 @@ export default function DatenschutzPage() {
               verarbeitet, wofür, auf welcher Grundlage, wie lange – und welche Rechte du hast. Sie
               beschreibt den tatsächlichen technischen Stand des Produkts.
             </p>
-            <p className="mt-2 text-sm text-slate-500">Stand: 13. Oktober 2026</p>
+            <p className="mt-2 text-sm text-slate-500">Stand: 17. November 2026</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -145,7 +152,7 @@ export default function DatenschutzPage() {
               items={[
                 "Vercel – Hosting der Website und der Serverfunktionen. Die Serverfunktionen laufen nach unserer Konfiguration in der Region London (Vereinigtes Königreich).",
                 "Supabase – Datenbank, Anmeldung (Authentifizierung) und Dateispeicher, z. B. für Profilfotos. Die Datenbank liegt in der Region London (Vereinigtes Königreich).",
-                "Resend – Versand von E-Mails aus dem Produkt, z. B. Einladungen und Benachrichtigungen.",
+                "Resend – Versand von E-Mails aus dem Produkt, z. B. Einladungen, Benachrichtigungen und der Newsletter.",
               ]}
             />
             <p>
@@ -501,6 +508,93 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
+          <BulletSection number="15b" title="Newsletter">
+            <p>
+              Wir verschicken einen Newsletter, etwa alle zwei Wochen. Er ist freiwillig und nie
+              vorangekreuzt. Du kannst dich auf zwei Wegen anmelden: in der App mit deinem Konto
+              oder ohne Konto über den Blog, nur mit deiner E-Mail-Adresse. Die beiden Listen sind
+              getrennt. Eine Anmeldung ohne Konto macht dich nicht zum Mitglied und schaltet in
+              keinem Konto etwas frei; umgekehrt gilt deine Anmeldung als Mitglied nur für die
+              Mitglieder-Liste.
+            </p>
+            <Sub>Anmeldung mit Konto</Sub>
+            <List
+              items={[
+                "Wir speichern deine Entscheidung (angefragt, bestätigt, abgemeldet), die Zeitpunkte und wo du dich angemeldet hast (Willkommensseite, Einstellungen oder Startseite).",
+                "Die Sprache der Mails richtet sich nach der Sprache deines Kontos.",
+                "Abmelden kannst du dich in deinen Kontoeinstellungen oder mit einem Klick in jeder Mail.",
+                "Löschst du dein Konto, wird auch diese Anmeldung gelöscht (Abschnitt 24).",
+              ]}
+            />
+            <Sub>Anmeldung ohne Konto (Blog)</Sub>
+            <List
+              items={[
+                "Wir speichern deine E-Mail-Adresse (klein geschrieben), die Sprache des Beitrags, auf dem du dich eingetragen hast, die Zeitpunkte von Anfrage, Bestätigung und Abmeldung, den Zeitpunkt der Willkommensmail und die Quelle (Blog).",
+                "In unserer Datenbank speichern wir dabei keine IP-Adresse, wir setzen kein Cookie und verknüpfen die Adresse nicht mit einem Konto. Die technisch notwendigen Verbindungsdaten bei den Hosting-Diensten (Abschnitt 22) bleiben davon unberührt.",
+                "Double-Opt-in: Nach dem Eintragen schicken wir dir eine Mail mit einem Bestätigungslink. Erst wenn du dort auf den Knopf klickst, gilt die Anmeldung. Das Öffnen des Links allein ändert nichts. Den Zeitpunkt der Bestätigung speichern wir als Nachweis deiner Einwilligung.",
+                "Nie bestätigte Anfragen löschen wir nach 14 Tagen automatisch.",
+                "Gegen automatische Eintragungen schützen ein verstecktes Formularfeld und eine Begrenzung der Anfragen pro Stunde (insgesamt, nicht pro Person). Dafür werden keine IP-Adressen gespeichert.",
+              ]}
+            />
+            <Sub>Willkommensmail, Abmeldung und Sperre</Sub>
+            <p>
+              Nach der Bestätigung schicken wir einmal eine Willkommensmail, bei beiden Wegen. Sie
+              weist auf die App hin; ein Konto ist freiwillig und für den Newsletter nicht nötig.
+              Jede Ausgabe enthält einen Link, mit dem du dich mit einem Klick abmeldest (auch
+              ohne Konto). Danach schicken wir dir nichts mehr. Bei der Anmeldung ohne Konto
+              bleibt deine Adresse danach als Sperre gespeichert, damit dich niemand ungewollt
+              wieder anschreibt. Schreib uns, wenn wir auch diesen Eintrag löschen sollen.
+            </p>
+            <Sub>Inhalt und Versand</Sub>
+            <List
+              items={[
+                "Der Newsletter enthält Gedanken und Geschichten sowie manchmal Einträge aus dem Netzwerk. Einträge aus CONNECT erscheinen nur, wenn die einstellende Person bei ihrem Eintrag „darf in Mails erscheinen“ gesetzt hat (Standard: aus), und ohne Namen.",
+                "Der Versand läuft über Resend (Abschnitt 3). Wir bauen kein Zählpixel und keine Link-Verfolgung in die Mails ein.",
+                "Die Sprache einer Ausgabe ist Deutsch oder Englisch; du bekommst die Ausgaben in der Sprache deines Kontos bzw. des Beitrags, auf dem du dich angemeldet hast.",
+              ]}
+            />
+            <p>
+              Rechtsgrundlage ist deine Einwilligung (Art. 6 Abs. 1 lit. a DSGVO, § 7 Abs. 2 Nr. 3
+              UWG). Du kannst sie jederzeit mit Wirkung für die Zukunft widerrufen. Die Sperre
+              nach einer Abmeldung speichern wir auf Grundlage unseres berechtigten Interesses,
+              deinen Widerruf zu beachten (Art. 6 Abs. 1 lit. f DSGVO).
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED:
+              - Resend: Öffnungs- und Klickverfolgung (open/click tracking) ist im Repo nicht
+                steuerbar; im Resend-Dashboard für die Absender-Domain ausgeschaltet bestätigen,
+                bevor der Satz „kein Zählpixel, keine Link-Verfolgung“ veröffentlicht wird
+                (der Code baut weder Pixel noch umgeschriebene Links ein).
+              - Einordnung der Sperrliste (Art. 6 Abs. 1 lit. f) und der Speicherung des
+                Bestätigungszeitpunkts als Nachweis (Art. 7 Abs. 1 DSGVO).
+              - Hinweistext zum Newsletter direkt am Eintragefeld (Blog) auf Vollständigkeit prüfen.
+              - Zusage, dass Zitate aus Danke-Nachrichten nur mit Erlaubnis erscheinen: im Code
+                nicht erzwungen (Handarbeit im Newsletter-Editor), deshalb nicht im Text.
+            */}
+          </BulletSection>
+
+          <BulletSection number="15c" title="Der öffentliche Blog">
+            <p>
+              Der Blog unter /blog ist öffentlich lesbar, ohne Konto und ohne Anmeldung. Er liest
+              keine Daten aus Konten, Teams oder Forschung und zeigt keine Mitgliederdaten.
+            </p>
+            <List
+              items={[
+                "Der Blog setzt keine Cookies, nutzt keine Analyse- oder Marketing-Dienste und lädt keine Skripte von Dritten. Deshalb gibt es dort keinen Cookie-Banner.",
+                "Beim Aufruf entstehen die technisch notwendigen Verbindungsdaten wie bei jeder Seite (Abschnitt 22).",
+                "Bilder in Beiträgen und Titelbilder laden aus unserem Dateispeicher bei Supabase (Abschnitt 3). Dabei sieht Supabase deine IP-Adresse und die Adresse des Bildes.",
+                "Die Sprache eines Beitrags steht in seiner Adresse bzw. wird vom Beitrag bestimmt; der Blog schreibt dafür nichts in deinen Browser.",
+                "Der RSS-Feed des Blogs enthält nur Titel, Kurztext, Datum und Link der Beiträge.",
+                "Der Newsletter-Kasten in Beiträgen ist ein Formular für die Anmeldung ohne Konto (Abschnitt 15b). Nur wenn du dort deine E-Mail-Adresse absendest, verarbeiten wir sie.",
+              ]}
+            />
+            {/*
+              LEGAL REVIEW REQUIRED: Dass der Blog selbst kein Cookie setzt, ist im Code belegt und
+              durch einen Test gesichert. Er liest ein bereits vorhandenes Sprach-Cookie (Abschnitt
+              21), um die Standardsprache der Übersicht zu wählen, schreibt aber keines.
+            */}
+          </BulletSection>
+
           <BulletSection number="16" title="Technische Produktanalyse">
             <p>
               Wenn du angemeldet bist, erfassen wir bei Fragebögen minimale Nutzungsereignisse: z. B.
@@ -631,6 +725,7 @@ export default function DatenschutzPage() {
                 "Interview-Entwürfe (lokaler Speicher): Was du in einem Interview tippst, wird bis zum Speichern im Browser zwischengespeichert und nach dem Speichern, beim Absenden, beim Abmelden und bei der Kontolöschung entfernt.",
                 "Forschungs-Ablaufkennung (Sitzungsspeicher): nur bei aktiver Forschungsteilnahme eine zufällige Kennung für einen Ablauf; ohne Teilnahme wird sie entfernt.",
                 "Service Worker: nur wenn du Push-Mitteilungen einschaltest, um sie anzuzeigen; er speichert keine Seiten zwischen.",
+                "Blog und Newsletter-Anmeldung ohne Konto setzen keine Cookies und keinen Browserspeicher (Abschnitte 15b und 15c).",
               ]}
             />
             <p>
@@ -652,7 +747,8 @@ export default function DatenschutzPage() {
               IP-Adresse, Zeitpunkt, aufgerufene Adresse und Browserangaben. Unsere
               Serverfunktionen protokollieren Fehler; diese Einträge können technische Kennungen
               und in Einzelfällen eine E-Mail-Adresse enthalten. Wir nutzen Protokolle nur für
-              Betrieb, Fehlersuche und Sicherheit (Art. 6 Abs. 1 lit. f DSGVO).
+              Betrieb, Fehlersuche und Sicherheit (Art. 6 Abs. 1 lit. f DSGVO). Das gilt auch für
+              den öffentlichen Blog.
             </p>
             {/*
               LEGAL REVIEW REQUIRED: Aufbewahrungsdauer der Protokolle bei Vercel und Supabase ist
@@ -673,6 +769,7 @@ export default function DatenschutzPage() {
                 "Nutzungs- und Forschungsereignisse (Abschnitte 16 und 17) werden automatisiert gelöscht. Maßgeblich ist der Zeitpunkt, zu dem sie bei uns eingegangen sind. Die Aufbewahrungsdauer beträgt rund 30 Tage; weil der Löschlauf einmal täglich stattfindet, können es technisch bis zu etwa 32 Tage sein.",
                 "Personenbezogene Teilnahme- und Antwortdaten zum Event-Check werden automatisiert innerhalb von rund zwei Tagen nach Ende des jeweiligen Events gelöscht.",
                 "Abgeschlossene Aufgaben der KI-Warteschlange (nur Verweise und technische Angaben, keine Inhalte) löschen wir automatisch nach 90 Tagen, Hinweise in der Anwendung nach 180 Tagen.",
+                "Newsletter ohne Konto: Nie bestätigte Anmeldungen werden nach 14 Tagen automatisch gelöscht. Bestätigte Anmeldungen bleiben bis zu deiner Abmeldung; danach bleibt die Adresse als Sperre gespeichert, bis du uns bittest, sie zu löschen (Abschnitt 15b).",
                 "Push-Zustelladressen speichern wir, bis du Push ausschaltest, der Push-Dienst sie als ungültig meldet oder du dein Konto löschst.",
                 "Einladungen laufen nach 14 bzw. 30 Tagen ab. Abgelaufene Einladungen werden derzeit nicht automatisch gelöscht, sondern spätestens mit dem Konto der einladenden Person.",
                 "Die Laufzeiten von Cookies und Browserspeicher stehen in Abschnitt 21.",
@@ -704,6 +801,7 @@ export default function DatenschutzPage() {
                 "dein FIND-Profil, deine Suchkriterien und gespeicherten Suchen",
                 "dein CONNECT-Profil, deine Anzeigen, Blockierungen und Meldungen, Vorschläge und Benachrichtigungseinstellungen",
                 "deine Forschungsdaten, soweit sie dir noch zugeordnet werden können",
+                "deine Newsletter-Anmeldung als Mitglied (die Anmeldung ohne Konto ist davon getrennt, Abschnitt 15b)",
                 "Einladungen, die du verschickt hast oder die an deine E-Mail-Adresse gingen",
                 "Event-Teilnahmen mit deiner E-Mail-Adresse",
                 "gemeinsame Formate zu zweit (z. B. Commitment Lab) – vollständig, also auch mit den Antworten der anderen Person",
