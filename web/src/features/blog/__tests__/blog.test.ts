@@ -233,3 +233,28 @@ test("the admin heart counts newsletter signups and more; the newsletter admin s
   assert.match(page, /new_since_seen/);
   assert.ok(page.indexOf("admin_newsletter_stats") < page.indexOf("admin_mark_newsletter_seen"), "read the numbers before marking them seen");
 });
+
+test("the heart: one part per area, the avatar shows their sum, the overview shows each part at its area, new accounts count since the last look", () => {
+  const sql = read("../supabase/migrations/20270508120000_admin_attention_areas.sql");
+  for (const key of ["feedback", "reports", "radar", "recommendations", "events", "newsletter", "highlights", "cron", "accounts"]) assert.match(sql, new RegExp(`'${key}'`), key);
+  assert.match(sql, /from jsonb_each\(v\)/, "the total is the sum of the parts");
+  assert.match(sql, /last_ok is false/);
+  assert.match(sql, /check \(area in \('accounts'\)\)/);
+  const overview = read("src/features/admin/AdminOverview.tsx");
+  assert.match(overview, /admin_attention_breakdown/);
+  assert.match(overview, /AreaHeart|AdminAreaHeart/);
+  assert.match(overview, /AREA_HEART_PART/);
+  assert.ok(overview.indexOf("heartCounts") < overview.indexOf("admin_mark_area_seen"), "read the numbers before marking them seen");
+  assert.match(read("src/features/admin/AdminAreaHeart.tsx"), /aria-label=\{label\}/);
+});
+
+test("speed: the public blog skips the app shell - no session refresh, no account queries, no app texts in the page", () => {
+  const middleware = read("src/middleware.ts");
+  assert.match(middleware, /x-blog-request/);
+  assert.match(middleware, /request\.headers\.set\(BLOG_REQUEST_HEADER, isBlog \? "1" : "0"\)/, "set on every request, so nobody can send it from outside");
+  assert.match(middleware, /if \(isBlog\) return NextResponse\.next/);
+  const layout = read("src/app/layout.tsx");
+  const early = layout.indexOf('"x-blog-request") === "1"');
+  assert.ok(early > 0 && early < layout.indexOf("getRequestUser()"), "decided before any account query");
+  assert.match(layout, /messages=\{\{\}\}/);
+});

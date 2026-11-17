@@ -1,6 +1,6 @@
 begin;
 create extension if not exists pgtap with schema extensions;
-select plan(19);
+select plan(20);
 insert into auth.users(id,instance_id,aud,role,email,email_confirmed_at,created_at,updated_at) values
  ('da5b0000-0000-4000-8000-000000000001','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dash-admin@example.invalid',now(),now(),now()),
  ('da5b0000-0000-4000-8000-000000000002','00000000-0000-0000-0000-000000000000','authenticated','authenticated','dash-admin2@example.invalid',now(),now(),now()),
@@ -33,7 +33,9 @@ select is((public.admin_feedback_counts()->>'new')::int,2,'read marks are per ad
 
 -- Zaehler
 reset role; select set_config('request.jwt.claim.sub','da5b0000-0000-4000-8000-000000000001',true); set local role authenticated;
-select is(public.admin_attention_count(),1,'the attention count is new feedback plus open reports');
+select is(((public.admin_attention_breakdown()->>'feedback')::int + (public.admin_attention_breakdown()->>'reports')::int), 1, 'the attention parts count new feedback plus open reports');
+-- Das Herz am Avatar ist die Summe der Teile.
+select is(public.admin_attention_count(), (select sum(value::text::int)::int from jsonb_each(public.admin_attention_breakdown())), 'the heart is the sum of its parts');
 select ok(public.admin_dashboard_stats() ? 'accounts_week' and public.admin_dashboard_stats() ? 'cron','the stats carry the expected keys');
 select lives_ok($$select public.admin_mark_reminder_done('db_dump',true)$$,'the dump reminder exists');
 

@@ -118,7 +118,8 @@
       "recommendations": "Review recommendations",
       "newsletter": "Newsletter",
       "eventsQr": "Events and QR",
-      "blog": "Blog"
+      "blog": "Blog",
+      "heart": "{count} waiting or new"
     },
     "migrationMissing": "This view needs a database update that has not been applied on this server yet. Apply the pending migrations and it will appear.",
     "teamChecks": {

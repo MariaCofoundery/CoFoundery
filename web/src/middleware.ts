@@ -1,7 +1,19 @@
-import { type NextRequest } from "next/server";
+import { type NextRequest, NextResponse } from "next/server";
 import { updateSession } from "@/lib/supabase/middleware";
 
+/**
+ * Der Blog ist oeffentlich und braucht weder Anmeldung noch Menue. Die Anfrage bekommt deshalb einen eigenen Hinweis fuer das Wurzel-Layout,
+ * das fuer Blog-Seiten die ganze App-Huelle ueberspringt: keine Abfragen zu Konto, Rollen und Zaehlern, keine App-Texte im Seitenquelltext.
+ * Der Hinweis wird bei JEDER Anfrage gesetzt (auch auf "0"), damit ihn niemand von aussen mitschicken kann.
+ */
+export const BLOG_REQUEST_HEADER = "x-blog-request";
+
 export async function middleware(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+  const isBlog = pathname === "/blog" || pathname.startsWith("/blog/");
+  request.headers.set(BLOG_REQUEST_HEADER, isBlog ? "1" : "0");
+  // Keine Sitzung zu erneuern, keine Abfrage beim Anmelde-Dienst: ein oeffentlicher Besuch kostet so nur die Seite selbst.
+  if (isBlog) return NextResponse.next({ request: { headers: request.headers } });
   return updateSession(request);
 }
 

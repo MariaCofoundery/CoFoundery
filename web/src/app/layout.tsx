@@ -15,7 +15,7 @@ import { teamIdFromPath } from "@/features/align/alignModel";
 import { LAST_PLACE_COOKIE } from "@/features/navigation/lastPlace";
 import { getResearchConsentState } from "@/features/research/consent";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { cookies } from "next/headers";
+import { cookies, headers } from "next/headers";
 import { ACTIVE_ORG_COOKIE, parseActiveOrg } from "@/features/advisor/activeOrg";
 import { parseWorkContext, WORK_CONTEXT_COOKIE } from "@/features/navigation/workContext";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -91,6 +91,19 @@ export const viewport: Viewport = {
 };
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  // Der oeffentliche Blog (Hinweis aus der Middleware): ohne App-Huelle - kein Menue, keine Konto-Abfragen, keine App-Texte im Quelltext.
+  // Das macht die Seiten schnell und klein, und sie sehen fuer Besucher:innen und Suchmaschinen gleich aus.
+  if ((await headers()).get("x-blog-request") === "1") {
+    const blogLocale = await getRequestLocale();
+    return (
+      <html lang={blogLocale} className={`${spectral.variable} ${unbounded.variable} ${inter.variable}`}>
+        <body>
+          <I18nProvider locale={blogLocale} messages={{}}>{children}</I18nProvider>
+        </body>
+      </html>
+    );
+  }
+
   // Sprache, Cookie und Anmeldung sind voneinander unabhaengig und laufen
   // gleichzeitig. `getRequestUser` oeffnet seinen Client selbst; der Netzwerkgang
   // zum Auth-Server ist der laengste Schritt und soll nicht hinter den beiden

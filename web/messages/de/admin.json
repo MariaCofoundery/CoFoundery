@@ -118,7 +118,8 @@
       "recommendations": "Empfehlungen prüfen",
       "newsletter": "Newsletter",
       "eventsQr": "Veranstaltungen und QR",
-      "blog": "Blog"
+      "blog": "Blog",
+      "heart": "{count} warten oder sind neu"
     },
     "migrationMissing": "Diese Ansicht braucht ein Datenbank-Update, das auf diesem Server noch nicht eingespielt ist. Spiel die ausstehenden Migrationen ein, dann erscheint sie.",
     "teamChecks": {

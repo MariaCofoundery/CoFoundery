@@ -74,9 +74,9 @@ reset role;
 insert into public.newsletter_subscriptions (user_id, status, source, confirmed_at) values ('f5500000-0000-4000-8000-000000000002', 'confirmed', 'settings', now());
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"f5500000-0000-4000-8000-000000000001","role":"authenticated"}';
-select extensions.is(public.admin_attention_count(), 1, 'a new newsletter signup lights the heart');
+select extensions.is((public.admin_attention_breakdown()->>'newsletter')::int, 1, 'a new newsletter signup lights the heart');
 select extensions.ok(public.admin_mark_newsletter_seen(), 'looking at the newsletter admin marks it seen');
-select extensions.is(public.admin_attention_count(), 0, 'and the heart goes out again');
+select extensions.is((public.admin_attention_breakdown()->>'newsletter')::int, 0, 'and the heart goes out again');
 select extensions.is((select confirmed_week from public.admin_newsletter_stats()), 1::bigint, 'the stats count this week');
 reset role;
 

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { AdminAreaHeart } from "@/features/admin/AdminAreaHeart";
 import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { markReminderDoneAction } from "@/features/moderation/adminReminderActions";
@@ -16,13 +17,16 @@ type Stats = {
 type CheckCounts = { started_total: number; started_30d: number; completed_total?: number; abandoned_total?: number };
 type TeamCheckStats = { read_my_mind: CheckCounts; founder_in_the_wild: CheckCounts; commitment_lab: CheckCounts };
 
+/** Welcher Teil des Herzens zu welchem Bereich gehoert. Bereiche ohne Eintrag haben kein Herz (dort passiert nichts, was auf dich wartet). */
+const AREA_HEART_PART: Record<string, string> = { moderation: "reports", highlights: "highlights", radar: "radar", events: "events", recommendations: "recommendations", newsletter: "newsletter" };
+
 const card = "flex min-w-0 flex-col gap-2.5 rounded-[22px] border border-[#e4e2f0] bg-white p-[22px]";
 const label = "text-[13px] font-semibold uppercase tracking-[.08em] text-[#5f5e7a]";
 const pill = "inline-block min-w-[22px] rounded-full px-2 py-0.5 text-center text-[13px] font-bold";
 
 /** Zaehler, "Zu tun" und Betrieb. Keine Scores, keine Rangliste, kein Personenbezug. */
 export async function AdminOverview({ client }: { client: SupabaseClient }) {
-  const [t, stats, dump, teamChecks, pendingEvents, pendingRecs] = await Promise.all([
+  const [t, stats, dump, teamChecks, pendingEvents, pendingRecs, breakdownResult] = await Promise.all([
     getTranslations("admin.overview"),
     client.rpc("admin_dashboard_stats"),
     client.rpc("admin_reminder_status", { p_key: "db_dump" }),
@@ -32,7 +36,12 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
     client.from("ecosystem_events").select("id", { count: "exact", head: true }).eq("status", "pending"),
     // Empfehlungen (20270414120000): neue und gemeldete Eintraege warten auf ein Mensch. Fehlt die Funktion noch, bleibt es leise bei 0.
     client.rpc("admin_list_recommendations", { p_status: "review" }),
+    // Das rosa Herz je Bereich: dieselben Teile, aus denen die Summe am Avatar besteht. Fehlt die Funktion noch, bleibt es leise ohne Herzen.
+    client.rpc("admin_attention_breakdown"),
   ]);
+  const heartCounts = ((breakdownResult.error ? {} : breakdownResult.data) ?? {}) as Record<string, number>;
+  // Neue Konten zaehlen "seit deinem letzten Blick": Wer die Uebersicht gesehen hat, hat sie gesehen (erst gelesen, dann als gesehen markiert).
+  if ((heartCounts.accounts ?? 0) > 0) await client.rpc("admin_mark_area_seen", { p_area: "accounts" });
   const recRows = pendingRecs.error ? [] : ((pendingRecs.data ?? []) as { report_count: number | string }[]);
   const recReported = recRows.filter((row) => Number(row.report_count) > 0).length;
   const recNew = recRows.length - recReported;
@@ -137,7 +146,10 @@ export async function AdminOverview({ client }: { client: SupabaseClient }) {
           <h2 className="text-[21px] font-semibold text-slate-950">{t("areas.title")}</h2>
           <div className="flex flex-wrap gap-2.5">
             {([["/admin/moderation", "moderation"], ["/admin/highlights", "highlights"], ["/admin/announcements", "announcements"], ["/admin/problem-radar", "radar"], ["/admin/problem-radar/board", "board"], ["/admin/research/workstyle-pretest", "research"], ["/admin/events", "events"], ["/admin/empfehlungen", "recommendations"], ["/admin/newsletter", "newsletter"], ["/admin/blog", "blog"], ["/admin/veranstaltungen", "eventsQr"]] as const).map(([href, key]) => (
-              <Link key={key} href={href} className="inline-flex min-h-11 items-center rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-slate-900 hover:bg-[#e9e7f4]">{t(`areas.${key}`)}</Link>
+              <Link key={key} href={href} className="inline-flex min-h-11 items-center gap-2 rounded-xl bg-[#f1f0f7] px-[18px] text-[15px] font-semibold text-slate-900 hover:bg-[#e9e7f4]">
+                {t(`areas.${key}`)}
+                <AdminAreaHeart count={heartCounts[AREA_HEART_PART[key] ?? ""] ?? 0} label={t("areas.heart", { count: heartCounts[AREA_HEART_PART[key] ?? ""] ?? 0 })} />
+              </Link>
             ))}
           </div>
           <p className="text-[13.5px] text-[#5f5e7a]">{t("areas.text")}</p>
