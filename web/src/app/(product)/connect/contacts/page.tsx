@@ -4,7 +4,7 @@ import { requireConnectMember } from "@/features/connect/connectAccess";
 import { ConnectContactActions } from "@/features/connect/ConnectContactActions";
 import { getConnectBlockState, getConnectContactRequests, getConnectConversations, getConnectProfilesByUserIds, getOwnConnectBlocks } from "@/features/connect/connectData";
 import type { ConnectBlockState, ConnectContactRequest, ConnectConversation, ConnectProfile } from "@/features/connect/connectTypes";
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { ConnectSafetyActions } from "@/features/connect/ConnectSafetyActions";
 import { unblockConnectUserAction } from "@/features/connect/connectActions";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
@@ -33,7 +33,7 @@ function ContactCard({ request, direction, t, locale, profile, blockState, intro
   return <article className="rounded-2xl border border-slate-200 bg-white p-5">
     <div className="flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between"><div className="min-w-0">
       <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t(`contact.status.${request.status}`)}</p>
-      <div className="mt-2 flex items-center gap-3"><ConnectAvatar profile={profile} displayName={counterpart} /><h3 className="text-lg font-semibold text-slate-950">{counterpart}</h3></div>
+      <div className="mt-2"><ConnectPersonLink userId={counterpartId} name={counterpart} profile={profile} nameClassName="text-lg font-semibold text-slate-950" /></div>
       {direction === "incoming" && request.sender_headline_snapshot ? <p className="mt-1 text-sm text-slate-500">{request.sender_headline_snapshot}</p> : null}
       <p className="mt-3 text-sm font-semibold text-violet-800">{intro ? t("introductions.forType", { type: doorTitle((key, values) => t(`doors.${key}`, values), { typeKey: intro.typeKey, otherLabel: intro.otherLabel }) }) : request.listing_title_snapshot}{intro?.snoozedAt && direction === "incoming" ? <span className="ml-2 rounded-full bg-slate-100 px-2 py-0.5 text-xs font-bold text-slate-700">{t("introductions.snoozedTag")}</span> : null}</p>
       <p className="mt-3 whitespace-pre-wrap text-sm leading-6 text-slate-700"><UserText text={request.message} /></p>
@@ -51,8 +51,7 @@ function AcceptedContactCard({ conversation, t, locale, profile, blockState, lin
     <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
       <div className="min-w-0">
         <div className="flex flex-wrap items-center gap-2">
-          <ConnectAvatar profile={profile} displayName={counterpartName} />
-          <h3 className="text-lg font-semibold text-slate-950">{counterpartName}</h3>
+          <ConnectPersonLink userId={conversation.counterpart_user_id} name={counterpartName} profile={profile} nameClassName="text-lg font-semibold text-slate-950" />
           {conversation.unread_count > 0 ? <span className="inline-flex min-w-5 items-center justify-center rounded-full bg-red-600 px-1.5 py-0.5 text-[.68rem] font-bold leading-none text-white" aria-label={t("messages.unreadCount", { count: conversation.unread_count })}>{Math.min(conversation.unread_count, 99)}</span> : null}
         </div>
         <p className="mt-2 text-sm font-semibold text-violet-800">{conversation.listing_title}</p>

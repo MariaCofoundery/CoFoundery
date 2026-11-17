@@ -6,7 +6,7 @@ import { retractConnectMessageAction, sendConnectMessageAction } from "@/feature
 import { getConnectBlockState, getConnectConversation, getConnectMessages, getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { ConnectMarkConversationRead } from "@/features/connect/ConnectMarkConversationRead";
 import { ConnectSubmitButton } from "@/features/connect/ConnectSubmitButton";
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { ConnectSafetyActions } from "@/features/connect/ConnectSafetyActions";
 import { knownKey } from "@/i18n/knownKey";
 import { CONNECT_SAFETY_KEYS } from "@/features/connect/connectFeedbackKeys";
@@ -65,7 +65,7 @@ export default async function ConversationPage({
       <Link href="/messages" className="inline-flex min-h-11 items-center text-sm font-semibold text-slate-600">← {t("messages.backToInbox")}</Link>
       <header className="rounded-3xl border border-slate-200 bg-white p-5 sm:p-7">
         <p className="text-xs font-semibold uppercase tracking-[.14em] text-slate-500">{t("messages.eyebrow")}</p>
-        <div className="mt-3 flex items-center gap-4"><ConnectAvatar profile={counterpartProfile} displayName={counterpartName} className="h-14 w-14 rounded-full object-cover" /><h1 className="text-2xl font-semibold text-slate-950">{counterpartName}</h1></div>
+        <div className="mt-3"><ConnectPersonLink userId={conversation.counterpart_user_id} name={counterpartName} profile={counterpartProfile} avatarClassName="h-14 w-14 rounded-full object-cover" nameClassName="text-2xl font-semibold text-slate-950" /></div>
         {conversation.origin === "connect_contact" && conversation.listing_id ? <Link href={`/connect/listings/${conversation.listing_id}`} className="mt-2 inline-block text-sm font-semibold text-violet-800 underline-offset-4 hover:underline">{conversation.listing_title}</Link> : conversation.origin === "connect_problem" && conversation.listing_title ? <p className="mt-2 text-sm font-semibold text-violet-800">{conversation.listing_title}</p> : null}
         {/* Bei drei Urspruengen in einem Postfach muss dastehen, woher das
             Gespraech kommt - sonst raet man beim Lesen. */}

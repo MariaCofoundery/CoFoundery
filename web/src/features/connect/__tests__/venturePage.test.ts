@@ -50,7 +50,7 @@ test("das Unternehmen steht zuerst, der Mensch darunter", () => {
   const personAt = page.indexOf("ventures.personBehind");
   assert.ok(whatAt > 0 && audienceAt > whatAt, "die Zielgruppe steht vor der Sache");
   assert.ok(personAt > audienceAt, "der Mensch steht ueber dem Unternehmen");
-  assert.match(page, /href=\{`\/connect\/people\/\$\{owner\.user_id\}`\}/);
+  assert.match(page, /<ConnectPersonLink[\s\S]*?userId=\{owner\.user_id\}/);
 });
 
 test("die Zielgruppe steht abgesetzt, weil sie das wichtigste Feld ist", () => {

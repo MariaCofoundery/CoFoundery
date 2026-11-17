@@ -58,9 +58,9 @@ test("authenticated photo delivery is proxied and fails closed", () => {
 
 test("Connect identity photos appear without dominating listings, contacts, or chat", () => {
   assert.match(source("src/features/connect/ConnectListingCard.tsx"), /<ConnectAvatar/);
-  assert.match(source("src/app/(product)/connect/listings/[listingId]/page.tsx"), /<ConnectAvatar/);
-  assert.match(source("src/app/(product)/connect/contacts/page.tsx"), /<ConnectAvatar/);
-  assert.match(source("src/app/(product)/messages/[conversationId]/page.tsx"), /<ConnectAvatar/);
+  // Bild und Name sitzen seit 17.11.2026 im gemeinsamen Personen-Link, der das Bild ueber ConnectAvatar zeigt.
+  assert.match(source("src/features/connect/ConnectPersonLink.tsx"), /<ConnectAvatar/);
+  for (const path of ["src/app/(product)/connect/listings/[listingId]/page.tsx", "src/app/(product)/connect/contacts/page.tsx", "src/app/(product)/messages/[conversationId]/page.tsx"]) assert.match(source(path), /<ConnectPersonLink/);
 });
 
 test("block is symmetric at RPC boundaries and keeps history while stopping writes", () => {

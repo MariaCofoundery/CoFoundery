@@ -6,7 +6,7 @@ import { listDoorsOf } from "@/features/connect/doors/doorsData";
 import { requireConnectMember } from "@/features/connect/connectAccess"; import { getConnectBlockState, getConnectListing, countContactRequestsForListing, getOwnContactRequestForListing, hasActiveConnectProfile } from "@/features/connect/connectData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "@/features/connect/connectPresentation";
 import type { ConnectProfile } from "@/features/connect/connectTypes";
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { DisclosedCapability } from "@/features/capability/DisclosedCapability";
 import { getDisclosedCapability } from "@/features/capability/capabilityData";
 import { knownKey } from "@/i18n/knownKey";
@@ -116,13 +116,7 @@ export default async function ListingDetail({ params, searchParams }: { params: 
           {profile ? (
             <section className={TILE}>
               <p className={LABEL}>{t("detail.person")}</p>
-              <div className="flex items-center gap-3.5">
-                <ConnectAvatar profile={profile} displayName={profile.display_name} className="h-14 w-14 rounded-full object-cover" />
-                <div className="min-w-0">
-                  <h2 className="break-words text-[19px] font-semibold leading-tight text-[#0b1f3a]">{profile.display_name}</h2>
-                  <p className="mt-0.5 text-sm text-[#5f5e7a]">{profile.headline}</p>
-                </div>
-              </div>
+              <ConnectPersonLink userId={profile.user_id} name={profile.display_name} profile={profile} headline={profile.headline} avatarClassName="h-14 w-14 rounded-full object-cover" className="gap-3.5" nameClassName="text-[19px] font-semibold leading-tight text-[#0b1f3a]" headlineClassName="mt-0.5 text-sm text-[#5f5e7a]" />
               {profile.bio ? <p className="text-[15px] leading-7 text-[#0b1f3a]">{profile.bio}</p> : null}
               {/* Hier faellt die Entscheidung, ob man schreibt - also steht hier auch,
                   in welcher Form diese Person ansprechbar ist. Genau das nimmt der

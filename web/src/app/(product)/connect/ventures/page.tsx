@@ -6,7 +6,7 @@ import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getActiveConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 
 /**
  * Die Unternehmen im Netzwerk.
@@ -134,18 +134,9 @@ export default async function ConnectVentureDirectoryPage({
 
                 {/* Der Mensch dahinter - ohne ihn waere das ein Handelsregister. */}
                 {owner ? (
-                  <Link
-                    href={`/connect/people/${owner.user_id}`}
-                    className="mt-4 flex min-w-0 items-center gap-3 border-t border-slate-100 pt-4 hover:opacity-80"
-                  >
-                    <ConnectAvatar profile={owner} displayName={owner.display_name} />
-                    <span className="min-w-0">
-                      <span className="block truncate text-sm font-semibold text-slate-900">
-                        {owner.display_name}
-                      </span>
-                      <span className="block truncate text-xs text-slate-500">{owner.headline}</span>
-                    </span>
-                  </Link>
+                  <div className="mt-4 border-t border-slate-100 pt-4">
+                    <ConnectPersonLink userId={owner.user_id} name={owner.display_name} profile={owner} headline={owner.headline} />
+                  </div>
                 ) : null}
 
                 {venture.website ? (

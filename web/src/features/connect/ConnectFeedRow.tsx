@@ -1,7 +1,7 @@
 import Link from "next/link";
 import type { ConnectFeedEntry } from "./connectFeedData";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "./connectPresentation";
-import { ConnectAvatar } from "./ConnectAvatar";
+import { ConnectPersonLink } from "./ConnectPersonLink";
 import type { ConnectProfile } from "./connectTypes";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
@@ -70,14 +70,11 @@ export function ConnectFeedRow({ entry, t, locale }: { entry: ConnectFeedEntry; 
         <span className={`inline-block rounded-full px-2.5 py-0.5 text-[13px] font-semibold ${TAG[kind]}`}>{t(`feed.kinds.${kind}`)}</span>
       </div>
       <div className="min-w-0 flex-1">
-        <h2 className="text-base font-semibold leading-snug tracking-tight text-slate-950 md:text-[1.0625rem]">{title}</h2>
+        <h2 className="text-base font-semibold leading-snug tracking-tight text-slate-950 md:text-[1.0625rem]"><Link href={href} className="hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-500">{title}</Link></h2>
         {facts.filter(Boolean).length ? <p className="mt-0.5 truncate text-[13px] text-[#5f5e7a]">{facts.filter(Boolean).join(" · ")}</p> : null}
       </div>
       {by ? (
-        <Link href={`/connect/people/${by.user_id}`} className="flex min-w-0 shrink-0 items-center gap-2 text-sm text-slate-800 hover:underline md:w-40">
-          <ConnectAvatar profile={by} displayName={by.display_name || "Connect"} className="h-7 w-7 shrink-0 rounded-full object-cover" />
-          <span className="truncate">{by.display_name}</span>
-        </Link>
+        <ConnectPersonLink userId={by.user_id} name={by.display_name || "Connect"} profile={by} avatarClassName="h-7 w-7 rounded-full object-cover" className="shrink-0 gap-2 md:w-40" nameClassName="text-sm font-normal text-slate-800" />
       ) : entry.kind === "problem" && entry.problem.origin === "public_source" ? (
         // Aus einer oeffentlichen Quelle: kein Verfasser, die Zeile sagt woher.
         <span className="min-w-0 shrink-0 truncate text-[13px] text-[#5f5e7a] md:w-40">{t("problems.source.tag")}</span>

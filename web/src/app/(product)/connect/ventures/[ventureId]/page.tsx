@@ -2,7 +2,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { requireConnectMember } from "@/features/connect/connectAccess";
 import { getConnectProfilesByUserIds } from "@/features/connect/connectData";
 import { getConnectVenture, getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVentureData";
@@ -149,18 +149,15 @@ export default async function ConnectVenturePage({
           <h2 className="text-xs font-semibold uppercase tracking-[0.12em] text-slate-500">
             {t("ventures.personBehind")}
           </h2>
-          <Link
-            href={`/connect/people/${owner.user_id}`}
-            className="mt-3 flex min-w-0 items-center gap-3 rounded-2xl border border-slate-200 p-4 transition hover:border-violet-300"
-          >
-            <ConnectAvatar profile={owner} displayName={owner.display_name} />
-            <span className="min-w-0">
-              <span className="block truncate font-semibold text-slate-900">
-                {owner.display_name}
-              </span>
-              <span className="block truncate text-sm text-slate-600">{owner.headline}</span>
-            </span>
-          </Link>
+          <ConnectPersonLink
+            userId={owner.user_id}
+            name={owner.display_name}
+            profile={owner}
+            headline={owner.headline}
+            className="mt-3 rounded-2xl border border-slate-200 p-4 transition hover:border-violet-300"
+            nameClassName="font-semibold text-slate-900"
+            headlineClassName="text-sm text-slate-600"
+          />
 
           {others.length > 0 ? (
             <div className="mt-4">

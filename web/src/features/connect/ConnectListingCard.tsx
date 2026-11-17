@@ -2,6 +2,7 @@ import Link from "next/link";
 import type { ConnectListing, ConnectProfile } from "./connectTypes";
 import { formatConnectContentTimeframe, normalizeConnectLocations } from "./connectPresentation";
 import { ConnectAvatar } from "./ConnectAvatar";
+import { ConnectPersonLink } from "./ConnectPersonLink";
 
 type T = (key: string, values?: Record<string, string | number>) => string;
 function owner(listing: ConnectListing) {
@@ -33,10 +34,7 @@ export function ConnectListingCard({ listing, t, locale }: { listing: ConnectLis
     {/* Der Mensch hinter der Anzeige ist ein Link. Bis zum 21.09.2026 stand
         hier nur sein Name - man sah, wer es ist, und kam nicht hin. */}
     {profile?.user_id ? (
-      <Link href={`/connect/people/${profile.user_id}`} className="flex min-w-0 shrink-0 items-center gap-3 rounded-xl hover:bg-slate-50 md:w-48">
-        <ConnectAvatar profile={profile} displayName={profile.display_name || "Connect"} />
-        <div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{profile.display_name}</p><p className="truncate text-xs text-slate-500">{profile.headline}</p></div>
-      </Link>
+      <ConnectPersonLink userId={profile.user_id} name={profile.display_name || "Connect"} profile={profile} headline={profile.headline} className="shrink-0 md:w-48" />
     ) : (
       <div className="flex min-w-0 shrink-0 items-center gap-3 md:w-48"><ConnectAvatar profile={profile} displayName={profile?.display_name || "Connect"} /><div className="min-w-0"><p className="truncate text-sm font-semibold text-slate-900">{profile?.display_name}</p><p className="truncate text-xs text-slate-500">{profile?.headline}</p></div></div>
     )}

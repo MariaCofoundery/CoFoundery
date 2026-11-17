@@ -4,7 +4,7 @@ import Link from "next/link";
 import { getTranslations } from "next-intl/server";
 import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { requireConnectMember } from "@/features/connect/connectAccess";
-import { ConnectAvatar } from "@/features/connect/ConnectAvatar";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { getConnectPeople } from "@/features/connect/connectPeopleData";
 import { parseDoorFilters } from "@/features/connect/doors/doorCatalog";
 import { DoorSearch } from "@/features/connect/doors/DoorSearch";
@@ -169,15 +169,16 @@ export default async function ConnectPeoplePage({
             {people.map((person) => (
               <article key={person.user_id} className={card}>
                 <div className="flex items-start gap-4">
-                  <ConnectAvatar
+                  <ConnectPersonLink
+                    userId={person.user_id}
+                    name={person.display_name}
                     profile={person}
-                    displayName={person.display_name}
-                    className="h-14 w-14 shrink-0 rounded-full object-cover"
+                    headline={person.headline}
+                    avatarClassName="h-14 w-14 rounded-full object-cover"
+                    className="flex-1"
+                    nameClassName="text-xl font-semibold text-slate-950"
+                    headlineClassName="mt-1 text-sm leading-6 text-slate-600"
                   />
-                  <div className="min-w-0 flex-1">
-                    <h2 className="text-xl font-semibold">{person.display_name}</h2>
-                    <p className="mt-1 text-sm leading-6 text-slate-600">{person.headline}</p>
-                  </div>
                   {person.user_id !== user.id ? <ThanksHeart userId={person.user_id} via="person" label={t("thanks.heartButton")} hint={t("thanks.heartHint")} /> : null}
                 </div>
 

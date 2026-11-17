@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { getTranslations } from "next-intl/server";
 import { ConnectProfileRequired } from "@/features/connect/ConnectProfileRequired";
 import {
@@ -90,7 +91,16 @@ export async function ProblemApproaches({
                         : author?.display_name ?? t("problems.unknownAuthor"),
                   })}
                 </p>
-                {author?.headline ? (
+                {author && approach.author_user_id ? (
+                  <ConnectPersonLink
+                    userId={approach.author_user_id}
+                    name={author.display_name}
+                    profile={author}
+                    headline={author.headline}
+                    avatarClassName="h-9 w-9 rounded-full object-cover"
+                    className="mt-2"
+                  />
+                ) : author?.headline ? (
                   <p className="mt-1 text-sm text-slate-600">{author.headline}</p>
                 ) : null}
                 <p className="mt-3 whitespace-pre-wrap leading-7 text-slate-800">

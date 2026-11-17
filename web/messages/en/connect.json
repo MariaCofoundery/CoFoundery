@@ -1652,5 +1652,6 @@
     "ideaCta": "Got an idea?",
     "viewCta": "Take a look",
     "note": "Answering earns no points and no ranking. If it helped, a thank-you comes back."
-  }
+  },
+  "linkPerson": "Open profile of {name}"
 }

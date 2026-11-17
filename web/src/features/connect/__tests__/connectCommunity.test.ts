@@ -72,7 +72,7 @@ test("Unternehmen sind durchsuchbar, und die eigenen bleiben verwaltbar", () => 
   assert.match(directory, /getActiveConnectVentures/);
   // Und jedes Unternehmen zeigt seinen Menschen - sonst waere es ein
   // Handelsregister.
-  assert.match(directory, /href=\{`\/connect\/people\/\$\{owner\.user_id\}`\}/);
+  assert.match(directory, /<ConnectPersonLink[^>]*userId=\{owner\.user_id\}/);
 
   // Der Umzug ist vollstaendig: Kein Formular und keine Aktion zeigt noch auf
   // die alte Adresse, sonst landet man nach dem Speichern im Verzeichnis.
@@ -101,7 +101,7 @@ test("die Leiste traegt alle vier Arten zu entdecken", () => {
 test("die Anzeigenkarte fuehrt zu dem Menschen, der sie eingestellt hat", () => {
   // Vorher stand dort nur der Name: Man sah, wer es ist, und kam nicht hin.
   const card = codeOnly("src/features/connect/ConnectListingCard.tsx");
-  assert.match(card, /href=\{`\/connect\/people\/\$\{profile\.user_id\}`\}/);
+  assert.match(card, /<ConnectPersonLink[^>]*userId=\{profile\.user_id\}/);
 });
 
 test("nichts davon sortiert Menschen oder Unternehmen nach Passung", () => {

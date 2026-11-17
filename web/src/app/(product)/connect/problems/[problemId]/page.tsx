@@ -1,5 +1,6 @@
 import { ProblemLifecycleControls } from "@/features/connect/ProblemLifecycleControls";
 import Link from "next/link";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { AllowInMailsToggle } from "@/features/newsletter/AllowInMailsToggle";
 import { ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { notFound } from "next/navigation";
@@ -213,13 +214,17 @@ export default async function ConnectProblemPage({
         ) : null}
 
         <div className="mt-5 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4 text-sm text-slate-600">
-          <span>
-            {fromSource
-              ? t("problems.source.byline")
-              : problem.author_user_id === null
-                ? t("problems.formerMember")
-                : author?.display_name ?? t("problems.unknownAuthor")}
-          </span>
+          {!fromSource && problem.author_user_id && author ? (
+            <ConnectPersonLink userId={problem.author_user_id} name={author.display_name} profile={author} avatarClassName="h-8 w-8 rounded-full object-cover" nameClassName="text-sm font-semibold text-slate-800" />
+          ) : (
+            <span>
+              {fromSource
+                ? t("problems.source.byline")
+                : problem.author_user_id === null
+                  ? t("problems.formerMember")
+                  : author?.display_name ?? t("problems.unknownAuthor")}
+            </span>
+          )}
           {fromSource ? null : <span>{t("problems.interestCount", { count: problem.interest_count })}</span>}
         </div>
       </article>

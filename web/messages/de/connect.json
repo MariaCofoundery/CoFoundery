@@ -1652,5 +1652,6 @@
     "ideaCta": "Hast du eine Idee?",
     "viewCta": "Ansehen",
     "note": "Antworten geben keine Punkte und keine Rangliste. Wenn es geholfen hat, kommt ein Danke zurück."
-  }
+  },
+  "linkPerson": "Profil von {name} öffnen"
 }
