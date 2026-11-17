@@ -29,8 +29,9 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
   };
 }
 
-export default async function BlogPostPage({ params }: { params: Promise<{ slug: string }> }) {
-  const post = await getPublishedBlogPost((await params).slug);
+export default async function BlogPostPage({ params, searchParams }: { params: Promise<{ slug: string }>; searchParams: Promise<{ nl?: string }> }) {
+  const [{ slug }, query] = await Promise.all([params, searchParams]);
+  const post = await getPublishedBlogPost(slug);
   if (!post) notFound();
   const origin = getPublicAppOrigin();
   const copy = blogCopy(post.language);
@@ -61,7 +62,7 @@ export default async function BlogPostPage({ params }: { params: Promise<{ slug:
               </figure>
             ) : null}
           </header>
-          <div className="mt-8"><BlogBody blocks={post.blocks} appOrigin={origin} language={post.language} /></div>
+          <div className="mt-8"><BlogBody blocks={post.blocks} appOrigin={origin} language={post.language} returnTo={`/blog/${post.slug}`} newsletterStatus={query.nl ?? null} /></div>
         </article>
         <aside aria-label={copy.aboutTitle} className="mt-10 flex items-start gap-4 border-t border-slate-200 pt-6 font-sans">
           <span aria-hidden="true" className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-slate-200 text-lg font-bold text-slate-600">{post.authorName.trim().charAt(0).toUpperCase()}</span>

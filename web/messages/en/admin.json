@@ -230,7 +230,8 @@
       "byLanguage": "Confirmed by language: {de} German, {en} English.",
       "statsWeek": "Signed up this week: {count}",
       "statsNew": "New since your last visit: {count}",
-      "statsNewNone": "Nothing new since your last visit."
+      "statsNewNone": "Nothing new since your last visit.",
+      "byList": "Newsletter only (no account, from the blog): {confirmed} confirmed, {pending} waiting for confirmation."
     },
     "status": {
       "draft": "Draft",
@@ -253,7 +254,14 @@
         "de": "German",
         "en": "English"
       },
-      "languageHint": "The issue goes only to confirmed subscribers whose account language matches (none set: German). You write the text itself in that language."
+      "languageHint": "The issue goes only to confirmed subscribers whose account language matches (none set: German). You write the text itself in that language.",
+      "audience": "Who gets it?",
+      "audiences": {
+        "members": "Members",
+        "public": "Newsletter only",
+        "all": "Both"
+      },
+      "audienceHint": "Members: confirmed with an account in the app. Newsletter only: confirmed through the blog, no account. With “Both” nobody gets the issue twice."
     },
     "look": {
       "title": "Look",

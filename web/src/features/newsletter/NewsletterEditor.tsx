@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import {
-  ACCENTS, BUTTON_STYLES, FONTS, HEADER_MODES, HEADING_CASES, LANGUAGES, LOOKS, LIMITS,
+  ACCENTS, AUDIENCES, BUTTON_STYLES, FONTS, HEADER_MODES, HEADING_CASES, LANGUAGES, LOOKS, LIMITS,
   type Block, type BlockType, type EntryItem, type IssueData,
 } from "@/features/newsletter/newsletterModel";
 import { renderNewsletterHtml } from "@/features/newsletter/newsletterRender";
@@ -15,7 +15,7 @@ import {
 type Candidate = { kind: "listing" | "problem"; id: string; title: string };
 type Props = {
   issueId: string; initial: IssueData; status: "draft" | "scheduled" | "sending" | "sent"; scheduledLocal: string;
-  candidates: Candidate[]; recipients: { de: number; en: number }; appOrigin: string; supabaseUrl: string;
+  candidates: Candidate[]; recipients: { members: { de: number; en: number }; list: { de: number; en: number } }; appOrigin: string; supabaseUrl: string;
 };
 
 const BOX = "rounded-2xl border border-[#d9dcec] bg-white p-4";
@@ -35,7 +35,8 @@ export function NewsletterEditor({ issueId, initial, status, scheduledLocal, can
   const [pending, start] = useTransition();
   const active = useRef<HTMLTextAreaElement | null>(null);
   const locked = status !== "draft";
-  const recipients = recipientsByLanguage[issue.language];
+  // Wer die Ausgabe bekommt: Mitglieder, die Nur-Newsletter-Liste oder beide - jeweils in der Sprache der Ausgabe.
+  const recipients = (issue.audience !== "public" ? recipientsByLanguage.members[issue.language] : 0) + (issue.audience !== "members" ? recipientsByLanguage.list[issue.language] : 0);
 
   const html = useMemo(() => renderNewsletterHtml(issue, {
     appOrigin, imageUrl: (path) => `${supabaseUrl}/storage/v1/object/public/newsletter/${encodeURIComponent(path)}`,
@@ -112,6 +113,13 @@ export function NewsletterEditor({ issueId, initial, status, scheduledLocal, can
               {LANGUAGES.map((code) => <button key={code} type="button" disabled={locked} onClick={() => set("language", code)} aria-pressed={issue.language === code} className={`${BTN} ${issue.language === code ? "border-[#5b3df5] bg-[#efeafd]" : ""}`}>{t(`basics.languages.${code}`)}</button>)}
             </div>
             <p className="mt-1 text-xs font-normal text-slate-600">{t("basics.languageHint")}</p>
+          </div>
+          <div className="mt-3 text-sm font-semibold" role="group" aria-label={t("basics.audience")}>
+            {t("basics.audience")}
+            <div className="mt-1 flex flex-wrap gap-2">
+              {AUDIENCES.map((code) => <button key={code} type="button" disabled={locked} onClick={() => set("audience", code)} aria-pressed={issue.audience === code} className={`${BTN} ${issue.audience === code ? "border-[#5b3df5] bg-[#efeafd]" : ""}`}>{t(`basics.audiences.${code}`)}</button>)}
+            </div>
+            <p className="mt-1 text-xs font-normal text-slate-600">{t("basics.audienceHint")}</p>
           </div>
           <label className="mt-3 block text-sm font-semibold">{t("basics.internal")}<input className={FIELD} value={issue.title} maxLength={120} disabled={locked} onChange={(e) => set("title", e.target.value)} /></label>
         </section>

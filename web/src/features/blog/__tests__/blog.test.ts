@@ -208,15 +208,18 @@ test("search fields: own title and description win, otherwise title and excerpt;
   assert.match(editor, /SEO_IDEAL\.title/);
 });
 
-test("the newsletter note: at most one, a hint to the app, no form and no data collected", () => {
+test("the newsletter box: at most one, signup with email only, no account, protected against bots", () => {
   assert.deepEqual(sanitizeBlogBlocks([{ type: "newsletter", id: "n", extra: "x" }]), [{ id: "n", type: "newsletter" }]);
   const two = { ...good, blocks: [{ id: "a", type: "newsletter" as const }, { id: "b", type: "newsletter" as const }] };
   assert.ok(blogPostProblems(two).includes("newsletter"));
   const button = { id: "k", type: "button" as const, label: "Los", href: "/" };
   assert.deepEqual(blogPostProblems({ ...good, blocks: [...good.blocks, { id: "n", type: "newsletter" as const }, button] }), []);
   const body = read("src/features/blog/BlogBody.tsx");
-  assert.match(body, /href="\/account"/);
-  assert.doesNotMatch(body, /<form|<input|type="email"/);
+  assert.match(body, /action=\{subscribePublicNewsletterAction\}/);
+  assert.match(body, /type="email" name="email" required/);
+  assert.match(body, /name="website"[^>]*tabIndex=\{-1\}/, "hidden field for bots");
+  assert.match(body, /href="\/datenschutz"/);
+  assert.equal((body.match(/<input type="(?!hidden)/g) ?? []).length, 2, "only the address and the hidden bot field");
   assert.match(read("../supabase/migrations/20270506120000_blog_categories_seo_attention.sql"), /'blog_newsletter'/);
 });
 

@@ -31,6 +31,15 @@ export function renderContextFor(userId: string | null, secret: string): RenderC
   };
 }
 
+/** Der Abmelde-Link der Nur-Newsletter-Liste: gehoert zu einer Anmeldung ohne Konto (eigene Seite, eigene Unterschrift). */
+export function publicUnsubscribeUrl(subscriberId: string, secret: string, language: "de" | "en"): string {
+  return `${getPublicAppOrigin()}/abmelden/newsletter/extern?i=${encodeURIComponent(subscriberId)}&t=${newsletterToken(subscriberId, "unsubscribe", secret)}&l=${language}`;
+}
+
+export function renderContextForPublic(subscriberId: string, secret: string, language: "de" | "en"): RenderContext {
+  return { ...renderContextFor(null, secret), unsubscribeUrl: publicUnsubscribeUrl(subscriberId, secret, language) };
+}
+
 function serviceClient() {
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -56,26 +65,40 @@ export async function runNewsletterSend(limit = NEWSLETTER_RUN_LIMIT): Promise<{
     const { data: row } = await client.from("newsletter_issues").select("*").eq("id", issueId).maybeSingle();
     if (!row) continue;
     const issue = issueFromRow(row as Record<string, unknown>);
+    // Erst die Mitglieder, dann (je nach Zielgruppe) die Nur-Newsletter-Liste. Jede Gruppe traegt ein, BEVOR gesendet wird.
     const { data: batch, error: claimError } = await client.rpc("claim_newsletter_batch", { p_issue_id: issueId, p_limit: limit - sent });
     if (claimError) return { ok: false, reason: "claim_failed" };
     const userIds = ((batch ?? []) as { user_id: string }[]).map((entry) => entry.user_id);
     const mails: NewsletterMail[] = [];
-    const skipped: string[] = [];
     const delivered: string[] = [];
     for (const userId of userIds) {
       const recipient = await getNotificationRecipient(userId);
-      if (!recipient) { skipped.push(userId); continue; }
+      if (!recipient) continue;
       const context = renderContextFor(userId, secret);
       mails.push({ to: recipient.email, subject: issue.subject, html: renderNewsletterHtml(issue, context), text: renderNewsletterText(issue, context), unsubscribeUrl: context.unsubscribeUrl });
       delivered.push(userId);
     }
-    const result = await sendNewsletterBatch(mails);
+    const publicMails: NewsletterMail[] = [];
+    const publicDelivered: string[] = [];
+    const room = limit - sent - mails.length;
+    if (room > 0) {
+      const { data: publicBatch, error: publicError } = await client.rpc("claim_newsletter_public_batch", { p_issue_id: issueId, p_limit: room });
+      if (publicError) return { ok: false, reason: "claim_failed" };
+      for (const entry of (publicBatch ?? []) as { subscriber_id: string; email: string; language: "de" | "en" }[]) {
+        const context = renderContextForPublic(entry.subscriber_id, secret, entry.language);
+        publicMails.push({ to: entry.email, subject: issue.subject, html: renderNewsletterHtml(issue, context), text: renderNewsletterText(issue, context), unsubscribeUrl: context.unsubscribeUrl });
+        publicDelivered.push(entry.subscriber_id);
+      }
+    }
+    const all = [...mails, ...publicMails];
+    const result = await sendNewsletterBatch(all);
     if (!result.ok) {
       // Das Paket ist nicht rausgegangen: Eintraege zurueck, damit niemand durchrutscht.
       if (delivered.length) await client.from("newsletter_deliveries").delete().eq("issue_id", issueId).in("user_id", delivered);
+      if (publicDelivered.length) await client.from("newsletter_public_deliveries").delete().eq("issue_id", issueId).in("subscriber_id", publicDelivered);
       return { ok: false, reason: result.error };
     }
-    sent += mails.length;
+    sent += all.length;
     await client.rpc("finish_newsletter_if_done", { p_issue_id: issueId });
   }
   return { ok: true, sent, issues: ids.length };

@@ -56,5 +56,5 @@ test("the migration filters claiming and finishing by the subscriber's language 
 test("the editor offers the language and the recipient count follows it", () => {
   const editor = read("src/features/newsletter/NewsletterEditor.tsx");
   assert.match(editor, /LANGUAGES\.map/);
-  assert.match(editor, /recipientsByLanguage\[issue\.language\]/);
+  assert.match(editor, /recipientsByLanguage\.members\[issue\.language\]/);
 });

@@ -230,7 +230,8 @@
       "byLanguage": "Bestätigt nach Sprache: {de} Deutsch, {en} Englisch.",
       "statsWeek": "Diese Woche angemeldet: {count}",
       "statsNew": "Neu seit deinem letzten Besuch: {count}",
-      "statsNewNone": "Nichts Neues seit deinem letzten Besuch."
+      "statsNewNone": "Nichts Neues seit deinem letzten Besuch.",
+      "byList": "Nur Newsletter (ohne Konto, aus dem Blog): {confirmed} bestätigt, {pending} warten auf Bestätigung."
     },
     "status": {
       "draft": "Entwurf",
@@ -253,7 +254,14 @@
         "de": "Deutsch",
         "en": "Englisch"
       },
-      "languageHint": "Die Ausgabe geht nur an bestätigte Abonnent:innen mit dieser Kontosprache (ohne Angabe: Deutsch). Der Text selbst schreibst du in dieser Sprache."
+      "languageHint": "Die Ausgabe geht nur an bestätigte Abonnent:innen mit dieser Kontosprache (ohne Angabe: Deutsch). Der Text selbst schreibst du in dieser Sprache.",
+      "audience": "Wer bekommt sie?",
+      "audiences": {
+        "members": "Mitglieder",
+        "public": "Nur Newsletter",
+        "all": "Beide"
+      },
+      "audienceHint": "Mitglieder: bestätigt mit Konto in der App. Nur Newsletter: bestätigt über den Blog, ohne Konto. Bei „Beide“ bekommt niemand die Ausgabe doppelt."
     },
     "look": {
       "title": "Look",

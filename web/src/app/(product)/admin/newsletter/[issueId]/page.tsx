@@ -22,8 +22,8 @@ export default async function NewsletterIssuePage({ params }: { params: Promise<
   ]);
   const row = ((data ?? []) as Record<string, unknown>[])[0];
   if (!row) notFound();
-  const counts = ((stats.data ?? []) as { confirmed_de: number; confirmed_en: number }[])[0];
-  const recipients = { de: Number(counts?.confirmed_de ?? 0), en: Number(counts?.confirmed_en ?? 0) };
+  const counts = ((stats.data ?? []) as { confirmed_de: number; confirmed_en: number; public_confirmed_de: number; public_confirmed_en: number }[])[0];
+  const recipients = { members: { de: Number(counts?.confirmed_de ?? 0), en: Number(counts?.confirmed_en ?? 0) }, list: { de: Number(counts?.public_confirmed_de ?? 0), en: Number(counts?.public_confirmed_en ?? 0) } };
   const scheduled = typeof row.scheduled_for === "string" ? isoToBerlinLocal(row.scheduled_for) : "";
   return (
     <main className="mx-auto w-full max-w-7xl px-4 py-8 sm:px-6">

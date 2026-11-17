@@ -140,14 +140,16 @@ export const BLOG_COPY = {
     by: "Von", back: "Alle Beiträge", readIn: "Dieser Beitrag auf Deutsch", otherList: "Beiträge auf Englisch", imprint: "Impressum", privacy: "Datenschutz",
     home: "Zur Startseite", feed: "RSS-Feed", published: "Veröffentlicht am", locale: "de-DE", ogLocale: "de_DE", more: "Weiterlesen",
     categories: "Kategorien", minutes: "Min. Lesezeit", moreIn: "Mehr aus", breadcrumbs: "Brotkrumen", miaAlt: "Mia sitzt auf einem Sitzsack, schreibt am Laptop und hat eine Idee",
-    aboutTitle: "Über die Autor:in", newsletterTitle: "Der Newsletter", newsletterText: "Alle zwei Wochen ein Gedanke zu Zusammenarbeit im Gründungsteam, per Mail. Du meldest dich in der App an und bestätigst per Mail.", newsletterButton: "Zur Anmeldung", categoryEmpty: "In dieser Kategorie gibt es noch keine Beiträge.",
+    aboutTitle: "Über die Autor:in", newsletterTitle: "Der Newsletter", newsletterText: "Alle zwei Wochen ein Gedanke zu Zusammenarbeit, Konflikten und Führung im Gründungsteam, per Mail. Dafür brauchst du kein Konto.", newsletterEmail: "Deine E-Mail-Adresse", newsletterButton: "Anmelden", newsletterNote: "Du bekommst erst eine Mail zur Bestätigung. Abmelden geht in jeder Mail mit einem Klick. Mehr dazu in der", newsletterPrivacy: "Datenschutzerklärung",
+    newsletterStatus: { sent: "Fast geschafft: Wir haben dir eine Mail geschickt. Bitte bestätige darin deine Anmeldung.", invalid: "Diese Adresse sieht nicht richtig aus. Bitte prüfe sie.", rate: "Gerade sind zu viele Anmeldungen eingegangen. Bitte versuch es in einer Stunde noch einmal.", error: "Das hat leider nicht geklappt. Bitte versuch es später noch einmal." }, categoryEmpty: "In dieser Kategorie gibt es noch keine Beiträge.",
   },
   en: {
     name: "Blog", title: "Blog", intro: "Thoughts on working together, conflict and leadership in founding teams.", all: "All posts", empty: "No posts yet.",
     by: "By", back: "All posts", readIn: "Read this post in English", otherList: "Posts in German", imprint: "Legal notice", privacy: "Privacy",
     home: "Home", feed: "RSS feed", published: "Published on", locale: "en-US", ogLocale: "en_US", more: "Read more",
     categories: "Categories", minutes: "min read", moreIn: "More from", breadcrumbs: "Breadcrumbs", miaAlt: "Mia sits on a beanbag, writes on a laptop and has an idea",
-    aboutTitle: "About the author", newsletterTitle: "The newsletter", newsletterText: "Every two weeks a thought on working together in a founding team, by email. You sign up in the app and confirm by email.", newsletterButton: "Sign up", categoryEmpty: "There are no posts in this category yet.",
+    aboutTitle: "About the author", newsletterTitle: "The newsletter", newsletterText: "Every two weeks a thought on working together, conflict and leadership in a founding team, by email. You do not need an account.", newsletterEmail: "Your email address", newsletterButton: "Sign up", newsletterNote: "You first get an email to confirm. You can unsubscribe in every email with one click. More in the", newsletterPrivacy: "privacy policy",
+    newsletterStatus: { sent: "Almost done: we sent you an email. Please confirm your signup there.", invalid: "That address does not look right. Please check it.", rate: "Too many signups right now. Please try again in an hour.", error: "That did not work, sorry. Please try again later." }, categoryEmpty: "There are no posts in this category yet.",
   },
 } as const;
 

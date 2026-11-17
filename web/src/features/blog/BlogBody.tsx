@@ -1,6 +1,7 @@
 import { blogButtonHref, blogCopy, type BlogBlock, type BlogLanguage } from "@/features/blog/blogModel";
 import { parseInline, parseRich, type Inline } from "@/features/blog/blogMarkup";
 import { blogImageUrl } from "@/features/blog/blogData";
+import { subscribePublicNewsletterAction } from "@/features/newsletter/publicNewsletterActions";
 
 /**
  * Der Inhalt eines Beitrags - gebaut aus Daten (React-Elemente), nie aus HTML-Text. Links nur auf https oder auf diese App.
@@ -20,7 +21,7 @@ const HEADING = {
   4: "mt-6 mb-2 font-sans text-lg font-bold leading-snug text-slate-950",
 } as const;
 
-export function BlogBody({ blocks, appOrigin, language = "de" }: { blocks: BlogBlock[]; appOrigin: string; language?: BlogLanguage }) {
+export function BlogBody({ blocks, appOrigin, language = "de", returnTo = "/blog", newsletterStatus = null }: { blocks: BlogBlock[]; appOrigin: string; language?: BlogLanguage; returnTo?: string; newsletterStatus?: string | null }) {
   const copy = blogCopy(language);
   return (
     <div className="text-[19px] leading-[1.75] text-slate-800">
@@ -53,12 +54,26 @@ export function BlogBody({ blocks, appOrigin, language = "de" }: { blocks: BlogB
           );
         }
         if (block.type === "newsletter") {
-          // Ein Hinweis, kein Formular: Der Blog erhebt nichts und kennt keine Konten. Die Anmeldung laeuft in der App (Double-Opt-in).
+          // Anmeldung nur mit E-Mail, ohne Konto (eigene Liste, Double-Opt-in). Der Blog setzt weder Cookies noch Skripte; das Formular schickt
+          // nur die Adresse (und ein verstecktes Feld gegen Programme) an eine Server-Aktion.
+          const status = newsletterStatus && newsletterStatus in copy.newsletterStatus ? (newsletterStatus as keyof typeof copy.newsletterStatus) : null;
           return (
-            <aside key={block.id} aria-labelledby={`nl-${block.id}`} className="my-10 rounded-2xl border border-[#cfc6f6] bg-[linear-gradient(120deg,#f4f0ff,#eaf6fb)] p-6 font-sans">
+            <aside key={block.id} id="newsletter" aria-labelledby={`nl-${block.id}`} className="my-10 rounded-2xl border border-[#cfc6f6] bg-[linear-gradient(120deg,#f4f0ff,#eaf6fb)] p-6 font-sans">
               <h2 id={`nl-${block.id}`} className="text-xl font-bold text-slate-950">{copy.newsletterTitle}</h2>
               <p className="mt-2 text-base leading-7 text-slate-700">{copy.newsletterText}</p>
-              <p className="mt-4"><a href="/account" className="inline-flex min-h-11 items-center rounded-full border border-[#6d49e0] bg-white px-6 text-base font-semibold text-[#4a2fb8] hover:bg-[#f4f0ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{copy.newsletterButton}</a></p>
+              {status ? <p role="status" className={`mt-3 rounded-xl p-3 text-sm ${status === "sent" ? "bg-emerald-50 text-emerald-900" : "bg-amber-50 text-amber-900"}`}>{copy.newsletterStatus[status]}</p> : null}
+              {status === "sent" ? null : (
+                <form action={subscribePublicNewsletterAction} className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-end">
+                  <input type="hidden" name="return_to" value={returnTo} />
+                  <input type="hidden" name="language" value={language} />
+                  <div aria-hidden="true" className="absolute -left-[9999px] h-0 w-0 overflow-hidden"><label>Website<input type="text" name="website" tabIndex={-1} autoComplete="off" /></label></div>
+                  <label className="block flex-1 text-sm font-semibold text-slate-900">{copy.newsletterEmail}
+                    <input type="email" name="email" required autoComplete="email" maxLength={254} className="mt-1 min-h-11 w-full rounded-xl border border-[#c9ccdf] bg-white px-3 text-base text-slate-950" />
+                  </label>
+                  <button type="submit" className="inline-flex min-h-11 items-center justify-center rounded-full bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-6 text-base font-semibold text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{copy.newsletterButton}</button>
+                </form>
+              )}
+              <p className="mt-3 text-[13px] leading-5 text-slate-600">{copy.newsletterNote} <a href="/datenschutz" className="underline">{copy.newsletterPrivacy}</a>.</p>
             </aside>
           );
         }

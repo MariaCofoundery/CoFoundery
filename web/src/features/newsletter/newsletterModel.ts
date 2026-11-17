@@ -10,6 +10,9 @@ export const BUTTON_STYLES = ["round", "square", "outline"] as const;
 export const HEADING_CASES = ["normal", "upper"] as const;
 export const LANGUAGES = ["de", "en"] as const;
 export type NewsletterLanguage = (typeof LANGUAGES)[number];
+/** Wer die Ausgabe bekommt: Mitglieder (mit Konto), die Nur-Newsletter-Liste (ohne Konto, z. B. aus dem Blog) oder beide. */
+export const AUDIENCES = ["members", "public", "all"] as const;
+export type NewsletterAudience = (typeof AUDIENCES)[number];
 export const ACCENTS = ["#5b3df5", "#0a88c2", "#2dbfa8", "#d4286b", "#e08a1e"] as const;
 
 export type EntryItem = { kind: "listing" | "problem"; id: string; title: string };
@@ -26,7 +29,7 @@ export type IssueData = {
   title: string; subject: string; preheader: string;
   look: Look; accent: string; headerMode: (typeof HEADER_MODES)[number]; headerImagePath: string; headerAlt: string;
   font: (typeof FONTS)[number]; buttonStyle: (typeof BUTTON_STYLES)[number]; headingCase: (typeof HEADING_CASES)[number];
-  language: NewsletterLanguage;
+  language: NewsletterLanguage; audience: NewsletterAudience;
   blocks: Block[];
 };
 
@@ -79,7 +82,7 @@ export function normalizeIssue(raw: Record<string, unknown>): IssueData {
     look: pick(LOOKS, raw.look, "night"), accent, headerMode: pick(HEADER_MODES, raw.headerMode, "gradient"),
     headerImagePath: str(raw.headerImagePath, 200).replace(/[^A-Za-z0-9._-]/g, ""), headerAlt: str(raw.headerAlt, 200),
     font: pick(FONTS, raw.font, "serif"), buttonStyle: pick(BUTTON_STYLES, raw.buttonStyle, "round"), headingCase: pick(HEADING_CASES, raw.headingCase, "normal"),
-    language: pick(LANGUAGES, raw.language, "de"), blocks: sanitizeBlocks(raw.blocks),
+    language: pick(LANGUAGES, raw.language, "de"), audience: pick(AUDIENCES, raw.audience, "members"), blocks: sanitizeBlocks(raw.blocks),
   };
 }
 
@@ -87,7 +90,7 @@ export function normalizeIssue(raw: Record<string, unknown>): IssueData {
 export function issueFromRow(row: Record<string, unknown>): IssueData {
   return normalizeIssue({
     title: row.title, subject: row.subject, preheader: row.preheader, look: row.look, accent: row.accent, headerMode: row.header_mode,
-    headerImagePath: row.header_image_path, headerAlt: row.header_alt, font: row.font, buttonStyle: row.button_style, headingCase: row.heading_case, language: row.language, blocks: row.blocks,
+    headerImagePath: row.header_image_path, headerAlt: row.header_alt, font: row.font, buttonStyle: row.button_style, headingCase: row.heading_case, language: row.language, audience: row.audience, blocks: row.blocks,
   });
 }
 
@@ -95,7 +98,7 @@ export function issueFromRow(row: Record<string, unknown>): IssueData {
 export function issueToPayload(issue: IssueData) {
   return {
     title: issue.title, subject: issue.subject, preheader: issue.preheader, look: issue.look, accent: issue.accent, header_mode: issue.headerMode,
-    header_image_path: issue.headerImagePath, header_alt: issue.headerAlt, font: issue.font, button_style: issue.buttonStyle, heading_case: issue.headingCase, language: issue.language, blocks: issue.blocks,
+    header_image_path: issue.headerImagePath, header_alt: issue.headerAlt, font: issue.font, button_style: issue.buttonStyle, heading_case: issue.headingCase, language: issue.language, audience: issue.audience, blocks: issue.blocks,
   };
 }
 
