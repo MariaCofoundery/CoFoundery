@@ -1,0 +1,1096 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Startup-Interview · grill-me-workshop · OM Workshop Wildau</title>
+<style>
+  :root {
+    --ink: #0f1d16;
+    --green-deep: #0b2c1d;
+    --green-mid: #155539;
+    --accent: #f4a259;
+    --accent-2: #ffe7c4;
+    --leaf: #7bd389;
+    --muted: #6b9b7a;
+    --line: rgba(15,29,22,.12);
+    --serif: "Iowan Old Style", Palatino, "Book Antiqua", Georgia, "Times New Roman", serif;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { font-family: var(--sans); background: #f5f0e8; color: var(--ink); -webkit-font-smoothing: antialiased; }
+
+  /* ── ACTION BAR ── */
+  .action-bar {
+    position: sticky; top: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between; gap: 12px;
+    padding: 10px 24px;
+    background: rgba(11,44,29,.97);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid rgba(255,255,255,.1);
+    box-shadow: 0 2px 12px rgba(0,0,0,.3);
+  }
+  .action-bar-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+  .action-bar-logo {
+    font-family: var(--serif); font-style: italic; font-size: 13px;
+    color: rgba(255,231,196,.7); white-space: nowrap; flex-shrink: 0;
+  }
+  #startup-name {
+    flex: 1; min-width: 0; max-width: 340px;
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 8px; padding: 7px 12px;
+    font-size: 14px; font-weight: 600; color: #fff;
+    font-family: var(--serif);
+  }
+  #startup-name::placeholder { color: rgba(255,255,255,.35); font-weight: 400; font-style: italic; }
+  #startup-name:focus { outline: none; border-color: var(--accent); background: rgba(255,255,255,.12); }
+
+  .action-bar-right { display: flex; align-items: center; gap: 8px; flex-shrink: 0; }
+  .save-status { font-size: 11px; color: rgba(255,255,255,.4); letter-spacing: .02em; margin-right: 4px; white-space: nowrap; }
+  .save-status.saved { color: var(--leaf); }
+  .save-status.saving { color: var(--accent); }
+
+  .btn {
+    display: inline-flex; align-items: center; gap: 6px;
+    border: none; border-radius: 8px; padding: 7px 14px;
+    font-size: 13px; font-weight: 600; cursor: pointer; transition: .15s;
+    text-decoration: none; white-space: nowrap;
+  }
+  .btn-export {
+    background: var(--accent); color: #1a0f08;
+  }
+  .btn-export:hover { background: #e8903f; }
+  .btn-ghost {
+    background: rgba(255,255,255,.08); color: rgba(255,255,255,.65);
+    border: 1px solid rgba(255,255,255,.15);
+  }
+  .btn-ghost:hover { background: rgba(255,255,255,.14); color: #fff; }
+
+  /* ── COVER PAGE ── */
+  .cover {
+    background:
+      radial-gradient(1200px 520px at 10% -10%, rgba(123,211,137,.40), transparent 55%),
+      radial-gradient(900px 560px at 110% 5%, rgba(244,162,89,.30), transparent 52%),
+      radial-gradient(900px 700px at 55% 130%, rgba(47,174,107,.28), transparent 60%),
+      linear-gradient(140deg, #0b2c1d 0%, #155539 55%, #1f7a52 120%);
+    color: #fff;
+    padding: 70px 80px 60px;
+    min-height: 297mm;
+    display: flex; flex-direction: column; justify-content: space-between;
+    page-break-after: always;
+  }
+  .cover-meta {
+    display: flex; align-items: center; gap: 10px;
+    font-family: var(--serif); font-style: italic; font-size: 13px;
+    font-weight: 600; letter-spacing: .03em; color: rgba(255,231,196,.85);
+  }
+  .cover-meta::before {
+    content: ""; display: inline-block; width: 8px; height: 8px;
+    border-radius: 50%; background: var(--accent); flex-shrink: 0;
+  }
+  .cover-main { flex: 1; display: flex; flex-direction: column; justify-content: center; padding: 40px 0; }
+  .cover-kicker { font-family: var(--serif); font-style: italic; font-size: 18px; color: var(--accent-2); margin-bottom: 16px; }
+  .cover-title { font-family: var(--serif); font-size: 58px; line-height: 1.05; font-weight: 700; letter-spacing: -.01em; margin-bottom: 20px; }
+  .cover-title em { color: var(--accent-2); font-style: italic; }
+
+  /* startup name display on cover */
+  .cover-startup-display {
+    display: none;
+    font-family: var(--serif); font-style: italic;
+    font-size: 24px; font-weight: 600; color: var(--accent-2);
+    margin-bottom: 12px;
+  }
+  .cover-startup-display.visible { display: block; }
+
+  .cover-sub { font-size: 16px; line-height: 1.6; color: rgba(231,243,234,.85); max-width: 52ch; margin-bottom: 32px; }
+  .cover-instruction {
+    background: rgba(244,162,89,.15); border: 1px solid rgba(244,162,89,.35);
+    border-radius: 10px; padding: 18px 22px; font-size: 14px; line-height: 1.6;
+    color: rgba(255,231,196,.95); max-width: 52ch;
+  }
+  .cover-instruction strong { color: #fff; }
+  .cover-blocks { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 32px; }
+  .cover-block-tag {
+    background: rgba(255,255,255,.1); border: 1px solid rgba(255,255,255,.18);
+    border-radius: 6px; padding: 5px 12px; font-size: 11px; font-weight: 600;
+    letter-spacing: .05em; color: rgba(255,255,255,.8); text-transform: uppercase;
+  }
+  .cover-footer { font-size: 11px; color: rgba(255,255,255,.45); letter-spacing: .08em; font-weight: 500; }
+
+  /* ── QUESTION PAGES ── */
+  .page {
+    background: #faf8f4; min-height: 297mm;
+    padding: 48px 64px 52px; page-break-after: always;
+    display: flex; flex-direction: column; gap: 0;
+  }
+  .page-header {
+    display: flex; align-items: flex-start; justify-content: space-between;
+    margin-bottom: 28px; padding-bottom: 20px; border-bottom: 2px solid var(--green-mid);
+  }
+  .block-label { display: inline-flex; align-items: center; gap: 10px; }
+  .block-letter {
+    width: 36px; height: 36px; background: var(--green-mid); border-radius: 8px;
+    display: grid; place-items: center; font-size: 15px; font-weight: 800;
+    color: #fff; letter-spacing: .03em; flex-shrink: 0;
+  }
+  .block-name { font-family: var(--serif); font-size: 22px; font-weight: 700; color: var(--ink); line-height: 1.1; }
+  .block-hint { font-size: 11px; color: var(--muted); font-weight: 500; margin-top: 2px; letter-spacing: .02em; }
+  .page-logo { font-family: var(--serif); font-style: italic; font-size: 11px; color: var(--muted); text-align: right; line-height: 1.5; }
+
+  /* questions */
+  .questions { display: flex; flex-direction: column; gap: 20px; flex: 1; }
+  .q-item { display: grid; grid-template-rows: auto 1fr; gap: 6px; }
+  .q-text { display: flex; align-items: flex-start; gap: 10px; }
+  .q-num {
+    flex-shrink: 0; width: 22px; height: 22px; background: var(--accent);
+    border-radius: 5px; display: grid; place-items: center;
+    font-size: 10px; font-weight: 800; color: #1a0f08; margin-top: 1px;
+  }
+  .q-label { font-size: 14px; font-weight: 600; color: var(--ink); line-height: 1.45; }
+  .q-sub { font-size: 11.5px; color: var(--muted); font-weight: 400; font-style: italic; margin-left: 32px; margin-top: -2px; line-height: 1.4; }
+  .q-divider { border: none; border-top: 1px dashed rgba(15,29,22,.12); margin: 4px 0 4px 32px; }
+
+  /* ── TEXTAREA / INPUT STYLES ── */
+  textarea.answer-box, input.answer-inline {
+    display: block; width: calc(100% - 32px); margin-left: 32px; margin-top: 4px;
+    border: 1.5px solid rgba(15,29,22,.18); border-radius: 7px;
+    background: #fff; padding: 10px 14px;
+    font-family: var(--sans); font-size: 13px; color: var(--ink); line-height: 1.5;
+    resize: vertical; transition: border-color .15s;
+    min-height: 52px;
+  }
+  textarea.answer-box:focus, input.answer-inline:focus {
+    outline: none; border-color: var(--green-mid);
+    box-shadow: 0 0 0 3px rgba(21,85,57,.08);
+  }
+  textarea.answer-box::placeholder { color: rgba(15,29,22,.25); font-style: italic; }
+  textarea.answer-box.tall { min-height: 80px; }
+  textarea.answer-box.xtall { min-height: 110px; }
+
+  /* checkbox row */
+  .check-row {
+    display: flex; align-items: center; gap: 20px;
+    margin-left: 32px; margin-top: 4px;
+    border: 1.5px solid rgba(15,29,22,.18); border-radius: 7px;
+    background: #fff; padding: 10px 14px; min-height: 44px;
+  }
+  .check-row label {
+    display: flex; align-items: center; gap: 6px;
+    font-size: 13px; color: var(--ink); cursor: pointer; user-select: none;
+  }
+  .check-row input[type="checkbox"], .check-row input[type="radio"] {
+    width: 15px; height: 15px; accent-color: var(--green-mid); cursor: pointer;
+  }
+
+  /* email count inline */
+  .email-row {
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+    margin-left: 32px; margin-top: 4px;
+    border: 1.5px solid rgba(15,29,22,.18); border-radius: 7px;
+    background: #fff; padding: 10px 14px;
+  }
+  .email-row label { display: flex; align-items: center; gap: 6px; font-size: 13px; color: var(--ink); cursor: pointer; }
+  .email-row input[type="number"] {
+    width: 90px; border: 1px solid rgba(15,29,22,.2); border-radius: 5px;
+    padding: 4px 8px; font-size: 13px; color: var(--ink);
+  }
+  .email-row input[type="number"]:focus { outline: none; border-color: var(--green-mid); }
+
+  /* adjective triple */
+  .adj-row {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 10px;
+    margin-left: 32px; margin-top: 4px;
+  }
+  input.adj-input {
+    border: 1.5px solid rgba(15,29,22,.18); border-bottom-width: 2px; border-radius: 7px;
+    background: #fff; padding: 10px 12px; font-size: 14px; font-family: var(--serif);
+    font-weight: 600; color: var(--ink); text-align: center;
+    transition: border-color .15s;
+  }
+  input.adj-input:focus { outline: none; border-color: var(--green-mid); }
+  input.adj-input::placeholder { font-weight: 400; font-style: italic; color: rgba(15,29,22,.25); font-family: var(--sans); font-size: 12px; }
+
+  /* table with textareas */
+  .t-table { margin-left: 32px; margin-top: 4px; width: calc(100% - 32px); border-collapse: collapse; }
+  .t-table th {
+    background: var(--green-mid); color: #fff; font-weight: 600;
+    padding: 7px 10px; text-align: left; font-size: 11px; letter-spacing: .03em;
+  }
+  .t-table td { border: 1px solid rgba(15,29,22,.14); padding: 0; vertical-align: top; background: #fff; }
+  .t-table td textarea {
+    display: block; width: 100%; border: none; outline: none; resize: none;
+    padding: 8px 10px; font-size: 12px; font-family: var(--sans);
+    color: var(--ink); line-height: 1.45; min-height: 48px; background: transparent;
+  }
+  .t-table td textarea::placeholder { color: rgba(15,29,22,.22); font-style: italic; }
+  .t-table td textarea:focus { background: rgba(21,85,57,.04); }
+
+  /* tip box */
+  .tip {
+    background: rgba(244,162,89,.08); border: 1px solid rgba(244,162,89,.3);
+    border-radius: 8px; padding: 12px 14px; font-size: 12px;
+    color: #5a3800; line-height: 1.5; margin-top: 12px;
+  }
+  .tip strong { color: #3d2500; }
+
+  /* page footer */
+  .page-foot {
+    margin-top: 20px; padding-top: 12px; border-top: 1px solid rgba(15,29,22,.1);
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: 10px; color: var(--muted); letter-spacing: .04em;
+  }
+
+  /* ── PRINT ── */
+  @media print {
+    .action-bar { display: none !important; }
+    body { background: #fff; }
+    .cover { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .page { background: #fff; }
+    .block-letter { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .q-num { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .t-table th { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    textarea.answer-box, .t-table td textarea, input.adj-input, .check-row, .email-row {
+      border-color: rgba(15,29,22,.25) !important;
+    }
+  }
+  @page { size: A4; margin: 0; }
+</style>
+</head>
+<body>
+
+<!-- ═══════════ ACTION BAR ═══════════ -->
+<div class="action-bar">
+  <div class="action-bar-left">
+    <div class="action-bar-logo">grill-me-workshop</div>
+    <input type="text" id="startup-name" placeholder="Startup-Name eingeben …" oninput="onNameChange()" autocomplete="off">
+  </div>
+  <div class="action-bar-right">
+    <span class="save-status" id="save-status">nicht gespeichert</span>
+    <button class="btn btn-ghost" onclick="clearAll()">↺ Zurücksetzen</button>
+    <button class="btn btn-export" onclick="exportMarkdown()">↓ Als .md exportieren</button>
+  </div>
+</div>
+
+<!-- ═══════════ COVER ═══════════ -->
+<div class="cover">
+  <div class="cover-meta">Reaktor Wildau · OM Workshop · KI-Marketing</div>
+  <div class="cover-main">
+    <div class="cover-kicker">Startup-Interview</div>
+    <div class="cover-startup-display" id="cover-startup-display"></div>
+    <h1 class="cover-title">Lass dich<br><em>grillen.</em></h1>
+    <p class="cover-sub">
+      10 Blöcke · ~45 Minuten · einmal ausgefüllt.
+      Danach kennt die KI euer Startup so gut, dass ihr keinen einzigen Kontext mehr erklären müsst.
+    </p>
+    <div class="cover-instruction">
+      <strong>So geht's:</strong> Füllt diesen Bogen direkt hier im Browser aus — eure Antworten
+      werden automatisch gespeichert. Stichpunkte, Halbsätze, Rohes reicht vollkommen.<br><br>
+      <strong>Fertig?</strong> Klickt oben auf „Als .md exportieren" — die Datei könnt ihr
+      per E-Mail an <em>cf@digitaleheimat.de</em> schicken oder direkt in ein Claude-Projekt hochladen.
+    </div>
+    <div class="cover-blocks">
+      <span class="cover-block-tag">A — Das Startup</span>
+      <span class="cover-block-tag">B — Digitale Basis</span>
+      <span class="cover-block-tag">C — Das Angebot</span>
+      <span class="cover-block-tag">D — Zielgruppe</span>
+      <span class="cover-block-tag">E — Problem</span>
+      <span class="cover-block-tag">F — Positionierung</span>
+      <span class="cover-block-tag">G — Einwände</span>
+      <span class="cover-block-tag">H — Brand Voice</span>
+      <span class="cover-block-tag">I — Beweise</span>
+      <span class="cover-block-tag">J — Fokus & Ziele</span>
+    </div>
+  </div>
+  <div class="cover-footer">digitaleheimat · grill-me-workshop · omww-2026</div>
+</div>
+
+<!-- ═══════════ BLOCK A ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">A</div>
+      <div class="block-info">
+        <div class="block-name">Das Startup</div>
+        <div class="block-hint">Wer seid ihr · Was macht ihr · Wie weit seid ihr</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Wie heißt euer Startup — und was macht ihr in einem Satz, für wen, mit welchem Ergebnis?</div></div>
+      <div class="q-sub">Nicht die Methode, sondern das Ergebnis für den Kunden: „[Zielgruppe] erreicht [Ergebnis] mit/durch [euer Angebot]"</div>
+      <textarea class="answer-box tall" id="a1" placeholder="Name + One-Liner …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Seit wann gibt es euch — und in welcher Phase seid ihr gerade?</div></div>
+      <div class="q-sub">Idee / MVP / erste Umsätze / Wachstum — und was genau habt ihr schon gebaut oder verkauft?</div>
+      <textarea class="answer-box" id="a2" placeholder="Gründungsdatum, Phase, erste Meilensteine …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Wer ist im Team — welche Rollen, welche Stärken?</div></div>
+      <textarea class="answer-box" id="a3" placeholder="Team, Rollen, relevante Hintergründe …" oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block A · Das Startup</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK B ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">B</div>
+      <div class="block-info">
+        <div class="block-name">Digitale Basis</div>
+        <div class="block-hint">Website · Social · E-Mail · Reichweite</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Eure Website-URL?</div></div>
+      <div class="q-sub">Falls keine vorhanden: wann ist sie geplant — oder bewusst kein Ziel?</div>
+      <textarea class="answer-box" id="b1" placeholder="https://…" oninput="schedSave()" rows="2"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Logo vorhanden?</div></div>
+      <div class="check-row">
+        <label><input type="radio" name="logo" id="b2-ja" value="Ja" onchange="schedSave()"> Ja</label>
+        <label><input type="radio" name="logo" id="b2-nein" value="Nein" onchange="schedSave()"> Nein</label>
+        <label><input type="radio" name="logo" id="b2-arbeit" value="In Arbeit" onchange="schedSave()"> In Arbeit</label>
+      </div>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Welche Social-Media-Kanäle sind aktiv — mit Handle / Link?</div></div>
+      <div class="q-sub">Nur aktiv gemeint: wo postet ihr wirklich. Plattform + Handle reicht.</div>
+      <textarea class="answer-box tall" id="b3" placeholder="z.B. LinkedIn: @meinStartup · Instagram: @… · TikTok: @…" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">E-Mail-Liste vorhanden — und wenn ja, wie viele Kontakte ungefähr?</div></div>
+      <div class="email-row">
+        <label><input type="radio" name="email-liste" id="b4-nein" value="Nein" onchange="schedSave()"> Nein</label>
+        <label>
+          <input type="radio" name="email-liste" id="b4-ja" value="Ja" onchange="schedSave()"> Ja — ca.
+          <input type="number" id="b4-count" placeholder="0" min="0" oninput="schedSave()" style="margin-left:6px"> Kontakte
+        </label>
+      </div>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">5</div><div class="q-label">Website-Besucher pro Monat — ungefähr?</div></div>
+      <div class="q-sub">Grobe Schätzung reicht. Kein Google Analytics nötig.</div>
+      <textarea class="answer-box" id="b5" placeholder="ca. X pro Monat / keine Ahnung / noch keine Daten …" oninput="schedSave()" rows="2"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block B · Digitale Basis</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK C ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">C</div>
+      <div class="block-info">
+        <div class="block-name">Das Angebot</div>
+        <div class="block-hint">Was ihr verkauft · Preis · Der eine Grund zu kaufen</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Wie heißt euer Produkt / euer Angebot konkret?</div></div>
+      <textarea class="answer-box" id="c1" placeholder="Produktname oder Angebotsbezeichnung …" oninput="schedSave()" rows="2"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Was bekommt jemand der bei euch kauft — in 2–3 Sätzen?</div></div>
+      <div class="q-sub">Nicht Features, sondern Leistung + Ergebnis. Was ist danach anders?</div>
+      <textarea class="answer-box tall" id="c2" placeholder="Was der Kunde bekommt und was sich danach verändert …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Auf welchem „Regal" suchen Kunden nach euch — wie googeln sie das?</div></div>
+      <div class="q-sub">Was tippen sie in die Suchmaske? Nicht wie ihr euch selbst nennt — wie sie suchen.</div>
+      <textarea class="answer-box" id="c3" placeholder='z.B. "Tool für X" / "Anbieter für Y" / "günstige Alternative zu Z" …' oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">Preismodell und konkreter Preis?</div></div>
+      <div class="q-sub">Einmalzahlung / Abo / Revenue-Share / andere. Und die konkrete Zahl.</div>
+      <textarea class="answer-box" id="c4" placeholder="z.B. 49 €/Monat Abo / 999 € Einmalig / ab 2.500 € Projektpreis …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">5</div><div class="q-label">Der EINE Grund warum jemand bei euch kauft — und nicht bei einer Alternative?</div></div>
+      <div class="q-sub">Ein Satz. Nicht drei. Der wichtigste.</div>
+      <textarea class="answer-box" id="c5" placeholder="Weil wir das einzige … das …" oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block C · Das Angebot</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK D ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">D</div>
+      <div class="block-info">
+        <div class="block-name">Zielgruppe & Personas</div>
+        <div class="block-hint">Idealer Kunde · B2B-Rollen · Anti-Persona</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">B2B oder B2C — und wie beschreibt ihr euren idealen Kunden?</div></div>
+      <div class="q-sub">B2B: Branche / Unternehmensgröße / Rolle. &nbsp; B2C: Alter / Lebenssituation / Typ.</div>
+      <textarea class="answer-box tall" id="d1" placeholder="B2B / B2C — und die Beschreibung des idealen Kunden …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Wo sind eure Kunden online aktiv?</div></div>
+      <div class="q-sub">Plattformen, Communities, Newsletter, Events — wo hängen sie wirklich rum?</div>
+      <textarea class="answer-box" id="d2" placeholder="LinkedIn / Reddit / Fachforen / Events / Newsletter …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Nur B2B: Wer nutzt, wer entscheidet, wer zahlt — sind das drei verschiedene Personen?</div></div>
+      <table class="t-table">
+        <tr>
+          <th style="width:22%">Rolle</th>
+          <th style="width:39%">Was interessiert sie?</th>
+          <th>Was ist ihr Einwand?</th>
+        </tr>
+        <tr>
+          <td><textarea id="d3-n-rolle" placeholder="Nutzer" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-n-int" placeholder="" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-n-ein" placeholder="" oninput="schedSave()"></textarea></td>
+        </tr>
+        <tr>
+          <td><textarea id="d3-e-rolle" placeholder="Entscheider" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-e-int" placeholder="" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-e-ein" placeholder="" oninput="schedSave()"></textarea></td>
+        </tr>
+        <tr>
+          <td><textarea id="d3-z-rolle" placeholder="Zahler / Budget" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-z-int" placeholder="" oninput="schedSave()"></textarea></td>
+          <td><textarea id="d3-z-ein" placeholder="" oninput="schedSave()"></textarea></td>
+        </tr>
+      </table>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">Wer ist ausdrücklich KEIN guter Kunde?</div></div>
+      <div class="q-sub">Anti-Persona: Wen lehnt ihr ab — oder bei wem hat es nie funktioniert?</div>
+      <textarea class="answer-box" id="d4" placeholder="Anti-Persona …" oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block D · Zielgruppe & Personas</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK E ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">E</div>
+      <div class="block-info">
+        <div class="block-name">Problem & Switching</div>
+        <div class="block-hint">Was den Kunden schmerzt · Warum sie wechseln · Was sie aufhält</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Was ist das größte Problem eurer Kunden bevor sie euch finden?</div></div>
+      <div class="q-sub">Nicht das Symptom — der eigentliche Schmerz. Was hält sie nachts wach?</div>
+      <textarea class="answer-box tall" id="e1" placeholder="Das eigentliche Problem …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Was kostet ihnen dieses Problem — Zeit, Geld, verpasste Chancen?</div></div>
+      <div class="q-sub">Konkret wenn möglich: „3 Stunden pro Woche", „20 % Churn", „nicht skalierbar".</div>
+      <textarea class="answer-box" id="e2" placeholder="Konkrete Kosten des Problems …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Was haben sie vorher versucht — und warum hat es nicht gereicht?</div></div>
+      <div class="q-sub">Tools, Agenturen, eigene Lösungen. Was war der konkrete Mangel?</div>
+      <textarea class="answer-box tall" id="e3" placeholder="Vorherige Lösungsversuche und warum sie gescheitert sind …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">Was hält sie bei der alten Lösung — obwohl sie besser wissen?</div></div>
+      <div class="q-sub">Gewohnheit / Angst / Kosten / „funktioniert ja irgendwie". Das ist der Switching-Widerstand.</div>
+      <textarea class="answer-box" id="e4" placeholder="Switching-Widerstand …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">5</div><div class="q-label">Wie beschreiben Kunden das Problem in ihren eigenen Worten?</div></div>
+      <div class="q-sub">Verbatim — genauso wie sie es sagen, nicht wie ihr es nennen würdet.</div>
+      <textarea class="answer-box tall" id="e5" placeholder='"Wir kämpfen immer damit, dass …" / "Das nervt uns am meisten …"' oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block E · Problem & Switching</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK F ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">F</div>
+      <div class="block-info">
+        <div class="block-name">Positionierung & Wettbewerb</div>
+        <div class="block-hint">Direkte Alternativen · Indirekte Alternativen · Was euch unique macht</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Eure direkten Wettbewerber — wer bietet die gleiche Lösung an?</div></div>
+      <div class="q-sub">Namen, URLs, kurze Einschätzung. Nicht wer ihr kennt — wer euren Kunden begegnet.</div>
+      <textarea class="answer-box tall" id="f1" placeholder="Wettbewerber 1: …, Wettbewerber 2: …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Indirekte Alternativen — welche anderen Ansätze nutzen Kunden statt euch?</div></div>
+      <div class="q-sub">Excel, nichts tun, Freelancer, Inhouse-Lösung — was ist die Alternative die nicht nach Wettbewerber aussieht?</div>
+      <textarea class="answer-box" id="f2" placeholder="Excel / nichts tun / Freelancer / Inhouse …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Warum fallen Wettbewerber und Alternativen für euren idealen Kunden kurz?</div></div>
+      <div class="q-sub">Was können sie nicht, was ihr könnt? Was lösen sie nicht?</div>
+      <textarea class="answer-box tall" id="f3" placeholder="Was die Alternativen nicht können oder nicht lösen …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">Was macht euch konkret anders — nicht „besser", sondern anders?</div></div>
+      <div class="q-sub">Positionierung ist Differenzierung, nicht Superiority. Wo seid ihr kategoriell verschieden?</div>
+      <textarea class="answer-box tall" id="f4" placeholder="Wir sind das einzige … das …" oninput="schedSave()"></textarea>
+    </div>
+    <div class="tip"><strong>Tipp:</strong> „Wir sind besser als X" ist keine Positionierung. „Wir sind das einzige Y das Z tut" ist eine. Woran würde ein Kunde euch in einem Satz erkennen?</div>
+  </div>
+  <div class="page-foot"><span>Block F · Positionierung & Wettbewerb</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK G ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">G</div>
+      <div class="block-info">
+        <div class="block-name">Einwände & Kundensprache</div>
+        <div class="block-hint">Was Kunden zögern lässt · Wie sie wirklich reden</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Die Top-3 Einwände die ihr hört — und eure ehrliche Antwort darauf?</div></div>
+      <table class="t-table">
+        <tr>
+          <th style="width:48%">Einwand („Ja aber …")</th>
+          <th>Eure Antwort</th>
+        </tr>
+        <tr>
+          <td><textarea id="g1-e1" placeholder='z.B. "Zu teuer für uns"' oninput="schedSave()"></textarea></td>
+          <td><textarea id="g1-a1" placeholder="Eure Antwort …" oninput="schedSave()"></textarea></td>
+        </tr>
+        <tr>
+          <td><textarea id="g1-e2" placeholder='z.B. "Wir haben das intern"' oninput="schedSave()"></textarea></td>
+          <td><textarea id="g1-a2" placeholder="Eure Antwort …" oninput="schedSave()"></textarea></td>
+        </tr>
+        <tr>
+          <td><textarea id="g1-e3" placeholder='z.B. "Wir müssen erst …"' oninput="schedSave()"></textarea></td>
+          <td><textarea id="g1-a3" placeholder="Eure Antwort …" oninput="schedSave()"></textarea></td>
+        </tr>
+      </table>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Was sagen zufriedene Kunden über euch — verbatim?</div></div>
+      <div class="q-sub">Kopiert aus E-Mails, Chats, Bewertungen. Genau so wie sie es gesagt haben.</div>
+      <textarea class="answer-box tall" id="g2" placeholder='"Das hat bei uns X verändert …" / Kopiert aus E-Mail oder Chat …' oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Wörter die eure Kunden benutzen — und Wörter die ihr selbst vermeidet?</div></div>
+      <div class="q-sub">Kundenwörter schlagen immer Marketingsprache. Was hört ihr in echten Gesprächen?</div>
+      <textarea class="answer-box tall" id="g3" placeholder="Kundenwörter: … / Wörter die wir meiden: …" oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block G · Einwände & Kundensprache</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK H ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">H</div>
+      <div class="block-info">
+        <div class="block-name">Brand Voice & Stil</div>
+        <div class="block-hint">Wie ihr klingt · Was ihr nie sagt · Euer Erkennungssatz</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">3 Adjektive die euren Kommunikationston beschreiben?</div></div>
+      <div class="q-sub">Nicht wie ihr gerne wärt — wie ihr wirklich klingt wenn ihr gut drauf seid.</div>
+      <div class="adj-row">
+        <input class="adj-input" type="text" id="h1a" placeholder="Adjektiv 1" oninput="schedSave()">
+        <input class="adj-input" type="text" id="h1b" placeholder="Adjektiv 2" oninput="schedSave()">
+        <input class="adj-input" type="text" id="h1c" placeholder="Adjektiv 3" oninput="schedSave()">
+      </div>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Was sagt ihr NIE — Wörter, Formulierungen, Themen die ihr meidet?</div></div>
+      <div class="q-sub">Brand-Tabus. Was klingt nach jemandem anderen — nicht nach euch?</div>
+      <textarea class="answer-box tall" id="h2" placeholder="Wörter, Phrasen, Themen die wir meiden …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Ein Beispielsatz der nach euch klingt — nicht nach eurem Wettbewerb?</div></div>
+      <div class="q-sub">Aus einer echten E-Mail, einem Post, einem Gespräch. Genau euer Ton.</div>
+      <textarea class="answer-box xtall" id="h3" placeholder='"Beispielsatz der genau nach uns klingt …"' oninput="schedSave()"></textarea>
+    </div>
+    <div class="tip"><strong>Wozu das gut ist:</strong> Die KI übernimmt euren Ton exakt — aber nur wenn ihr ihm einen Namen gebt. Ohne Brand Voice klingt alles gleich generisch.</div>
+  </div>
+  <div class="page-foot"><span>Block H · Brand Voice & Stil</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK I ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">I</div>
+      <div class="block-info">
+        <div class="block-name">Beweise & Zahlen</div>
+        <div class="block-hint">Was ihr belegen könnt · Referenzen · Ein echtes Zitat</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Welche Ergebnisse oder Zahlen könnt ihr nennen?</div></div>
+      <div class="q-sub">Zeitersparnis, ROI, Nutzerzahl, Wachstum — alles was konkret und belegbar ist. Auch kleine Zahlen zählen.</div>
+      <textarea class="answer-box tall" id="i1" placeholder="z.B. 120 aktive Nutzer / 40% Zeitersparnis / 3 Piloten abgeschlossen …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Bekannte Kunden, Referenzen oder Partner die ihr nennen dürft?</div></div>
+      <div class="q-sub">Logos, Firmennamen, Institutionen. Auch wenn es nur eine Person ist.</div>
+      <textarea class="answer-box" id="i2" placeholder="Firmenname / Institution / Person (mit Erlaubnis) …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Ein konkretes Kundenzitat das ihr auf einer Website oder in einem Pitch nutzen würdet?</div></div>
+      <div class="q-sub">Name (oder Rolle) + was sie gesagt haben. Verbatim schlägt paraphrasiert.</div>
+      <textarea class="answer-box xtall" id="i3" placeholder='"Das hat uns X gebracht." — [Vorname], [Rolle bei Firma]' oninput="schedSave()"></textarea>
+    </div>
+    <div class="tip"><strong>Falls ihr noch keine Zahlen habt:</strong> Schreibt trotzdem auf was ihr beobachtet, gemessen oder erlebt habt. „3 von 5 Testkunden haben X gesagt" ist ein Beweis. Startups mit wenig Daten haben oft mehr als sie denken.</div>
+  </div>
+  <div class="page-foot"><span>Block I · Beweise & Zahlen</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<!-- ═══════════ BLOCK J ═══════════ -->
+<div class="page">
+  <div class="page-header">
+    <div class="block-label">
+      <div class="block-letter">J</div>
+      <div class="block-info">
+        <div class="block-name">Fokus & Ziele</div>
+        <div class="block-hint">Was jetzt wichtig ist · Euer CTA · Die eine Aufgabe diese Woche</div>
+      </div>
+    </div>
+    <div class="page-logo">grill-me-workshop<br>Reaktor Wildau 2026</div>
+  </div>
+  <div class="questions">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">1</div><div class="q-label">Wichtigstes Marketing-Ziel gerade — konkret und messbar?</div></div>
+      <div class="q-sub">Nicht „mehr Bekanntheit" — sondern was genau, bis wann, gemessen womit?</div>
+      <textarea class="answer-box tall" id="j1" placeholder="Ziel: … / Bis: … / Gemessen an: …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">2</div><div class="q-label">Was soll jemand tun der eure Website sieht oder euren Content liest?</div></div>
+      <div class="q-sub">Der eine Call to Action — was ist die nächste Handlung die ihr von Interessenten wollt?</div>
+      <textarea class="answer-box" id="j2" placeholder="CTA: Demo buchen / Newsletter anmelden / Kontakt aufnehmen / …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">3</div><div class="q-label">Was messt ihr bereits — welche Zahlen schaut ihr euch an?</div></div>
+      <textarea class="answer-box" id="j3" placeholder="GA4 / LinkedIn Analytics / App-Installs / Conversion Rate / …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">4</div><div class="q-label">Euer EINE Haupthebel aus dem Workshop-Deep-Dive heute?</div></div>
+      <div class="q-sub">Der Bereich wo eine Verbesserung den größten Effekt hätte — nicht der mit dem meisten Spaß.</div>
+      <textarea class="answer-box tall" id="j4" placeholder="Haupthebel …" oninput="schedSave()"></textarea>
+    </div>
+    <hr class="q-divider">
+    <div class="q-item">
+      <div class="q-text"><div class="q-num">5</div><div class="q-label">Die EINE konkrete Aufgabe die ihr diese Woche umsetzt?</div></div>
+      <div class="q-sub">Nicht drei, nicht „danach schauen wir". Genau eine Aufgabe — bis wann, wer macht sie?</div>
+      <textarea class="answer-box tall" id="j5" placeholder="Aufgabe: … / Bis: … / Verantwortlich: …" oninput="schedSave()"></textarea>
+    </div>
+  </div>
+  <div class="page-foot"><span>Block J · Fokus & Ziele</span><span>grill-me-workshop · digitaleheimat</span></div>
+</div>
+
+<script>
+  const STORE_KEY = 'grill-me-omww-2026';
+  let saveTimer = null;
+
+  // ── FIELD IDS (ordered for export) ──
+  const TEXTAREA_IDS = [
+    'a1','a2','a3',
+    'b1','b3','b5',
+    'c1','c2','c3','c4','c5',
+    'd1','d2',
+    'd3-n-rolle','d3-n-int','d3-n-ein',
+    'd3-e-rolle','d3-e-int','d3-e-ein',
+    'd3-z-rolle','d3-z-int','d3-z-ein',
+    'd4',
+    'e1','e2','e3','e4','e5',
+    'f1','f2','f3','f4',
+    'g1-e1','g1-a1','g1-e2','g1-a2','g1-e3','g1-a3',
+    'g2','g3',
+    'h2','h3',
+    'i1','i2','i3',
+    'j1','j2','j3','j4','j5'
+  ];
+  const TEXT_IDS = ['h1a','h1b','h1c'];
+  const RADIO_NAMES = ['logo','email-liste'];
+
+  // ── SAVE ──
+  function schedSave() {
+    setStatus('saving');
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(doSave, 1200);
+  }
+
+  function doSave() {
+    const data = {};
+    data['startup-name'] = document.getElementById('startup-name').value;
+    TEXTAREA_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) data[id] = el.value;
+    });
+    TEXT_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el) data[id] = el.value;
+    });
+    RADIO_NAMES.forEach(name => {
+      const checked = document.querySelector(`input[name="${name}"]:checked`);
+      data['radio-' + name] = checked ? checked.value : '';
+    });
+    const countEl = document.getElementById('b4-count');
+    data['b4-count'] = countEl ? countEl.value : '';
+    localStorage.setItem(STORE_KEY, JSON.stringify(data));
+    setStatus('saved');
+  }
+
+  // ── LOAD ──
+  function loadSaved() {
+    const raw = localStorage.getItem(STORE_KEY);
+    if (!raw) return;
+    let data;
+    try { data = JSON.parse(raw); } catch(e) { return; }
+
+    const nameEl = document.getElementById('startup-name');
+    if (data['startup-name']) { nameEl.value = data['startup-name']; updateCoverName(data['startup-name']); }
+
+    TEXTAREA_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && data[id]) el.value = data[id];
+    });
+    TEXT_IDS.forEach(id => {
+      const el = document.getElementById(id);
+      if (el && data[id]) el.value = data[id];
+    });
+    RADIO_NAMES.forEach(name => {
+      if (data['radio-' + name]) {
+        const el = document.querySelector(`input[name="${name}"][value="${data['radio-' + name]}"]`);
+        if (el) el.checked = true;
+      }
+    });
+    const countEl = document.getElementById('b4-count');
+    if (countEl && data['b4-count']) countEl.value = data['b4-count'];
+
+    setStatus('saved');
+  }
+
+  function setStatus(state) {
+    const el = document.getElementById('save-status');
+    if (state === 'saved') { el.textContent = '✓ Gespeichert'; el.className = 'save-status saved'; }
+    else if (state === 'saving') { el.textContent = '… wird gespeichert'; el.className = 'save-status saving'; }
+    else { el.textContent = 'nicht gespeichert'; el.className = 'save-status'; }
+  }
+
+  // ── NAME UPDATE ──
+  function onNameChange() {
+    updateCoverName(document.getElementById('startup-name').value);
+    schedSave();
+  }
+  function updateCoverName(name) {
+    const el = document.getElementById('cover-startup-display');
+    if (name.trim()) { el.textContent = name.trim(); el.classList.add('visible'); }
+    else { el.textContent = ''; el.classList.remove('visible'); }
+  }
+
+  // ── CLEAR ──
+  function clearAll() {
+    if (!confirm('Alle Antworten löschen? Das kann nicht rückgängig gemacht werden.')) return;
+    localStorage.removeItem(STORE_KEY);
+    document.getElementById('startup-name').value = '';
+    updateCoverName('');
+    TEXTAREA_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    TEXT_IDS.forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+    RADIO_NAMES.forEach(name => {
+      document.querySelectorAll(`input[name="${name}"]`).forEach(el => el.checked = false);
+    });
+    const countEl = document.getElementById('b4-count');
+    if (countEl) countEl.value = '';
+    setStatus('none');
+  }
+
+  // ── EXPORT MARKDOWN ──
+  function exportMarkdown() {
+    const name = document.getElementById('startup-name').value.trim() || 'Unbekannt';
+    const date = new Date().toLocaleDateString('de-DE', {day:'2-digit', month:'2-digit', year:'numeric'});
+    const g = id => { const el = document.getElementById(id); return el ? el.value.trim() : ''; };
+    const radio = name_ => { const c = document.querySelector(`input[name="${name_}"]:checked`); return c ? c.value : '—'; };
+
+    const logoVal = radio('logo');
+    const emailVal = radio('email-liste');
+    const emailCount = g('b4-count');
+    const emailStr = emailVal === 'Ja' ? `Ja — ca. ${emailCount || '?'} Kontakte` : emailVal;
+
+    const adj = [g('h1a'), g('h1b'), g('h1c')].filter(Boolean).join(', ') || '—';
+
+    const roleN = g('d3-n-rolle') || 'Nutzer';
+    const roleE = g('d3-e-rolle') || 'Entscheider';
+    const roleZ = g('d3-z-rolle') || 'Zahler / Budget';
+
+    const md = `---
+type: Note
+okf_version: "0.1"
+title: Startup-Kontext: ${name}
+description: Ausgefüllter grill-me-workshop Fragebogen · OM Workshop Wildau
+processed: false
+timestamp: ${new Date().toISOString()}
+---
+
+# ${name} — Marketing-Kontext
+
+> Ausgefüllter grill-me-workshop Fragebogen · OM Workshop Wildau · ${date}
+> Bitte dieses Dokument in das Claude-Projekt hochladen und dann /grill-me-workshop aufrufen.
+
+---
+
+## A · Das Startup
+
+**A1 · Name und One-Liner:**
+${g('a1') || '—'}
+
+**A2 · Phase und Gründung:**
+${g('a2') || '—'}
+
+**A3 · Team:**
+${g('a3') || '—'}
+
+---
+
+## B · Digitale Basis
+
+**B1 · Website:**
+${g('b1') || '—'}
+
+**B2 · Logo vorhanden:**
+${logoVal || '—'}
+
+**B3 · Aktive Social-Media-Kanäle:**
+${g('b3') || '—'}
+
+**B4 · E-Mail-Liste:**
+${emailStr || '—'}
+
+**B5 · Website-Besucher/Monat:**
+${g('b5') || '—'}
+
+---
+
+## C · Das Angebot
+
+**C1 · Produktname / Angebotsbezeichnung:**
+${g('c1') || '—'}
+
+**C2 · Was der Käufer bekommt:**
+${g('c2') || '—'}
+
+**C3 · Wie Kunden danach suchen:**
+${g('c3') || '—'}
+
+**C4 · Preismodell und Preis:**
+${g('c4') || '—'}
+
+**C5 · Der eine Kaufgrund:**
+${g('c5') || '—'}
+
+---
+
+## D · Zielgruppe & Personas
+
+**D1 · Idealer Kunde:**
+${g('d1') || '—'}
+
+**D2 · Wo Kunden online aktiv sind:**
+${g('d2') || '—'}
+
+**D3 · B2B-Rollen (Nutzer / Entscheider / Zahler):**
+
+| Rolle | Was interessiert sie? | Was ist ihr Einwand? |
+|---|---|---|
+| ${roleN} | ${g('d3-n-int') || '—'} | ${g('d3-n-ein') || '—'} |
+| ${roleE} | ${g('d3-e-int') || '—'} | ${g('d3-e-ein') || '—'} |
+| ${roleZ} | ${g('d3-z-int') || '—'} | ${g('d3-z-ein') || '—'} |
+
+**D4 · Anti-Persona:**
+${g('d4') || '—'}
+
+---
+
+## E · Problem & Switching
+
+**E1 · Größtes Problem der Kunden:**
+${g('e1') || '—'}
+
+**E2 · Was das Problem kostet:**
+${g('e2') || '—'}
+
+**E3 · Was Kunden vorher versucht haben:**
+${g('e3') || '—'}
+
+**E4 · Switching-Widerstand:**
+${g('e4') || '—'}
+
+**E5 · Kundenwörter für das Problem:**
+${g('e5') || '—'}
+
+---
+
+## F · Positionierung & Wettbewerb
+
+**F1 · Direkte Wettbewerber:**
+${g('f1') || '—'}
+
+**F2 · Indirekte Alternativen:**
+${g('f2') || '—'}
+
+**F3 · Warum Alternativen nicht reichen:**
+${g('f3') || '—'}
+
+**F4 · Was uns kategorisch anders macht:**
+${g('f4') || '—'}
+
+---
+
+## G · Einwände & Kundensprache
+
+**G1 · Top-Einwände und Antworten:**
+
+| Einwand | Antwort |
+|---|---|
+| ${g('g1-e1') || '—'} | ${g('g1-a1') || '—'} |
+| ${g('g1-e2') || '—'} | ${g('g1-a2') || '—'} |
+| ${g('g1-e3') || '—'} | ${g('g1-a3') || '—'} |
+
+**G2 · Was zufriedene Kunden sagen (verbatim):**
+${g('g2') || '—'}
+
+**G3 · Kundenwörter und Brand-Tabus:**
+${g('g3') || '—'}
+
+---
+
+## H · Brand Voice & Stil
+
+**H1 · Drei Adjektive für unseren Ton:**
+${adj}
+
+**H2 · Was wir NIE sagen:**
+${g('h2') || '—'}
+
+**H3 · Beispielsatz der nach uns klingt:**
+${g('h3') || '—'}
+
+---
+
+## I · Beweise & Zahlen
+
+**I1 · Ergebnisse und Zahlen:**
+${g('i1') || '—'}
+
+**I2 · Referenzen und Partner:**
+${g('i2') || '—'}
+
+**I3 · Kundenzitat:**
+${g('i3') || '—'}
+
+---
+
+## J · Fokus & Ziele
+
+**J1 · Wichtigstes Marketing-Ziel:**
+${g('j1') || '—'}
+
+**J2 · Call to Action:**
+${g('j2') || '—'}
+
+**J3 · Was wir bereits messen:**
+${g('j3') || '—'}
+
+**J4 · Unser Haupthebel:**
+${g('j4') || '—'}
+
+**J5 · Die eine Aufgabe diese Woche:**
+${g('j5') || '—'}
+
+---
+
+*Erstellt mit grill-me-workshop · digitaleheimat · OM Workshop Wildau 2026*
+`;
+
+    const slug = name.toLowerCase().replace(/[^a-z0-9äöü]/g, '-').replace(/-+/g, '-').replace(/^-|-$/g, '');
+    const dateSlug = new Date().toISOString().slice(0,10);
+    const filename = `startup-kontext-${slug}-${dateSlug}.md`;
+
+    const blob = new Blob([md], { type: 'text/markdown;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = filename;
+    document.body.appendChild(a); a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  // ── INIT ──
+  window.addEventListener('DOMContentLoaded', loadSaved);
+</script>
+</body>
+</html>
