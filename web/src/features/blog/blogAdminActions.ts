@@ -6,14 +6,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { requirePlatformAdmin } from "@/features/moderation/access";
 import { parseBlogDraftJson } from "@/features/blog/blogDraftImport";
-import { blogPostToPayload, emptyBlogPost, normalizeBlogPost, type BlogPostData } from "@/features/blog/blogModel";
+import { blogPostToPayload, emptyBlogPost, normalizeBlogPost, slugify, type BlogPostData } from "@/features/blog/blogModel";
 
 const BASE = "/admin/blog";
 export type BlogActionResult = { ok: true; id?: string; path?: string; status?: string } | { ok: false; error: string };
 
 function errorKey(message: string | undefined): string {
   const m = message ?? "";
-  for (const code of ["blog_locked", "blog_not_approved", "blog_title", "blog_excerpt", "blog_author", "blog_empty", "blog_alt", "blog_cta"]) if (m.includes(code)) return code.slice(5);
+  for (const code of ["blog_locked", "blog_not_approved", "blog_category_in_use", "blog_title", "blog_excerpt", "blog_author", "blog_empty", "blog_alt", "blog_cta", "blog_newsletter"]) if (m.includes(code)) return code.slice(5);
+  if (m.includes("blog_categories_slug_key")) return "category_slug_taken";
+  if (m.includes("blog_categories_")) return "category_invalid";
   if (m.includes("blog_posts_slug_key") || m.includes("duplicate key") && m.includes("slug")) return "slug_taken";
   if (m.includes("translation_key")) return "translation_taken";
   if (m.includes("blog_posts_slug")) return "slug_invalid";
@@ -34,6 +36,11 @@ export async function importBlogDraftAction(formData: FormData) {
   const parsed = parseBlogDraftJson(String(formData.get("draft") ?? ""));
   if (!parsed.ok) redirect(`${BASE}?import=${parsed.error}`);
   let post = parsed.post;
+  if (parsed.categorySlug) {
+    const { data: categories } = await client.rpc("admin_list_blog_categories");
+    const hit = ((categories ?? []) as { id: string; slug: string }[]).find((c) => c.slug === parsed.categorySlug);
+    if (hit) post = { ...post, categoryId: hit.id };
+  }
   let id: string | null = null;
   for (let attempt = 0; attempt < 3 && !id; attempt += 1) {
     const { data, error } = await client.rpc("admin_save_blog_post", { p_id: null, p: blogPostToPayload(post) });
@@ -107,5 +114,29 @@ export async function deleteBlogPostAction(id: string): Promise<BlogActionResult
   const { error } = await client.rpc("admin_delete_blog_post", { p_id: id });
   if (error) return { ok: false, error: "locked" };
   revalidatePath(BASE);
+  return { ok: true };
+}
+
+const CATEGORY_FIELDS = ["slug", "name_de", "name_en", "description_de", "description_en"] as const;
+
+/** Eine Kategorie anlegen (id = null) oder aendern. Adresse: nur a-z, 0-9, Bindestriche. */
+export async function saveBlogCategoryAction(id: string | null, raw: Record<string, unknown>): Promise<BlogActionResult> {
+  const client = await requirePlatformAdmin();
+  const payload: Record<string, unknown> = {};
+  for (const key of CATEGORY_FIELDS) payload[key] = typeof raw[key] === "string" ? (raw[key] as string).trim().slice(0, key.startsWith("description") ? 200 : 60) : "";
+  payload.slug = slugify(String(payload.slug || payload.name_de));
+  if (typeof raw.sort_order === "number" && Number.isInteger(raw.sort_order)) payload.sort_order = raw.sort_order;
+  const { data, error } = await client.rpc("admin_save_blog_category", { p_id: id, p: payload });
+  if (error || !data) return { ok: false, error: errorKey(error?.message) };
+  revalidatePath(`${BASE}/kategorien`);
+  revalidatePath("/blog");
+  return { ok: true, id: data as string };
+}
+
+export async function deleteBlogCategoryAction(id: string): Promise<BlogActionResult> {
+  const client = await requirePlatformAdmin();
+  const { error } = await client.rpc("admin_delete_blog_category", { p_id: id });
+  if (error) return { ok: false, error: errorKey(error.message) === "category_in_use" ? "category_in_use" : "save" };
+  revalidatePath(`${BASE}/kategorien`);
   return { ok: true };
 }

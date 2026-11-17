@@ -227,7 +227,10 @@
       "confirmed": "confirmed",
       "pending": "waiting for confirmation",
       "unsubscribed": "unsubscribed",
-      "byLanguage": "Confirmed by language: {de} German, {en} English."
+      "byLanguage": "Confirmed by language: {de} German, {en} English.",
+      "statsWeek": "Signed up this week: {count}",
+      "statsNew": "New since your last visit: {count}",
+      "statsNewNone": "Nothing new since your last visit."
     },
     "status": {
       "draft": "Draft",
@@ -514,7 +517,19 @@
         "published": "Published: go back to draft to change it (it is then no longer public)."
       },
       "checklist": "Still open before approving",
-      "ready": "All there: the post can be approved."
+      "ready": "All there: the post can be approved.",
+      "category": "Category",
+      "categoryHint": "A post has at most one category. Names appear in the post's language.",
+      "categoryNone": "No category",
+      "categoryManage": "Manage categories",
+      "seo": "Search and preview",
+      "seoHint": "What search engines and social networks show. Empty fields fall back to the title and summary.",
+      "seoTitle": "Search title (optional, at most 70 characters)",
+      "seoDescription": "Search description (optional, at most 200 characters)",
+      "seoPreview": "How the result could look",
+      "counter": "{count} characters (ideal up to {ideal})",
+      "addNewsletter": "+ Newsletter note",
+      "newsletterHint": "A box “The newsletter” with a button to sign up in the app. At most one per post, placed before the button at the end."
     },
     "problems": {
       "title": "The title is missing.",
@@ -523,7 +538,8 @@
       "author": "The author is missing.",
       "empty": "The post has no content yet.",
       "alt": "An image has no alt text.",
-      "cta": "At most one button, and it must be the last block (with label and target)."
+      "cta": "At most one button, and it must be the last block (with label and target).",
+      "newsletter": "There is more than one newsletter note."
     },
     "messages": {
       "saved": "Saved.",
@@ -549,8 +565,33 @@
       "error_type": "JPG, PNG or WebP only.",
       "error_upload": "The upload did not work.",
       "error_not_configured": "Storage is not set up.",
-      "error_delete": "Only drafts can be deleted."
+      "error_delete": "Only drafts can be deleted.",
+      "error_newsletter": "At most one newsletter note.",
+      "error_category_in_use": "The category is still used by posts.",
+      "error_category_slug_taken": "That category address already exists.",
+      "error_category_invalid": "The category name or address is invalid."
     },
-    "previewBanner": "Preview of an unpublished post. Only you can see it."
+    "previewBanner": "Preview of an unpublished post. Only you can see it.",
+    "categories": {
+      "title": "Categories",
+      "intro": "Name in German and English, address and a sentence shown at the top of the category page. A category only appears publicly once a published post in that language belongs to it. The order is the order of the buttons on the blog page, not by popularity.",
+      "new": "+ New category",
+      "nameDe": "Name (German)",
+      "nameEn": "Name (English)",
+      "slug": "Address (a–z, 0–9, hyphens)",
+      "descDe": "Sentence at the top of the page (German)",
+      "descEn": "Sentence at the top of the page (English)",
+      "posts": "{count} posts",
+      "save": "Save",
+      "delete": "Delete",
+      "deleteSure": "Really delete?",
+      "deleteYes": "Yes, delete",
+      "up": "Move up",
+      "down": "Move down",
+      "saved": "Saved.",
+      "deleted": "Deleted.",
+      "deleteHint": "Deleting only works while no post uses the category.",
+      "back": "Blog admin"
+    }
   }
 }

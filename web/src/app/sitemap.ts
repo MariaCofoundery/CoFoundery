@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { listBlogSitemap } from "@/features/blog/blogData";
+import { listBlogCategorySitemap, listBlogSitemap } from "@/features/blog/blogData";
 import { createClient } from "@/lib/supabase/server";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
 
@@ -16,9 +16,10 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
     priority: path ? 0.3 : 1,
   }));
   // Blog: die Uebersicht und jeder veroeffentlichte Beitrag, mit den Sprachfassungen, die es wirklich gibt.
-  const blogPosts = await listBlogSitemap().catch(() => []);
+  const [blogPosts, blogCategories] = await Promise.all([listBlogSitemap().catch(() => []), listBlogCategorySitemap().catch(() => [])]);
   const blogPages: MetadataRoute.Sitemap = blogPosts.length === 0 ? [] : [
     { url: `${origin}/blog`, changeFrequency: "weekly", priority: 0.6 },
+    ...blogCategories.map((c) => ({ url: `${origin}/blog/kategorie/${c.slug}${c.language === "en" ? "?lang=en" : ""}`, changeFrequency: "weekly" as const, priority: 0.5 })),
     ...blogPosts.map((post) => ({
       url: `${origin}/blog/${post.slug}`,
       lastModified: new Date(post.updatedAt),

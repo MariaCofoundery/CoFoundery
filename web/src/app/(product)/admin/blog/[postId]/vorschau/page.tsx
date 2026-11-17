@@ -27,7 +27,7 @@ export default async function BlogPreviewPage({ params }: { params: Promise<{ po
       <main lang={post.language} className="mx-auto w-full max-w-3xl px-5 py-10">
         <h1 className="font-sans text-4xl font-bold leading-tight tracking-tight text-slate-950">{post.title}</h1>
         <p className="mt-3 font-sans text-sm text-slate-600">{copy.by} {post.authorName}</p>
-        <div className="mt-8"><BlogBody blocks={post.blocks} appOrigin={getPublicAppOrigin()} /></div>
+        <div className="mt-8"><BlogBody blocks={post.blocks} appOrigin={getPublicAppOrigin()} language={post.language} /></div>
       </main>
       <BlogFooter language={post.language} />
     </div>

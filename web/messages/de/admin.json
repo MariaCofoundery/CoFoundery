@@ -227,7 +227,10 @@
       "confirmed": "bestätigt",
       "pending": "warten auf Bestätigung",
       "unsubscribed": "abgemeldet",
-      "byLanguage": "Bestätigt nach Sprache: {de} Deutsch, {en} Englisch."
+      "byLanguage": "Bestätigt nach Sprache: {de} Deutsch, {en} Englisch.",
+      "statsWeek": "Diese Woche angemeldet: {count}",
+      "statsNew": "Neu seit deinem letzten Besuch: {count}",
+      "statsNewNone": "Nichts Neues seit deinem letzten Besuch."
     },
     "status": {
       "draft": "Entwurf",
@@ -514,7 +517,19 @@
         "published": "Veröffentlicht: zum Ändern zurück in den Entwurf (dann ist er nicht mehr öffentlich)."
       },
       "checklist": "Noch offen vor dem Freigeben",
-      "ready": "Alles da: Der Beitrag kann freigegeben werden."
+      "ready": "Alles da: Der Beitrag kann freigegeben werden.",
+      "category": "Kategorie",
+      "categoryHint": "Ein Beitrag hat höchstens eine Kategorie. Die Namen stehen in der Sprache des Beitrags.",
+      "categoryNone": "Ohne Kategorie",
+      "categoryManage": "Kategorien verwalten",
+      "seo": "Suche und Vorschau",
+      "seoHint": "Was Suchmaschinen und soziale Netze zeigen. Leer gelassene Felder nehmen Titel und Kurztext.",
+      "seoTitle": "Suchtitel (optional, höchstens 70 Zeichen)",
+      "seoDescription": "Suchbeschreibung (optional, höchstens 200 Zeichen)",
+      "seoPreview": "So könnte der Treffer aussehen",
+      "counter": "{count} Zeichen (ideal bis {ideal})",
+      "addNewsletter": "+ Newsletter-Hinweis",
+      "newsletterHint": "Ein Kasten „Der Newsletter“ mit Knopf zur Anmeldung in der App. Höchstens einer je Beitrag, steht vor dem Knopf am Ende."
     },
     "problems": {
       "title": "Es fehlt ein Titel.",
@@ -523,7 +538,8 @@
       "author": "Es fehlt die Autor:in.",
       "empty": "Der Beitrag hat noch keinen Inhalt.",
       "alt": "Ein Bild hat keinen Alternativtext.",
-      "cta": "Höchstens ein Knopf, und er muss der letzte Baustein sein (mit Beschriftung und Ziel)."
+      "cta": "Höchstens ein Knopf, und er muss der letzte Baustein sein (mit Beschriftung und Ziel).",
+      "newsletter": "Es gibt mehr als einen Newsletter-Hinweis."
     },
     "messages": {
       "saved": "Gespeichert.",
@@ -549,8 +565,33 @@
       "error_type": "Nur JPG, PNG oder WebP.",
       "error_upload": "Das Hochladen hat nicht geklappt.",
       "error_not_configured": "Der Speicher ist nicht eingerichtet.",
-      "error_delete": "Nur Entwürfe lassen sich löschen."
+      "error_delete": "Nur Entwürfe lassen sich löschen.",
+      "error_newsletter": "Höchstens ein Newsletter-Hinweis.",
+      "error_category_in_use": "Die Kategorie wird noch von Beiträgen genutzt.",
+      "error_category_slug_taken": "Diese Kategorie-Adresse gibt es schon.",
+      "error_category_invalid": "Name oder Adresse der Kategorie sind ungültig."
     },
-    "previewBanner": "Vorschau eines nicht veröffentlichten Beitrags. Nur du siehst sie."
+    "previewBanner": "Vorschau eines nicht veröffentlichten Beitrags. Nur du siehst sie.",
+    "categories": {
+      "title": "Kategorien",
+      "intro": "Name auf Deutsch und Englisch, Adresse und ein Satz, der oben auf der Kategorie-Seite steht. Eine Kategorie erscheint öffentlich erst, wenn ein veröffentlichter Beitrag in der jeweiligen Sprache dazugehört. Die Reihenfolge ist die der Knöpfe auf der Blogseite, nicht nach Beliebtheit.",
+      "new": "+ Neue Kategorie",
+      "nameDe": "Name (Deutsch)",
+      "nameEn": "Name (Englisch)",
+      "slug": "Adresse (a–z, 0–9, Bindestriche)",
+      "descDe": "Satz oben auf der Seite (Deutsch)",
+      "descEn": "Satz oben auf der Seite (Englisch)",
+      "posts": "{count} Beiträge",
+      "save": "Speichern",
+      "delete": "Löschen",
+      "deleteSure": "Wirklich löschen?",
+      "deleteYes": "Ja, löschen",
+      "up": "Nach oben",
+      "down": "Nach unten",
+      "saved": "Gespeichert.",
+      "deleted": "Gelöscht.",
+      "deleteHint": "Löschen geht nur, solange kein Beitrag die Kategorie nutzt.",
+      "back": "Blog im Admin"
+    }
   }
 }

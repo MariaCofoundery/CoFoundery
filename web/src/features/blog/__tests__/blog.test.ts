@@ -5,7 +5,7 @@ import { test } from "node:test";
 import { isProductChromePath } from "@/features/navigation/productChromePath";
 import { parseBlogDraftJson } from "@/features/blog/blogDraftImport";
 import { parseInline, parseRich, toPlainText } from "@/features/blog/blogMarkup";
-import { blogButtonHref, blogPostProblems, emptyBlogPost, isValidSlug, normalizeBlogPost, sanitizeBlogBlocks, slugify, type BlogPostData } from "@/features/blog/blogModel";
+import { blogButtonHref, blogPostProblems, emptyBlogPost, isValidSlug, normalizeBlogPost, readingMinutes, sanitizeBlogBlocks, searchDescription, searchTitle, slugify, type BlogPostData } from "@/features/blog/blogModel";
 
 const root = new URL("../../../../", import.meta.url).pathname;
 const read = (path: string) => readFileSync(join(root, path), "utf8");
@@ -18,7 +18,7 @@ function files(dir: string): string[] {
 
 const good: BlogPostData = {
   slug: "drei-fragen", language: "de", translationKey: "", title: "Drei Fragen", excerpt: "Kurz.", authorName: "Maria", postDate: "2026-11-17", coverPath: "", coverAlt: "",
-  blocks: [{ id: "a", type: "text", text: "# Hallo" }],
+  blocks: [{ id: "a", type: "text", text: "# Hallo" }], categoryId: "", seoTitle: "", seoDescription: "",
 };
 
 test("slugs: umlauts become ascii, results are always valid", () => {
@@ -87,7 +87,7 @@ test("the blog is public and not part of the product chrome", () => {
 test("public pages carry imprint and privacy, the feed and per-post SEO", () => {
   assert.match(read("src/features/blog/BlogFooter.tsx"), /href="\/impressum"/);
   assert.match(read("src/features/blog/BlogFooter.tsx"), /href="\/datenschutz"/);
-  for (const page of ["src/app/blog/page.tsx", "src/app/blog/[slug]/page.tsx"]) assert.match(read(page), /<BlogFooter/, page);
+  for (const page of ["src/features/blog/BlogListView.tsx", "src/app/blog/[slug]/page.tsx"]) assert.match(read(page), /<BlogFooter/, page);
   const post = read("src/app/blog/[slug]/page.tsx");
   for (const piece of [/canonical/, /languages/, /openGraph/, /twitter/, /BlogPosting/, /alt=\{post\.coverAlt\}/]) assert.match(post, piece);
   assert.match(read("src/app/blog/feed.xml/route.ts"), /application\/rss\+xml/);
@@ -166,4 +166,67 @@ test("the blog skill's example is valid JSON that the import accepts, and its ru
   assert.match(skill, /Höchstens ein `button`, und er steht als letzter Baustein/);
   assert.match(skill, /Veröffentlicht nie|veröffentlichst nie/);
   assert.match(skill, /Alternativtext/);
+});
+
+test("categories: one per post, taken from the import by address, shown only with a published post, own admin page", () => {
+  assert.equal(normalizeBlogPost({ categoryId: "not-a-uuid" }).categoryId, "");
+  assert.equal(normalizeBlogPost({ categoryId: "AAAAAAAA-AAAA-4AAA-8AAA-AAAAAAAAAAAA" }).categoryId, "aaaaaaaa-aaaa-4aaa-8aaa-aaaaaaaaaaaa");
+  const parsed = parseBlogDraftJson(JSON.stringify({ title: "T", category: "Zu-Zweit-Gruenden", blocks: [{ type: "text", text: "x" }] }));
+  assert.ok(parsed.ok && parsed.categorySlug === "zu-zweit-gruenden");
+  const sql = read("../supabase/migrations/20270506120000_blog_categories_seo_attention.sql");
+  assert.match(sql, /revoke all on public\.blog_categories from public, anon, authenticated/);
+  assert.match(sql, /b\.status = 'published' and b\.language = p_language/, "a category shows only with a published post in the language");
+  assert.match(sql, /blog_category_in_use/);
+  for (const slug of ["zu-zweit-gruenden", "konflikte-frueh-erkennen", "struktur-und-fuehrung", "erfahrungen", "neues"]) assert.match(sql, new RegExp(`'${slug}'`));
+  assert.match(read("src/app/(product)/admin/blog/kategorien/page.tsx"), /requirePlatformAdmin\(\)/);
+  assert.match(read("src/app/blog/kategorie/[slug]/page.tsx"), /notFound\(\)/);
+  assert.match(read("src/app/sitemap.ts"), /listBlogCategorySitemap/);
+});
+
+test("the blog header carries Mia, the category chips wrap instead of scrolling sideways", () => {
+  const view = read("src/features/blog/BlogListView.tsx");
+  assert.match(view, /src="\/brand\/mia\.png"/);
+  assert.match(view, /alt=\{copy\.miaAlt\}/);
+  assert.match(view, /<nav aria-label=\{copy\.categories\} className="mt-8 flex flex-wrap/);
+  assert.doesNotMatch(view, /overflow-x-auto/);
+  assert.match(view, /min-h-11/);
+});
+
+test("search fields: own title and description win, otherwise title and excerpt; reading time is derived", () => {
+  assert.equal(searchTitle({ title: "A", seoTitle: "" }), "A");
+  assert.equal(searchTitle({ title: "A", seoTitle: " B " }), "B");
+  assert.equal(searchDescription({ excerpt: "E", seoDescription: "" }), "E");
+  assert.equal(searchDescription({ excerpt: "E", seoDescription: "D" }), "D");
+  assert.equal(readingMinutes([{ id: "a", type: "text", text: "wort ".repeat(450) }]), 3);
+  assert.equal(readingMinutes([]), 1);
+  const post = read("src/app/blog/[slug]/page.tsx");
+  assert.match(post, /searchTitle\(post\)/);
+  assert.match(post, /searchDescription\(post\)/);
+  assert.match(post, /made2found-logo-on-light\.png/, "an OG image even without a cover");
+  const editor = read("src/features/blog/BlogEditor.tsx");
+  assert.match(editor, /editor\.seoPreview/);
+  assert.match(editor, /SEO_IDEAL\.title/);
+});
+
+test("the newsletter note: at most one, a hint to the app, no form and no data collected", () => {
+  assert.deepEqual(sanitizeBlogBlocks([{ type: "newsletter", id: "n", extra: "x" }]), [{ id: "n", type: "newsletter" }]);
+  const two = { ...good, blocks: [{ id: "a", type: "newsletter" as const }, { id: "b", type: "newsletter" as const }] };
+  assert.ok(blogPostProblems(two).includes("newsletter"));
+  const button = { id: "k", type: "button" as const, label: "Los", href: "/" };
+  assert.deepEqual(blogPostProblems({ ...good, blocks: [...good.blocks, { id: "n", type: "newsletter" as const }, button] }), []);
+  const body = read("src/features/blog/BlogBody.tsx");
+  assert.match(body, /href="\/account"/);
+  assert.doesNotMatch(body, /<form|<input|type="email"/);
+  assert.match(read("../supabase/migrations/20270506120000_blog_categories_seo_attention.sql"), /'blog_newsletter'/);
+});
+
+test("the admin heart counts newsletter signups and more; the newsletter admin shows week and new numbers and marks them seen", () => {
+  const sql = read("../supabase/migrations/20270506120000_blog_categories_seo_attention.sql");
+  for (const part of [/product_feedback/, /network_reports where status = 'open'/, /radar_signals where review_status = 'new'/, /network_recommendations where status = 'review'/, /ecosystem_events where status = 'pending'/, /newsletter_subscriptions where status = 'confirmed' and confirmed_at > v_seen/]) assert.match(sql, part);
+  assert.match(sql, /grant execute on function public\.%s to authenticated/);
+  const page = read("src/app/(product)/admin/newsletter/page.tsx");
+  assert.match(page, /admin_mark_newsletter_seen/);
+  assert.match(page, /confirmed_week/);
+  assert.match(page, /new_since_seen/);
+  assert.ok(page.indexOf("admin_newsletter_stats") < page.indexOf("admin_mark_newsletter_seen"), "read the numbers before marking them seen");
 });

@@ -20,7 +20,9 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
     client.rpc("admin_list_newsletter_issues"), client.rpc("admin_newsletter_stats"),
   ]);
   const rows = (issues.error ? [] : (issues.data ?? [])) as Row[];
-  const s = ((stats.data ?? []) as { confirmed: number; pending: number; unsubscribed: number; confirmed_de: number; confirmed_en: number }[])[0] ?? { confirmed: 0, pending: 0, unsubscribed: 0, confirmed_de: 0, confirmed_en: 0 };
+  const s = ((stats.data ?? []) as { confirmed: number; pending: number; unsubscribed: number; confirmed_de: number; confirmed_en: number; confirmed_week: number; new_since_seen: number }[])[0] ?? { confirmed: 0, pending: 0, unsubscribed: 0, confirmed_de: 0, confirmed_en: 0, confirmed_week: 0, new_since_seen: 0 };
+  // Erst gelesen, dann als gesehen markiert: Das rosa Herz am Avatar geht aus, sobald du hier warst (spaetestens beim naechsten Seitenwechsel).
+  await client.rpc("admin_mark_newsletter_seen");
   const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
@@ -37,6 +39,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
         ))}
       </section>
       <p className="mt-2 text-sm text-slate-600">{t("stats.byLanguage", { de: s.confirmed_de, en: s.confirmed_en })}</p>
+      <p className="mt-1 text-sm text-slate-600">{t("stats.statsWeek", { count: s.confirmed_week })} · <strong className={s.new_since_seen > 0 ? "text-[#a3174f]" : ""}>{s.new_since_seen > 0 ? t("stats.statsNew", { count: s.new_since_seen }) : t("stats.statsNewNone")}</strong></p>
       <form action={createNewsletterIssueAction} className="mt-6"><SubmitButton label={t("new")} pendingLabel="…" className="min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white" /></form>
       <section className="mt-8 rounded-2xl border border-[#d9dcec] bg-white p-4" aria-labelledby="welcome-title">
         <h2 id="welcome-title" className="text-lg font-semibold">{t("welcomeTitle")}</h2>

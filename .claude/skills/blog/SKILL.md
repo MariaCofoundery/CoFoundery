@@ -34,7 +34,7 @@ Aufbau (Muster, nicht Zwang), 600 bis 1200 Wörter:
 ## Sprache und Übersetzung
 - Jeder Beitrag hat **eine** Sprache (`language`: `de` oder `en`), nie gemischt. Deutsch ist die Hauptfassung.
 - **Zweitfassung:** Kein Wort-für-Wort-Übersetzen, sondern denselben Gedanken in der anderen Sprache neu schreiben (Englisch: American spelling, keine deutschen Sonderzeichen, englische Suchbegriffe in Titel und Überschriften, Beispiele, die dort funktionieren). Beide Fassungen bekommen **denselben `translationKey`** (kleingeschrieben, Bindestriche, z. B. `splitting-equity`) und **je eine eigene Adresse in ihrer Sprache** (`anteile-teilen` und `splitting-equity`). Nur so zeigt die Seite die Sprachumschaltung, und erst wenn beide veröffentlicht sind.
-- Ohne Zweitfassung bleibt `translationKey` leer.
+- Ohne Zweitfassung bleibt `translationKey` leer. Beide Fassungen bekommen dieselbe `category` (die Seite zeigt den Namen in der Sprache des Beitrags).
 
 ## Ausgabeformat
 Schreibe **ein JSON-Objekt** (ohne Kommentare), speichere es als `marketing/blog/entwuerfe/JJJJ-MM-TT-adresse.json` und gib es zusätzlich in einem Codeblock zum Kopieren aus. Maria fügt es im Admin unter „Entwurf einfügen“ ein.
@@ -45,19 +45,23 @@ Schreibe **ein JSON-Objekt** (ohne Kommentare), speichere es als `marketing/blog
   "slug": "anteile-unter-co-foundern-teilen",
   "language": "de",
   "translationKey": "splitting-equity",
+  "category": "zu-zweit-gruenden",
+  "seoTitle": "Anteile unter Co-Foundern teilen",
+  "seoDescription": "So sprecht ihr früh und ruhig über Anteile im Gründungsteam: drei Fragen und ein Gespräch statt einer Formel.",
   "excerpt": "Wie ihr Anteile fair besprecht, bevor aus einem Gefühl ein Streit wird: drei Fragen und ein Gespräch.",
   "author": "Maria",
   "date": "2026-11-17",
   "blocks": [
     { "id": "einstieg", "type": "text", "text": "Wer bekommt wie viel, und warum?\n\nDiese Frage ist unbequem. Hier steht, wie ihr sie früh und ruhig besprecht." },
     { "id": "teil1", "type": "text", "text": "# Warum ein Gespräch besser ist als eine Formel\n\nAbsatz mit **fett**, *kursiv* und [Link](https://example.com).\n\n- erster Punkt\n- zweiter Punkt" },
+    { "id": "newsletter", "type": "newsletter" },
     { "id": "frage", "type": "quote", "text": "Was erwartet ihr beide in einem Jahr vom jeweils anderen?", "by": "Frage für euer Gespräch" },
     { "id": "knopf", "type": "button", "label": "Zu deinem Profil", "href": "/me/profile" }
   ]
 }
 ```
 
-Erlaubt: `language` de | en; `slug` nur `a-z 0-9` und einzelne Bindestriche, 3 bis 80 Zeichen; `translationKey` nur `a-z 0-9 -`; `date` als `JJJJ-MM-TT` (leer = heute); `author` frei (Standard Maria). Bausteine: `text` (bis 12000 Zeichen; `# ` Überschrift, `## ` kleinere, `### ` kleinste, `- ` Liste, `**fett**`, `*kursiv*`, `[Text](https://…)`), `quote` (`text`, `by`), `button` (`label`, `href`: https oder ein Pfad der App wie `/me/profile`). **Höchstens ein `button`, und er steht als letzter Baustein.** `image` nicht verwenden. Titelbild (`cover`) nur, wenn Maria es schon hochgeladen hat.
+Erlaubt: `category` (Adresse einer Kategorie: `zu-zweit-gruenden`, `konflikte-frueh-erkennen`, `struktur-und-fuehrung`, `erfahrungen`, `neues`; Maria kann weitere anlegen, frag bei Zweifel; genau eine, oder leer lassen); `seoTitle` (optional, höchstens 70 Zeichen, ideal bis 60; der Suchtitel, wenn er vom Titel abweichen soll) und `seoDescription` (optional, höchstens 200, ideal bis 155; die Suchbeschreibung); `language` de | en; `slug` nur `a-z 0-9` und einzelne Bindestriche, 3 bis 80 Zeichen; `translationKey` nur `a-z 0-9 -`; `date` als `JJJJ-MM-TT` (leer = heute); `author` frei (Standard Maria). Bausteine: `text` (bis 12000 Zeichen; `# ` Überschrift, `## ` kleinere, `### ` kleinste, `- ` Liste, `**fett**`, `*kursiv*`, `[Text](https://…)`), `quote` (`text`, `by`), `newsletter` (ein Kasten „Der Newsletter“ mit Knopf zur Anmeldung in der App, ohne weitere Felder; höchstens einer, gern nach dem Hauptteil und vor der Frage, nicht in jedem Beitrag), `button` (`label`, `href`: https oder ein Pfad der App wie `/me/profile`). **Höchstens ein `button`, und er steht als letzter Baustein.** `image` nicht verwenden. Titelbild (`cover`) nur, wenn Maria es schon hochgeladen hat.
 
 ## Nach dem Schreiben
 Sag Maria in wenigen Zeilen: Thema und gewählte Suchfrage, was sie noch ergänzen muss (Titelbild und Bilder mit deinen Alternativtexten, Quellen, die du nicht belegen konntest, Fakten, die sie bestätigen soll), ob eine Zweitfassung dazugehört (mit gleichem `translationKey`), und dass **nichts veröffentlicht** wurde: im Admin „Entwurf einfügen“, ansehen (Vorschau), freigeben, veröffentlichen. Trage das Thema in `marketing/newsletter/THEMEN.md` ein, sobald Maria den Beitrag freigibt.

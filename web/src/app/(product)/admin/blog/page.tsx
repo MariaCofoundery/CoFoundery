@@ -22,7 +22,7 @@ export default async function BlogAdminPage({ searchParams }: { searchParams: Pr
       <Link href="/admin" className="text-sm text-slate-600 underline">{"← "}{t("back")}</Link>
       <h1 className="mt-4 text-3xl font-semibold text-slate-950">{t("title")}</h1>
       <p className="mt-2 max-w-2xl text-base leading-7 text-slate-600">{t("intro")}</p>
-      <p className="mt-2 flex flex-wrap gap-4 text-sm"><Link href="/blog" className="inline-flex min-h-11 items-center font-semibold underline">{t("viewBlog")}</Link><a href="/blog/feed.xml" className="inline-flex min-h-11 items-center font-semibold underline">{t("feed")}</a></p>
+      <p className="mt-2 flex flex-wrap gap-4 text-sm"><Link href="/blog" className="inline-flex min-h-11 items-center font-semibold underline">{t("viewBlog")}</Link><a href="/blog/feed.xml" className="inline-flex min-h-11 items-center font-semibold underline">{t("feed")}</a><Link href="/admin/blog/kategorien" className="inline-flex min-h-11 items-center font-semibold underline">{t("categories.title")}</Link></p>
       {params.error ? <p role="alert" className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t("errorCreate")}</p> : null}
       {params.import ? <p role="alert" className="mt-2 rounded-2xl bg-amber-50 p-3 text-sm text-amber-900">{t(IMPORT_KEYS[params.import] ?? "importSave")}</p> : null}
       <form action={createBlogPostAction} className="mt-4"><SubmitButton label={t("new")} pendingLabel="…" className="min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white" /></form>

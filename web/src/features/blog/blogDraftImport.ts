@@ -4,7 +4,7 @@ import { normalizeBlogPost, type BlogPostData } from "@/features/blog/blogModel"
  * "Entwurf einfuegen": ein Beitrag als JSON (title, slug, language, excerpt, blocks, author/authorName, date/postDate, translationKey, cover) wird eine neue
  * Ausgabe im ENTWURF - nie ein Veroeffentlichen. Das JSON geht durch dieselbe Bereinigung wie ein Speichern im Editor.
  */
-export type BlogImportResult = { ok: true; post: BlogPostData } | { ok: false; error: "empty" | "invalid" | "too_big" | "no_content" };
+export type BlogImportResult = { ok: true; post: BlogPostData; categorySlug: string } | { ok: false; error: "empty" | "invalid" | "too_big" | "no_content" };
 
 const MAX_BYTES = 200_000;
 
@@ -25,7 +25,10 @@ export function parseBlogDraftJson(text: string): BlogImportResult {
     postDate: o.postDate ?? o.date,
     coverPath: o.coverPath ?? cover.path,
     coverAlt: o.coverAlt ?? cover.alt,
+    seoTitle: o.seoTitle ?? o.seo_title, seoDescription: o.seoDescription ?? o.seo_description,
   });
   if (!post.title.trim() || post.blocks.length === 0) return { ok: false, error: "no_content" };
-  return { ok: true, post };
+  // Die Kategorie kommt als Adresse (z. B. "zu-zweit-gruenden"); die Aktion sucht die passende Kategorie.
+  const categorySlug = typeof o.category === "string" ? o.category.trim().toLowerCase().slice(0, 60) : "";
+  return { ok: true, post, categorySlug };
 }

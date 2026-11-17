@@ -1,4 +1,4 @@
-import { blogButtonHref, type BlogBlock } from "@/features/blog/blogModel";
+import { blogButtonHref, blogCopy, type BlogBlock, type BlogLanguage } from "@/features/blog/blogModel";
 import { parseInline, parseRich, type Inline } from "@/features/blog/blogMarkup";
 import { blogImageUrl } from "@/features/blog/blogData";
 
@@ -20,7 +20,8 @@ const HEADING = {
   4: "mt-6 mb-2 font-sans text-lg font-bold leading-snug text-slate-950",
 } as const;
 
-export function BlogBody({ blocks, appOrigin }: { blocks: BlogBlock[]; appOrigin: string }) {
+export function BlogBody({ blocks, appOrigin, language = "de" }: { blocks: BlogBlock[]; appOrigin: string; language?: BlogLanguage }) {
+  const copy = blogCopy(language);
   return (
     <div className="text-[19px] leading-[1.75] text-slate-800">
       {blocks.map((block) => {
@@ -49,6 +50,16 @@ export function BlogBody({ blocks, appOrigin }: { blocks: BlogBlock[]; appOrigin
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={blogImageUrl(block.path)} alt={block.alt} loading="lazy" decoding="async" className="h-auto max-w-full rounded-2xl" />
             </figure>
+          );
+        }
+        if (block.type === "newsletter") {
+          // Ein Hinweis, kein Formular: Der Blog erhebt nichts und kennt keine Konten. Die Anmeldung laeuft in der App (Double-Opt-in).
+          return (
+            <aside key={block.id} aria-labelledby={`nl-${block.id}`} className="my-10 rounded-2xl border border-[#cfc6f6] bg-[linear-gradient(120deg,#f4f0ff,#eaf6fb)] p-6 font-sans">
+              <h2 id={`nl-${block.id}`} className="text-xl font-bold text-slate-950">{copy.newsletterTitle}</h2>
+              <p className="mt-2 text-base leading-7 text-slate-700">{copy.newsletterText}</p>
+              <p className="mt-4"><a href="/account" className="inline-flex min-h-11 items-center rounded-full border border-[#6d49e0] bg-white px-6 text-base font-semibold text-[#4a2fb8] hover:bg-[#f4f0ff] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#6d49e0] focus-visible:ring-offset-2">{copy.newsletterButton}</a></p>
+            </aside>
           );
         }
         const href = blogButtonHref(block.href, appOrigin);

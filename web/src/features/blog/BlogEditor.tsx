@@ -1,17 +1,19 @@
 "use client";
 
 import { useState, useTransition } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import {
-  BLOG_LANGUAGES, BLOG_LIMITS, blogPostProblems, slugify,
+  BLOG_LANGUAGES, BLOG_LIMITS, SEO_IDEAL, blogPostProblems, searchDescription, searchTitle, slugify,
   type BlogBlock, type BlogBlockType, type BlogPostData,
 } from "@/features/blog/blogModel";
 import {
   approveBlogPostAction, deleteBlogPostAction, publishBlogPostAction, saveBlogPostAction, unpublishBlogPostAction, uploadBlogImageAction,
 } from "@/features/blog/blogAdminActions";
 
-type Props = { postId: string; initial: BlogPostData; status: "draft" | "approved" | "published"; supabaseUrl: string };
+export type EditorCategory = { id: string; name_de: string; name_en: string };
+type Props = { postId: string; initial: BlogPostData; status: "draft" | "approved" | "published"; supabaseUrl: string; categories: EditorCategory[]; appOrigin: string };
 
 const BOX = "rounded-2xl border border-[#d9dcec] bg-white p-4";
 const LABEL = "text-xs font-bold uppercase tracking-[.08em] text-[#6d28d9]";
@@ -20,7 +22,7 @@ const BTN = "min-h-11 rounded-xl border border-[#c9ccdf] bg-white px-4 text-sm f
 const BTN_PRIMARY = "min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white disabled:opacity-50";
 const newId = () => `b${Math.random().toString(36).slice(2, 9)}`;
 
-export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
+export function BlogEditor({ postId, initial, status, supabaseUrl, categories, appOrigin }: Props) {
   const t = useTranslations("admin.blog");
   const router = useRouter();
   const [post, setPost] = useState<BlogPostData>(initial);
@@ -44,7 +46,8 @@ export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
     if (post.blocks.length >= BLOG_LIMITS.blocks) return;
     if (type === "button" && post.blocks.some((b) => b.type === "button")) return;
     const id = newId();
-    const block: BlogBlock = type === "text" ? { id, type, text: "" } : type === "quote" ? { id, type, text: "", by: "" } : type === "image" ? { id, type, path: "", alt: "" } : { id, type, label: "", href: "/" };
+    if (type === "newsletter" && post.blocks.some((b) => b.type === "newsletter")) return;
+    const block: BlogBlock = type === "newsletter" ? { id, type } : type === "text" ? { id, type, text: "" } : type === "quote" ? { id, type, text: "", by: "" } : type === "image" ? { id, type, path: "", alt: "" } : { id, type, label: "", href: "/" };
     // Der Knopf steht immer ganz am Ende; alles andere kommt vor ihn.
     setPost((current) => {
       const last = current.blocks[current.blocks.length - 1];
@@ -85,12 +88,40 @@ export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
             {BLOG_LANGUAGES.map((code) => <button key={code} type="button" disabled={locked} aria-pressed={post.language === code} onClick={() => set("language", code)} className={`${BTN} ${post.language === code ? "border-[#5b3df5] bg-[#efeafd]" : ""}`}>{t(`lang.${code}`)}</button>)}
           </div>
         </div>
+        <fieldset className="mt-3 rounded-xl border border-[#d9dcec] bg-[#faf9fe] px-3 pb-2 pt-1" disabled={locked}>
+          <legend className="px-1 text-sm font-semibold">{t("editor.category")}</legend>
+          <p className="text-xs text-slate-600">{t("editor.categoryHint")}</p>
+          {categories.map((c) => (
+            <label key={c.id} className="flex min-h-11 items-center gap-2.5 text-[15px]"><input type="radio" name="category" className="h-[18px] w-[18px]" checked={post.categoryId === c.id} onChange={() => set("categoryId", c.id)} />{post.language === "en" && c.name_en ? c.name_en : c.name_de}</label>
+          ))}
+          <label className="flex min-h-11 items-center gap-2.5 text-[15px] text-slate-600"><input type="radio" name="category" className="h-[18px] w-[18px]" checked={post.categoryId === ""} onChange={() => set("categoryId", "")} />{t("editor.categoryNone")}</label>
+          <Link href="/admin/blog/kategorien" className="inline-flex min-h-11 items-center text-sm font-semibold underline">{t("editor.categoryManage")}</Link>
+        </fieldset>
         <label className="mt-3 block text-sm font-semibold">{t("editor.translationKey")}<input className={FIELD} value={post.translationKey} maxLength={80} disabled={locked} onChange={(e) => set("translationKey", e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))} /></label>
         <p className="mt-1 text-xs text-slate-600">{t("editor.translationHint")}</p>
         <label className="mt-3 block text-sm font-semibold">{t("editor.excerpt")}<textarea className={FIELD} rows={3} value={post.excerpt} maxLength={BLOG_LIMITS.excerpt} disabled={locked} onChange={(e) => set("excerpt", e.target.value)} /></label>
         <div className="mt-3 grid gap-3 sm:grid-cols-2">
           <label className="block text-sm font-semibold">{t("editor.author")}<input className={FIELD} value={post.authorName} maxLength={BLOG_LIMITS.author} disabled={locked} onChange={(e) => set("authorName", e.target.value)} /></label>
           <label className="block text-sm font-semibold">{t("editor.date")}<input type="date" className={FIELD} value={post.postDate} disabled={locked} onChange={(e) => set("postDate", e.target.value)} /></label>
+        </div>
+      </section>
+
+      <section className={BOX} aria-labelledby="blog-seo">
+        <h2 id="blog-seo" className={LABEL}>{t("editor.seo")}</h2>
+        <p className="mt-1 text-xs text-slate-600">{t("editor.seoHint")}</p>
+        <label className="mt-3 block text-sm font-semibold">{t("editor.seoTitle")}
+          <input className={FIELD} value={post.seoTitle} maxLength={BLOG_LIMITS.seoTitle} disabled={locked} placeholder={post.title} onChange={(e) => set("seoTitle", e.target.value)} />
+        </label>
+        <p className={`mt-1 text-xs ${searchTitle(post).length > SEO_IDEAL.title ? "text-amber-800" : "text-slate-600"}`}>{t("editor.counter", { count: searchTitle(post).length, ideal: SEO_IDEAL.title })}</p>
+        <label className="mt-3 block text-sm font-semibold">{t("editor.seoDescription")}
+          <textarea className={FIELD} rows={3} value={post.seoDescription} maxLength={BLOG_LIMITS.seoDescription} disabled={locked} placeholder={post.excerpt} onChange={(e) => set("seoDescription", e.target.value)} />
+        </label>
+        <p className={`mt-1 text-xs ${searchDescription(post).length > SEO_IDEAL.description ? "text-amber-800" : "text-slate-600"}`}>{t("editor.counter", { count: searchDescription(post).length, ideal: SEO_IDEAL.description })}</p>
+        <div className="mt-3 rounded-xl border border-[#e3e5f2] bg-white p-3" aria-label={t("editor.seoPreview")}>
+          <p className="text-xs font-semibold text-slate-600">{t("editor.seoPreview")}</p>
+          <p className="mt-2 truncate text-xs text-[#1e6b3a]">{appOrigin.replace(/^https?:\/\//, "")} › blog › {post.slug || "…"}</p>
+          <p className="mt-0.5 text-[19px] leading-snug text-[#1a0dab]">{searchTitle(post).slice(0, SEO_IDEAL.title + 5) || t("untitled")}{searchTitle(post).length > SEO_IDEAL.title + 5 ? "…" : ""}</p>
+          <p className="mt-0.5 text-sm leading-snug text-slate-700">{searchDescription(post).slice(0, SEO_IDEAL.description + 5)}{searchDescription(post).length > SEO_IDEAL.description + 5 ? "…" : ""}</p>
         </div>
       </section>
 
@@ -112,7 +143,7 @@ export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
           {post.blocks.map((block, index) => (
             <li key={block.id} className="rounded-xl border border-[#e3e5f2] p-3">
               <div className="flex flex-wrap items-center gap-2">
-                <span className="text-sm font-semibold">{index + 1}. {block.type === "text" ? t("editor.addText").slice(2) : block.type === "quote" ? t("editor.quote") : block.type === "image" ? t("editor.addImage").slice(2) : t("editor.addButton").slice(2)}</span>
+                <span className="text-sm font-semibold">{index + 1}. {block.type === "text" ? t("editor.addText").slice(2) : block.type === "quote" ? t("editor.quote") : block.type === "image" ? t("editor.addImage").slice(2) : block.type === "newsletter" ? t("editor.addNewsletter").slice(2) : t("editor.addButton").slice(2)}</span>
                 <span className="ml-auto flex gap-1">
                   <button type="button" className={BTN} disabled={locked || index === 0} onClick={() => move(index, -1)} aria-label={t("editor.up")}>↑</button>
                   <button type="button" className={BTN} disabled={locked || index === post.blocks.length - 1} onClick={() => move(index, 1)} aria-label={t("editor.down")}>↓</button>
@@ -130,6 +161,7 @@ export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
                   <label className="mt-2 block text-sm font-semibold">{t("editor.imageAlt")}<input className={FIELD} maxLength={BLOG_LIMITS.alt} disabled={locked} value={block.alt} aria-required="true" aria-invalid={block.path !== "" && !block.alt.trim()} onChange={(e) => setBlock(block.id, { alt: e.target.value })} /></label>
                 </div>
               ) : null}
+              {block.type === "newsletter" ? <p className="mt-2 text-sm text-slate-700">{t("editor.newsletterHint")}</p> : null}
               {block.type === "button" ? (
                 <div className="mt-2 grid gap-2 sm:grid-cols-2">
                   <label className="block text-sm font-semibold">{t("editor.buttonLabel")}<input className={FIELD} maxLength={BLOG_LIMITS.label} disabled={locked} value={block.label} onChange={(e) => setBlock(block.id, { label: e.target.value })} /></label>
@@ -142,6 +174,7 @@ export function BlogEditor({ postId, initial, status, supabaseUrl }: Props) {
         </ol>
         <div className="mt-3 flex flex-wrap gap-2">
           {(["text", "quote", "image"] as const).map((type) => <button key={type} type="button" className={BTN} disabled={locked} onClick={() => add(type)}>{t(`editor.add${type[0].toUpperCase()}${type.slice(1)}`)}</button>)}
+          <button type="button" className={BTN} disabled={locked || post.blocks.some((b) => b.type === "newsletter")} onClick={() => add("newsletter")}>{t("editor.addNewsletter")}</button>
           <button type="button" className={BTN} disabled={locked || post.blocks.some((b) => b.type === "button")} onClick={() => add("button")}>{t("editor.addButton")}</button>
         </div>
       </section>
