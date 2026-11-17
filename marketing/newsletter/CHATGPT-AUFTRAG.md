@@ -70,6 +70,7 @@ Gib für jede Variante EIN JSON-Objekt in einem eigenen Codeblock aus (gültiges
   "title": "Interner Name",
   "subject": "Betreff",
   "preheader": "Vorschauzeile",
+  "language": "de",
   "look": "light",
   "accent": "#5b3df5",
   "headerMode": "gradient",
@@ -85,6 +86,6 @@ Gib für jede Variante EIN JSON-Objekt in einem eigenen Codeblock aus (gültiges
   ]
 }
 
-Erlaubt: look light, night oder plain; accent einer von #5b3df5 #0a88c2 #2dbfa8 #d4286b #e08a1e; headerMode gradient, image oder none; font serif oder sans; buttonStyle round, square oder outline; headingCase normal oder upper. Bausteine: text (bis 6000 Zeichen; "# " Überschrift, "## " kleine Überschrift, "- " Liste, **fett**, *kursiv*, [Text](https://adresse)), quote (text, by), button (label, href: ein Pfad der App wie /me/profile oder /dashboard, oder https), divider. Verwende keine anderen Bausteine (kein image, kein entries): Bilder und Netzwerk-Einträge fügt Maria im Editor ein.
+Erlaubt: language de oder en (Sprache der ganzen Ausgabe, der Text ist komplett in dieser Sprache, nie gemischt; Standard de); look light, night oder plain; accent einer von #5b3df5 #0a88c2 #2dbfa8 #d4286b #e08a1e; headerMode gradient, image oder none; font serif oder sans; buttonStyle round, square oder outline; headingCase normal oder upper. Bausteine: text (bis 6000 Zeichen; "# " Überschrift, "## " kleine Überschrift, "- " Liste, **fett**, *kursiv*, [Text](https://adresse)), quote (text, by), button (label, href: ein Pfad der App wie /me/profile oder /dashboard, oder https), divider. Verwende keine anderen Bausteine (kein image, kein entries): Bilder und Netzwerk-Einträge fügt Maria im Editor ein.
 
 Beginne jetzt. Frage nur, wenn dir etwas Wichtiges fehlt.

@@ -39,6 +39,7 @@ Schreibe **ein JSON-Objekt** (ohne Kommentare), speichere es als `marketing/news
   "title": "Interner Name der Ausgabe",
   "subject": "Betreff",
   "preheader": "Vorschauzeile",
+  "language": "de",
   "look": "light",
   "accent": "#5b3df5",
   "headerMode": "gradient",
@@ -54,7 +55,7 @@ Schreibe **ein JSON-Objekt** (ohne Kommentare), speichere es als `marketing/news
 }
 ```
 
-Erlaubt: `look` light | night | plain; `accent` einer von `#5b3df5 #0a88c2 #2dbfa8 #d4286b #e08a1e`; `headerMode` gradient | image | none; `font` serif | sans; `buttonStyle` round | square | outline; `headingCase` normal | upper. Bausteine: `text` (bis 6000 Zeichen; `# ` Überschrift, `## ` kleine Überschrift, `- ` Liste, `**fett**`, `*kursiv*`, `[Text](https://…)`), `quote` (`text`, `by`), `button` (`label`, `href`), `divider`. Lass `entries` und `image` weg: Einträge und Bilder fügt Maria im Editor ein. Standard-Look für Ausgaben: `light`, Akzent `#5b3df5`.
+Erlaubt: `language` de | en (Sprache der ganzen Ausgabe; der Text ist komplett in dieser Sprache, nie gemischt; Standard de); `look` light | night | plain; `accent` einer von `#5b3df5 #0a88c2 #2dbfa8 #d4286b #e08a1e`; `headerMode` gradient | image | none; `font` serif | sans; `buttonStyle` round | square | outline; `headingCase` normal | upper. Bausteine: `text` (bis 6000 Zeichen; `# ` Überschrift, `## ` kleine Überschrift, `- ` Liste, `**fett**`, `*kursiv*`, `[Text](https://…)`), `quote` (`text`, `by`), `button` (`label`, `href`), `divider`. Lass `entries` und `image` weg: Einträge und Bilder fügt Maria im Editor ein. Standard-Look für Ausgaben: `light`, Akzent `#5b3df5`.
 
 ## Comic-Idee (optional, in der Antwort, nicht im JSON)
 Gib Maria für die Rubrik „Comic“ **ein einziges Bild** (Ein-Bild-Comic mit ein, zwei Sprechblasen, so wie in der Newsletter-Vorlage, die sie mag):

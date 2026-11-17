@@ -53,10 +53,17 @@ function blockHtml(block: Block, issue: IssueData, theme: Theme, ctx: RenderCont
   }
 }
 
+/** Die festen Worte der Mail (Kopf und Fuss) je Sprache. Der Inhalt der Ausgabe steht in ihrer Sprache schon in den Bausteinen. */
+const FOOTER = {
+  de: { name: "Aus dem Netzwerk", why: "Du bekommst diese Mail, weil du dich für „Aus dem Netzwerk“ angemeldet und per Mail bestätigt hast.", unsubscribe: "Mit einem Klick abmelden", unsubscribeShort: "Abmelden", privacy: "Datenschutz", imprint: "Impressum" },
+  en: { name: "From the network", why: "You are getting this email because you signed up for “From the network” and confirmed by email.", unsubscribe: "Unsubscribe with one click", unsubscribeShort: "Unsubscribe", privacy: "Privacy", imprint: "Legal notice" },
+} as const;
+
 export function renderNewsletterHtml(issue: IssueData, ctx: RenderContext): string {
   const theme = THEMES[issue.look];
   const font = FONT_STACK[issue.font];
-  const headerTitle = issue.headingCase === "upper" ? "AUS DEM NETZWERK" : "Aus dem Netzwerk";
+  const words = FOOTER[issue.language];
+  const headerTitle = issue.headingCase === "upper" ? words.name.toUpperCase() : words.name;
   const header =
     issue.headerMode === "image" && issue.headerImagePath
       ? `<tr><td style="padding:0;"><img src="${escapeHtml(ctx.imageUrl(issue.headerImagePath))}" alt="${escapeHtml(issue.headerAlt)}" width="600" style="display:block;width:100%;height:auto;"></td></tr>`
@@ -66,7 +73,7 @@ export function renderNewsletterHtml(issue: IssueData, ctx: RenderContext): stri
   const body = issue.blocks.map((block) => blockHtml(block, issue, theme, ctx)).join("");
   const footerColor = theme.sub;
   return `<!DOCTYPE html>
-<html lang="de">
+<html lang="${issue.language}">
   <head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="color-scheme" content="light dark"><meta name="supported-color-schemes" content="light dark"><title>${escapeHtml(issue.subject)}</title></head>
   <body style="margin:0;padding:0;background:${theme.page};font-family:${font};color:${theme.text};">
     <div style="display:none;max-height:0;overflow:hidden;opacity:0;">${escapeHtml(issue.preheader)}</div>
@@ -76,8 +83,8 @@ export function renderNewsletterHtml(issue: IssueData, ctx: RenderContext): stri
           ${header}
           <tr><td style="padding:26px 32px 12px;font-family:${font};">${body}</td></tr>
           <tr><td style="padding:8px 32px 28px;font-family:Arial,Helvetica,sans-serif;font-size:12px;line-height:19px;color:${footerColor};">
-            <p style="margin:0 0 6px;">Du bekommst diese Mail, weil du dich für „Aus dem Netzwerk“ angemeldet und per Mail bestätigt hast.</p>
-            <p style="margin:0;"><a href="${escapeHtml(ctx.unsubscribeUrl)}" style="color:${footerColor};">Mit einem Klick abmelden</a> · <a href="${escapeHtml(ctx.privacyUrl)}" style="color:${footerColor};">Datenschutz</a> · <a href="${escapeHtml(ctx.imprintUrl)}" style="color:${footerColor};">Impressum</a></p>
+            <p style="margin:0 0 6px;">${escapeHtml(words.why)}</p>
+            <p style="margin:0;"><a href="${escapeHtml(ctx.unsubscribeUrl)}" style="color:${footerColor};">${escapeHtml(words.unsubscribe)}</a> · <a href="${escapeHtml(ctx.privacyUrl)}" style="color:${footerColor};">${escapeHtml(words.privacy)}</a> · <a href="${escapeHtml(ctx.imprintUrl)}" style="color:${footerColor};">${escapeHtml(words.imprint)}</a></p>
           </td></tr>
         </table>
       </td></tr>
@@ -88,7 +95,8 @@ export function renderNewsletterHtml(issue: IssueData, ctx: RenderContext): stri
 
 /** Die Textfassung fuer Programme ohne Bilder und fuer die Spam-Pruefung. */
 export function renderNewsletterText(issue: IssueData, ctx: RenderContext): string {
-  const parts: string[] = [issue.headingCase === "upper" ? "AUS DEM NETZWERK" : "Aus dem Netzwerk", ""];
+  const words = FOOTER[issue.language];
+  const parts: string[] = [issue.headingCase === "upper" ? words.name.toUpperCase() : words.name, ""];
   for (const block of issue.blocks) {
     if (block.type === "text") parts.push(toPlain(block.text), "");
     else if (block.type === "quote") parts.push(`„${block.text}“${block.by ? ` – ${block.by}` : ""}`, "");
@@ -96,6 +104,6 @@ export function renderNewsletterText(issue: IssueData, ctx: RenderContext): stri
     else if (block.type === "entries") { if (block.title) parts.push(block.title); for (const item of block.items) parts.push(`- ${item.title}: ${ctx.appOrigin}${KIND_PATH[item.kind]}${item.id}`); parts.push(""); }
     else if (block.type === "divider") parts.push("---", "");
   }
-  parts.push("--", `Abmelden: ${ctx.unsubscribeUrl}`, `Datenschutz: ${ctx.privacyUrl}`, `Impressum: ${ctx.imprintUrl}`);
+  parts.push("--", `${words.unsubscribeShort}: ${ctx.unsubscribeUrl}`, `${words.privacy}: ${ctx.privacyUrl}`, `${words.imprint}: ${ctx.imprintUrl}`);
   return parts.join("\n");
 }

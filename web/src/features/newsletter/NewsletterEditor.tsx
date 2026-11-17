@@ -3,7 +3,7 @@
 import { useMemo, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 import {
-  ACCENTS, BUTTON_STYLES, FONTS, HEADER_MODES, HEADING_CASES, LOOKS, LIMITS,
+  ACCENTS, BUTTON_STYLES, FONTS, HEADER_MODES, HEADING_CASES, LANGUAGES, LOOKS, LIMITS,
   type Block, type BlockType, type EntryItem, type IssueData,
 } from "@/features/newsletter/newsletterModel";
 import { renderNewsletterHtml } from "@/features/newsletter/newsletterRender";
@@ -15,7 +15,7 @@ import {
 type Candidate = { kind: "listing" | "problem"; id: string; title: string };
 type Props = {
   issueId: string; initial: IssueData; status: "draft" | "scheduled" | "sending" | "sent"; scheduledLocal: string;
-  candidates: Candidate[]; recipients: number; appOrigin: string; supabaseUrl: string;
+  candidates: Candidate[]; recipients: { de: number; en: number }; appOrigin: string; supabaseUrl: string;
 };
 
 const BOX = "rounded-2xl border border-[#d9dcec] bg-white p-4";
@@ -25,7 +25,7 @@ const BTN = "min-h-11 rounded-xl border border-[#c9ccdf] bg-white px-4 text-sm f
 const BTN_PRIMARY = "min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white disabled:opacity-50";
 const newId = () => `b${Math.random().toString(36).slice(2, 9)}`;
 
-export function NewsletterEditor({ issueId, initial, status, scheduledLocal, candidates, recipients, appOrigin, supabaseUrl }: Props) {
+export function NewsletterEditor({ issueId, initial, status, scheduledLocal, candidates, recipients: recipientsByLanguage, appOrigin, supabaseUrl }: Props) {
   const t = useTranslations("admin.newsletter");
   const [issue, setIssue] = useState<IssueData>(initial);
   const [note, setNote] = useState<{ tone: "ok" | "error"; text: string } | null>(null);
@@ -35,6 +35,7 @@ export function NewsletterEditor({ issueId, initial, status, scheduledLocal, can
   const [pending, start] = useTransition();
   const active = useRef<HTMLTextAreaElement | null>(null);
   const locked = status !== "draft";
+  const recipients = recipientsByLanguage[issue.language];
 
   const html = useMemo(() => renderNewsletterHtml(issue, {
     appOrigin, imageUrl: (path) => `${supabaseUrl}/storage/v1/object/public/newsletter/${encodeURIComponent(path)}`,
@@ -105,6 +106,13 @@ export function NewsletterEditor({ issueId, initial, status, scheduledLocal, can
           <h2 className={LABEL}>{t("basics.title")}</h2>
           <label className="mt-3 block text-sm font-semibold">{t("basics.subject")}<input className={FIELD} value={issue.subject} maxLength={LIMITS.subject} disabled={locked} onChange={(e) => set("subject", e.target.value)} /></label>
           <label className="mt-3 block text-sm font-semibold">{t("basics.preheader")}<input className={FIELD} value={issue.preheader} maxLength={LIMITS.preheader} disabled={locked} onChange={(e) => set("preheader", e.target.value)} /></label>
+          <div className="mt-3 text-sm font-semibold" role="group" aria-label={t("basics.language")}>
+            {t("basics.language")}
+            <div className="mt-1 flex flex-wrap gap-2">
+              {LANGUAGES.map((code) => <button key={code} type="button" disabled={locked} onClick={() => set("language", code)} aria-pressed={issue.language === code} className={`${BTN} ${issue.language === code ? "border-[#5b3df5] bg-[#efeafd]" : ""}`}>{t(`basics.languages.${code}`)}</button>)}
+            </div>
+            <p className="mt-1 text-xs font-normal text-slate-600">{t("basics.languageHint")}</p>
+          </div>
           <label className="mt-3 block text-sm font-semibold">{t("basics.internal")}<input className={FIELD} value={issue.title} maxLength={120} disabled={locked} onChange={(e) => set("title", e.target.value)} /></label>
         </section>
 

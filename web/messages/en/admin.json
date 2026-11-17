@@ -225,7 +225,8 @@
       "title": "Subscriptions",
       "confirmed": "confirmed",
       "pending": "waiting for confirmation",
-      "unsubscribed": "unsubscribed"
+      "unsubscribed": "unsubscribed",
+      "byLanguage": "Confirmed by language: {de} German, {en} English."
     },
     "status": {
       "draft": "Draft",
@@ -242,7 +243,13 @@
       "title": "Subject",
       "subject": "Subject (up to 60 characters is ideal)",
       "preheader": "Preview text in the inbox",
-      "internal": "Internal title (only you see it)"
+      "internal": "Internal title (only you see it)",
+      "language": "Issue language",
+      "languages": {
+        "de": "German",
+        "en": "English"
+      },
+      "languageHint": "The issue goes only to confirmed subscribers whose account language matches (none set: German). You write the text itself in that language."
     },
     "look": {
       "title": "Look",

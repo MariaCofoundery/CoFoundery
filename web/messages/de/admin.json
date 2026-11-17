@@ -225,7 +225,8 @@
       "title": "Anmeldungen",
       "confirmed": "bestätigt",
       "pending": "warten auf Bestätigung",
-      "unsubscribed": "abgemeldet"
+      "unsubscribed": "abgemeldet",
+      "byLanguage": "Bestätigt nach Sprache: {de} Deutsch, {en} Englisch."
     },
     "status": {
       "draft": "Entwurf",
@@ -242,7 +243,13 @@
       "title": "Betreff",
       "subject": "Betreff (höchstens 60 Zeichen sind ideal)",
       "preheader": "Vorschautext im Postfach",
-      "internal": "Interner Titel (siehst nur du)"
+      "internal": "Interner Titel (siehst nur du)",
+      "language": "Sprache der Ausgabe",
+      "languages": {
+        "de": "Deutsch",
+        "en": "Englisch"
+      },
+      "languageHint": "Die Ausgabe geht nur an bestätigte Abonnent:innen mit dieser Kontosprache (ohne Angabe: Deutsch). Der Text selbst schreibst du in dieser Sprache."
     },
     "look": {
       "title": "Look",

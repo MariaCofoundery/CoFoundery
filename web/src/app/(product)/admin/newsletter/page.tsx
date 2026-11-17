@@ -8,7 +8,7 @@ import { SubmitButton } from "@/features/ui/SubmitButton";
 
 export const metadata: Metadata = { robots: { index: false, follow: false } };
 
-type Row = { id: string; title: string; subject: string; status: "draft" | "scheduled" | "sending" | "sent"; scheduled_for: string | null; sent_at: string | null; updated_at: string; delivered: number; origin: "manual" | "auto"; variant: string };
+type Row = { id: string; title: string; subject: string; status: "draft" | "scheduled" | "sending" | "sent"; scheduled_for: string | null; sent_at: string | null; updated_at: string; delivered: number; origin: "manual" | "auto"; language: "de" | "en"; variant: string };
 
 const PILL: Record<Row["status"], string> = { draft: "bg-amber-100 text-amber-900", scheduled: "bg-sky-100 text-sky-900", sending: "bg-violet-100 text-violet-900", sent: "bg-emerald-100 text-emerald-900" };
 
@@ -20,7 +20,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
     client.rpc("admin_list_newsletter_issues"), client.rpc("admin_newsletter_stats"),
   ]);
   const rows = (issues.error ? [] : (issues.data ?? [])) as Row[];
-  const s = ((stats.data ?? []) as { confirmed: number; pending: number; unsubscribed: number }[])[0] ?? { confirmed: 0, pending: 0, unsubscribed: 0 };
+  const s = ((stats.data ?? []) as { confirmed: number; pending: number; unsubscribed: number; confirmed_de: number; confirmed_en: number }[])[0] ?? { confirmed: 0, pending: 0, unsubscribed: 0, confirmed_de: 0, confirmed_en: 0 };
   const fmt = new Intl.DateTimeFormat(locale, { dateStyle: "medium", timeStyle: "short", timeZone: "Europe/Berlin" });
   return (
     <main className="mx-auto w-full max-w-5xl px-4 py-8 sm:px-6">
@@ -36,6 +36,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
           <div key={key} className="rounded-2xl border border-[#d9dcec] bg-white p-4"><div className="text-3xl font-bold">{value}</div><div className="text-sm text-slate-600">{t(`stats.${key}`)}</div></div>
         ))}
       </section>
+      <p className="mt-2 text-sm text-slate-600">{t("stats.byLanguage", { de: s.confirmed_de, en: s.confirmed_en })}</p>
       <form action={createNewsletterIssueAction} className="mt-6"><SubmitButton label={t("new")} pendingLabel="…" className="min-h-11 rounded-xl bg-[linear-gradient(120deg,#6d49e0,#0a80b8)] px-5 text-sm font-semibold text-white" /></form>
       <section className="mt-8 rounded-2xl border border-[#d9dcec] bg-white p-4" aria-labelledby="welcome-title">
         <h2 id="welcome-title" className="text-lg font-semibold">{t("welcomeTitle")}</h2>
@@ -65,6 +66,7 @@ export default async function NewsletterAdminPage({ searchParams }: { searchPara
             <li key={row.id}>
               <Link href={`/admin/newsletter/${row.id}`} className="flex flex-wrap items-center gap-3 rounded-2xl border border-[#d9dcec] bg-white px-4 py-3 hover:bg-[#faf9fe]">
                 <span className="min-w-0 flex-1 font-semibold">{row.title || row.subject || t("untitled")}</span>
+                <span className="rounded-full bg-slate-100 px-2.5 py-0.5 text-xs font-bold text-slate-800">{t(`basics.languages.${row.language}`)}</span>
                 {row.origin === "auto" ? <span className="rounded-full bg-violet-100 px-2.5 py-0.5 text-xs font-bold text-violet-900">{row.variant ? t("autoVariant", { variant: row.variant }) : t("auto")}</span> : null}
                 <span className={`rounded-full px-2.5 py-0.5 text-xs font-bold ${PILL[row.status]}`}>{t(`status.${row.status}`)}</span>
                 <span className="text-sm text-slate-600">
