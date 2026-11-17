@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { ConnectPersonLink } from "@/features/connect/ConnectPersonLink";
 import { getTranslations } from "next-intl/server";
 import { DOOR_GROUPS, DOOR_SECTORS, type DoorFilters, type DoorResult } from "@/features/connect/doors/doorCatalog";
 import { doorMeta, doorTitle } from "@/features/connect/doors/doorLabels";
@@ -48,8 +49,7 @@ export async function DoorSearch({ filters, results }: { filters: DoorFilters | 
           <ul className="mt-3 grid gap-4 md:grid-cols-2">
             {results.map((result) => (
               <li key={result.id} className="flex flex-col gap-1.5 rounded-2xl border border-slate-200 bg-white p-4">
-                <Link href={`/connect/people/${result.userId}`} className="text-[15px] font-semibold text-slate-950 underline-offset-4 hover:underline">{result.displayName}</Link>
-                {result.headline ? <span className="text-[13px] text-slate-600">{result.headline}</span> : null}
+                <ConnectPersonLink userId={result.userId} name={result.displayName} headline={result.headline} avatar={false} nameClassName="text-[15px] font-semibold text-slate-950" headlineClassName="text-[13px] text-slate-600" />
                 <b className="mt-1 text-[15.5px] text-slate-950">{doorTitle(tt, result)}</b>
                 <span className="text-[13.5px] text-slate-700">{doorMeta(tt, result)}</span>
                 <span className="text-[13.5px] text-slate-900"><b>{t(`closeness.${result.closeness}.label`)}</b>{result.note ? <span className="text-slate-700"> · „{result.note}“</span> : null}</span>
