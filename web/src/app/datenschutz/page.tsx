@@ -1,9 +1,9 @@
 import Link from "next/link";
 
 /*
- * ERGÄNZT AM 17.11.2026 (gegen den Code geprüft): Abschnitte 15b (Newsletter, mit und ohne Konto)
- * und 15c (öffentlicher Blog), dazu Zeilen in 3, 21, 22, 23 und 24. NOCH NICHT in diesem Text und
- * vor dem Livegang zu prüfen: Erinnerungs-Mails, Danke-Herz, Wertemodul. Was nicht belegbar ist
+ * ERGÄNZT AM 17.11.2026 (gegen den Code geprüft): Abschnitte 6c (Werte), 11b (Danke und Herz),
+ * 15 (Unterabschnitt Erinnerungen), 15b (Newsletter, mit und ohne Konto) und 15c (öffentlicher
+ * Blog), dazu Zeilen in 3, 21, 22, 23 und 24. Was nicht belegbar ist
  * (Resend-Einstellungen, Einordnung durch die Rechtsberatung), steht als LEGAL REVIEW REQUIRED.
  *
  * DATENSCHUTZERKLÄRUNG – Stand 20.10.2026, gegen den Code geprüft (Änderungen seit 13.10.2026:
@@ -274,6 +274,29 @@ export default function DatenschutzPage() {
             </p>
           </BulletSection>
 
+          <BulletSection number="6c" title="Werte">
+            <p>
+              Im Bereich „Werte“ wählst du drei bis fünf Werte, die dir wichtig sind, aus einem
+              Katalog oder mit einem eigenen Begriff, in deiner Reihenfolge. Du kannst jedem Wert
+              ein paar eigene Worte dazuschreiben und optional kurz notieren, woran du merkst, dass ein Wert verletzt wird.
+              Es gibt keine Punkte und keinen Vergleich von Plätzen.
+            </p>
+            <List
+              items={[
+                "Gespeichert werden die Werte mit Platz, Begriff, deinen Worten (bis 200 Zeichen), die Notiz (bis 300 Zeichen) und deine Einstellungen zur Freigabe.",
+                "Standard: Niemand sieht sie. Zwei getrennte Freigaben: (1) mit einem bestimmten Team teilen, (2) die Begriffe in deinem CONNECT-Profil zeigen. Ein Teambeitritt, ein Programm oder ein CONNECT-Profil gibt nichts frei.",
+                "Teilst du mit einem Team, sehen die Mitglieder dieses Teams deine Werte nebeneinander mit denen der anderen, die ebenfalls geteilt haben. Verlässt du das Team, endet die Freigabe für dieses Team.",
+                "Advisors und Organisationen sehen Werte nie.",
+                "Beim Löschen deines Kontos werden deine Werte und Freigaben gelöscht.",
+              ]}
+            />
+            <p>
+              Rechtsgrundlage ist die Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO) und,
+              soweit du etwas teilst oder im Profil zeigst, deine Entscheidung dazu (Art. 6 Abs. 1
+              lit. a DSGVO), die du jederzeit zurücknehmen kannst.
+            </p>
+          </BulletSection>
+
           <BulletSection number="7" title="Fähigkeiten (Capabilities) und Interview">
             <p>
               Du kannst angeben, in welchen Bereichen du Erfahrung hast, wie tief diese Erfahrung
@@ -419,6 +442,35 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
+          <BulletSection number="11b" title="Danke und Herz in CONNECT">
+            <p>
+              In CONNECT kannst du Mitgliedern danken, die dir geholfen haben, auch ohne vorheriges
+              Gespräch (etwa von einem Profil, einem Gesuch, einem Problem oder einem Unternehmen
+              aus). Das Herz ist ein Zeichen, keine Zahl: Es erscheint auf Profilen und Karten, wenn
+              eine Person schon mindestens einmal Dank bekommen hat. Wir zählen, listen oder
+              sortieren Danksagungen nicht.
+            </p>
+            <List
+              items={[
+                "Gespeichert werden: wer wem gedankt hat, wobei geholfen wurde (z. B. Wissen, Feedback, Kontakt, Zeit), was daraus wurde (freiwillig: Treffen, Vermittlung, noch offen), freiwillig ein paar Worte (bis 280 Zeichen), woran sich der Dank knüpft (z. B. ein Profil oder ein Gesuch) und der Zeitpunkt.",
+                "Deine Worte sind privat, bis du sie ausdrücklich für das Profil der anderen Person freigibst. Die Person, der gedankt wurde, kann einen freigegebenen Dank jederzeit ausblenden. Auf einem Profil zeigen wir höchstens drei freigegebene Danksagungen, mit dem Vornamen der dankenden Person, für angemeldete Personen.",
+                "Die Person, der du dankst, bekommt einen Hinweis in der App ohne deinen Text. Dazu kann eine Mail und eine Mitteilung aufs Gerät kommen, wenn sie diese Art Benachrichtigung eingeschaltet hat; sie nennen deinen Vornamen und nie deine Worte.",
+                "Grenzen gegen Missbrauch: Je Person einmal in 90 Tagen, höchstens fünf direkte Danksagungen am Tag, nicht an dich selbst, nicht an Blockierte und nur an Mitglieder mit aktivem Profil.",
+                "Löschst du dein Konto oder die andere Person ihres, wird der gemeinsame Dank gelöscht (Abschnitt 24).",
+              ]}
+            />
+            <p>
+              Rechtsgrundlage ist die Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO); die
+              Freigabe deiner Worte für ein Profil beruht auf deiner Einwilligung (Art. 6 Abs. 1
+              lit. a DSGVO), die du über das Ausblenden bzw. deine Löschwünsche zurücknehmen kannst.
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED: Die Einwilligung zur Freigabe der Worte fürs Profil wird bei
+              der dankenden Person abgefragt (show_on_profile); die Person, der gedankt wird, kann
+              ausblenden (helper_hidden). Prüfen, ob die Rollenverteilung im Text so ausreicht.
+            */}
+          </BulletSection>
+
           <BulletSection number="12" title="Wie Made2Found Vorschläge und Auswertungen bildet">
             <List
               items={[
@@ -483,6 +535,24 @@ export default function DatenschutzPage() {
               nur, wenn du sie eingeschaltet hast; abbestellen kannst du sie in deinem Konto.
               Benachrichtigungen enthalten in der Regel nur, dass etwas passiert ist, und den Namen
               der beteiligten Person – nicht den Inhalt von Nachrichten.
+            </p>
+            <Sub>Erinnerungen</Sub>
+            <p>
+              Neben dem Newsletter (Abschnitt 15b) schicken wir drei Arten von Erinnerungen. Sie
+              nennen immer nur, dass etwas ansteht, nicht den Inhalt und keine Namen von Teams oder
+              Organisationen.
+            </p>
+            <List
+              items={[
+                "Erinnerungen nach dem Einstieg: nur mit deiner ausdrücklichen Zustimmung (auf der Willkommensseite „Erinnere mich morgen“ oder die einmalige Frage nach dem ersten Erfolg im Fragebogen; ein „Nein danke“ wird festgehalten, damit wir nicht noch einmal fragen). Höchstens zwei Mails, nach etwa einem und nach etwa drei Tagen, und nur, solange in deinem Profil oder in den von dir gewählten Bereichen noch etwas offen ist. Die Mail führt zum nächsten offenen Schritt. Gespeichert werden deine Zustimmung mit Zeitpunkt, die Quelle und die Zeitpunkte der gesendeten Mails. Abmelden geht mit einem Klick in der Mail, auch ohne Anmeldung.",
+                "Erinnerungen an fällige Team-Check-ins: eine Mitteilung aufs Gerät (wenn du Push eingeschaltet hast und die Art nicht abbestellt ist) und eine Mail nur mit deiner ausdrücklichen Zustimmung im Konto. Höchstens eine Erinnerung je Person, Team und Fälligkeit; wir speichern dafür einen Vermerk, dass sie gesendet wurde.",
+                "Erinnerungen an Programm-Updates (nur bei aktivem Programm einer Organisation, an dem dein Team teilnimmt): zwei Tage vor Fälligkeit ein Hinweis im Postfach der App; Mitteilung aufs Gerät und Mail nur, wenn du sie eingeschaltet hast.",
+              ]}
+            />
+            <p>
+              Rechtsgrundlage für Erinnerungs-Mails und Push ist deine Einwilligung (Art. 6 Abs. 1
+              lit. a DSGVO, bei Push zusätzlich § 25 Abs. 1 TDDDG), für Hinweise in der App die
+              Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO).
             </p>
             <Sub>Mitteilungen aufs Gerät (Push)</Sub>
             <p>
@@ -769,6 +839,7 @@ export default function DatenschutzPage() {
                 "Nutzungs- und Forschungsereignisse (Abschnitte 16 und 17) werden automatisiert gelöscht. Maßgeblich ist der Zeitpunkt, zu dem sie bei uns eingegangen sind. Die Aufbewahrungsdauer beträgt rund 30 Tage; weil der Löschlauf einmal täglich stattfindet, können es technisch bis zu etwa 32 Tage sein.",
                 "Personenbezogene Teilnahme- und Antwortdaten zum Event-Check werden automatisiert innerhalb von rund zwei Tagen nach Ende des jeweiligen Events gelöscht.",
                 "Abgeschlossene Aufgaben der KI-Warteschlange (nur Verweise und technische Angaben, keine Inhalte) löschen wir automatisch nach 90 Tagen, Hinweise in der Anwendung nach 180 Tagen.",
+                "Erinnerungs-Vermerke (Check-in) löschen wir nach 365 Tagen. Deine Zustimmung zu den Erinnerungen nach dem Einstieg und deine Werte speichern wir, bis du sie änderst, widerrufst oder dein Konto löschst.",
                 "Newsletter ohne Konto: Nie bestätigte Anmeldungen werden nach 14 Tagen automatisch gelöscht. Bestätigte Anmeldungen bleiben bis zu deiner Abmeldung; danach bleibt die Adresse als Sperre gespeichert, bis du uns bittest, sie zu löschen (Abschnitt 15b).",
                 "Push-Zustelladressen speichern wir, bis du Push ausschaltest, der Push-Dienst sie als ungültig meldet oder du dein Konto löschst.",
                 "Einladungen laufen nach 14 bzw. 30 Tagen ab. Abgelaufene Einladungen werden derzeit nicht automatisch gelöscht, sondern spätestens mit dem Konto der einladenden Person.",
@@ -801,6 +872,7 @@ export default function DatenschutzPage() {
                 "dein FIND-Profil, deine Suchkriterien und gespeicherten Suchen",
                 "dein CONNECT-Profil, deine Anzeigen, Blockierungen und Meldungen, Vorschläge und Benachrichtigungseinstellungen",
                 "deine Forschungsdaten, soweit sie dir noch zugeordnet werden können",
+                "deine Werte und Freigaben, deine Zustimmung zu Erinnerungen und Danksagungen, die du gegeben oder bekommen hast (auch für die andere Person, denn ein Dank gehört beiden)",
                 "deine Newsletter-Anmeldung als Mitglied (die Anmeldung ohne Konto ist davon getrennt, Abschnitt 15b)",
                 "Einladungen, die du verschickt hast oder die an deine E-Mail-Adresse gingen",
                 "Event-Teilnahmen mit deiner E-Mail-Adresse",
