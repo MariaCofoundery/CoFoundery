@@ -152,3 +152,18 @@ test("admin copy exists in both languages", () => {
   assert.deepEqual(keys(de).sort(), keys(en).sort());
   assert.ok(keys(de).length > 80);
 });
+
+test("the blog skill's example is valid JSON that the import accepts, and its rules match the model", () => {
+  const skill = read("../.claude/skills/blog/SKILL.md");
+  const json = /```json\n([\s\S]*?)\n```/.exec(skill)?.[1] ?? "";
+  const parsed = parseBlogDraftJson(json);
+  assert.ok(parsed.ok, "example imports");
+  if (parsed.ok) {
+    assert.equal(parsed.post.slug, "anteile-unter-co-foundern-teilen");
+    assert.equal(parsed.post.translationKey, "splitting-equity");
+    assert.deepEqual(blogPostProblems(parsed.post), [], "the example is ready to approve");
+  }
+  assert.match(skill, /Höchstens ein `button`, und er steht als letzter Baustein/);
+  assert.match(skill, /Veröffentlicht nie|veröffentlichst nie/);
+  assert.match(skill, /Alternativtext/);
+});
