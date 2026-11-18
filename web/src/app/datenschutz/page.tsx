@@ -78,7 +78,7 @@ export default function DatenschutzPage() {
               verarbeitet, wofür, auf welcher Grundlage, wie lange – und welche Rechte du hast. Sie
               beschreibt den tatsächlichen technischen Stand des Produkts.
             </p>
-            <p className="mt-2 text-sm text-slate-500">Stand: 17. November 2026</p>
+            <p className="mt-2 text-sm text-slate-500">Stand: 18. November 2026</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -531,8 +531,10 @@ export default function DatenschutzPage() {
             <Sub>E-Mails</Sub>
             <p>
               Wir senden E-Mails, die für die Nutzung nötig sind, z. B. Anmelde-E-Mails und
-              Einladungen. Benachrichtigungen per E-Mail, z. B. über neue Vorschläge, schicken wir
-              nur, wenn du sie eingeschaltet hast; abbestellen kannst du sie in deinem Konto.
+              Einladungen. Benachrichtigungen per E-Mail, etwa zu Kontaktanfragen, Nachrichten oder
+              Vorstellungsanfragen, bekommst du, bis du sie in deinem Konto abbestellst. Mails zu
+              neuen Vorschlägen, zu fälligen Check-ins und zu Programm-Updates schicken wir nur,
+              wenn du sie ausdrücklich eingeschaltet hast.
               Benachrichtigungen enthalten in der Regel nur, dass etwas passiert ist, und den Namen
               der beteiligten Person – nicht den Inhalt von Nachrichten.
             </p>
@@ -777,13 +779,13 @@ export default function DatenschutzPage() {
           <BulletSection number="20" title="Kontakt per E-Mail">
             <p>
               Wenn du uns per E-Mail schreibst, verarbeiten wir deine Nachricht und deine Angaben,
-              um dein Anliegen zu bearbeiten. Für unser E-Mail-Postfach nutzen wir Gmail (Google
-              Ireland Limited, Dublin, Irland). Dabei kann es zu einer Übermittlung in Drittländer
-              kommen; Google stützt solche Übermittlungen auf Standardvertragsklauseln.
+              um dein Anliegen zu bearbeiten. Für unser E-Mail-Postfach nutzen wir IONOS
+              (Rechenzentren in Deutschland). Deine Nachricht und die Antwort liegen dort, bis wir
+              sie löschen.
             </p>
             {/*
-              LEGAL REVIEW REQUIRED: Betriebsangabe, im Repo nicht belegbar (übernommen aus der
-              bisherigen Fassung). Vor Veröffentlichung bestätigen, ebenso die Transfergrundlage.
+              LEGAL REVIEW REQUIRED: Betriebsangabe, im Repo nicht belegbar (Anbieter laut Maria seit
+              18.11.2026 IONOS, vorher stand hier Gmail). Vor Veröffentlichung bestätigen.
             */}
           </BulletSection>
 
@@ -797,6 +799,11 @@ export default function DatenschutzPage() {
               items={[
                 "Anmelde-Cookies von Supabase: halten dich nach der Anmeldung eingeloggt.",
                 "Sprach-Cookie: merkt sich deine gewählte Sprache, gültig ein Jahr.",
+                "Cookie „zuletzt besuchter Bereich“: merkt sich, wo du zuletzt warst, damit du dort weitermachen kannst, gültig 30 Tage.",
+                "Anmelde-Hilfe-Cookie: hält deine E-Mail-Adresse zwischen der Eingabe und dem Code fest, gültig eine Stunde.",
+                "Kalender-Cookie: merkt sich Bundesland und Ferienwahl im Kalender, gültig ein Jahr.",
+                "Oberflächen-Cookies für Advisors: merken das gewählte Programm und eine laufende Einrichtung, nur für die Browsersitzung.",
+                "Lokaler Speicher: merkt sich, welche Kurzanleitung du schon gesehen hast und ob die Seitenleiste offen ist; bleibt, bis du die Browserdaten löschst.",
                 "Arbeitsbereich-Cookie: merkt sich nur nach einem ausdrücklichen Wechsel, ob du gerade als Founder oder Advisor arbeitest; endet mit der Browsersitzung.",
                 "Einladungs-Cookies: halten den Einladungscode während der Anmeldung fest, gültig 15 Minuten.",
                 "Event-Cookie: hält deine Event-Teilnahme fest, gültig 7 Tage.",
