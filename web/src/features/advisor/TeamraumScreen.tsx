@@ -239,12 +239,21 @@ export async function TeamraumScreen({ section, searchParams }: { section: Teamr
         <div className="flex flex-wrap items-center gap-2.5">
           {section === "tasks" && canWrite ? (
             <>
-              <Link href={teamraumHref("tasks", org.id, { ...keepForActions, dictate: "1" })} className="hidden min-h-11 items-center gap-2 rounded-xl border border-slate-300 bg-white px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50 md:inline-flex">
+              {/* Der Knopf ist ein Schalter: offen sieht er gedrueckt aus, und ein zweiter Klick schliesst wieder. */}
+              <Link
+                href={teamraumHref("tasks", org.id, query.dictate === "1" ? keepForActions : { ...keepForActions, dictate: "1" })}
+                aria-pressed={query.dictate === "1"}
+                className={`hidden min-h-11 items-center gap-2 rounded-xl border px-4 text-sm font-semibold md:inline-flex ${query.dictate === "1" ? "border-violet-400 bg-violet-50 text-violet-900" : "border-slate-300 bg-white text-slate-700 hover:bg-slate-50"}`}
+              >
                 <svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><rect x="9" y="3" width="6" height="11" rx="3" /><path d="M5 11a7 7 0 0 0 14 0M12 18v3" /></svg>
                 {t("dictate")}
               </Link>
-              <Link href={teamraumHref("tasks", org.id, { ...keepForActions, new: "1" })} className="brand-cta hidden min-h-11 items-center rounded-xl px-[18px] text-sm font-semibold md:inline-flex">
-                + {t("newTask")}
+              <Link
+                href={teamraumHref("tasks", org.id, query.new === "1" ? keepForActions : { ...keepForActions, new: "1" })}
+                aria-pressed={query.new === "1"}
+                className={`hidden min-h-11 items-center rounded-xl px-[18px] text-sm font-semibold md:inline-flex ${query.new === "1" ? "border border-violet-400 bg-violet-50 text-violet-900" : "brand-cta"}`}
+              >
+                {query.new === "1" ? "×" : "+"} {t("newTask")}
               </Link>
             </>
           ) : null}

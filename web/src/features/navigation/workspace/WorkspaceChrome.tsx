@@ -117,7 +117,18 @@ export function WorkspaceChrome({
     setMoreOpen(false);
     setCreateOpen(false);
     setSearchOpen(false);
-  }, [pathname, tab, view]);
+  }, [pathname, tab, view, params.toString()]);
+
+  // Ein Tipp auf einen Eintrag schliesst das Menue sofort. Der Ortswechsel allein reicht nicht: "Neue Aufgabe" oeffnet
+  // dieselbe Seite nur mit ?new=1 - dann aendern sich Pfad, Reiter und Ansicht nicht, und das Menue bliebe offen.
+  const closeOnLink = (event: React.MouseEvent) => {
+    if ((event.target as HTMLElement).closest("a[href]")) {
+      setMoreOpen(false);
+      setCreateOpen(false);
+    }
+  };
+  // "Mehr" laesst sich nach unten wegwischen (am Griff und der Kopfzeile) - wie jedes Blatt am Telefon.
+  const swipeStart = useRef<number | null>(null);
 
   // Escape schliesst nur, was dieses Geruest selbst offen hat - und sagt es (preventDefault), damit ein offenes Seitenpanel
   // (EscapeCloses) nicht im selben Atemzug mit zugeht. Capture: Wir sind vor ihm dran.
@@ -306,7 +317,7 @@ export function WorkspaceChrome({
                 <span className="sr-only sm:hidden">{tw("create.button")}</span>
               </button>
               {createOpen ? (
-                <div role="menu" aria-label={tw("create.menuLabel")} className="absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_40px_rgba(23,23,58,0.16)]">
+                <div role="menu" aria-label={tw("create.menuLabel")} onClick={closeOnLink} className="absolute right-0 z-50 mt-2 w-[min(20rem,calc(100vw-1.5rem))] rounded-2xl border border-slate-200 bg-white p-2 shadow-[0_18px_40px_rgba(23,23,58,0.16)]">
                   <p className="mx-2.5 mb-1.5 mt-1.5 text-xs font-semibold uppercase tracking-[0.06em] text-slate-600">{tw("create.title")}</p>
                   {creates.map((entry) => (
                     <Link key={entry.key} href={entry.href} role="menuitem" className="flex min-h-12 items-center gap-3 rounded-[10px] px-2.5 hover:bg-slate-50">
@@ -378,10 +389,21 @@ export function WorkspaceChrome({
         <div className="fixed inset-0 z-50 min-[700px]:hidden">
           <button type="button" aria-label={tw("moreClose")} onClick={() => setMoreOpen(false)} className="absolute inset-0 bg-[#14152B]/45" />
           <div ref={moreRef} tabIndex={-1} role="dialog" aria-modal="true" aria-label={tw("more")} className="absolute inset-x-0 bottom-0 top-16 flex flex-col overflow-hidden rounded-t-[26px] bg-white outline-none">
-            <div className="flex items-center justify-between px-5 pb-1 pt-3">
-              <span aria-hidden="true" className="mx-auto h-1.5 w-10 rounded-full bg-slate-300" />
+            <div
+              className="relative flex touch-none items-center justify-center px-5 pb-2 pt-3"
+              onTouchStart={(event) => { swipeStart.current = event.touches[0]?.clientY ?? null; }}
+              onTouchEnd={(event) => {
+                const start = swipeStart.current;
+                swipeStart.current = null;
+                if (start !== null && (event.changedTouches[0]?.clientY ?? start) - start > 50) setMoreOpen(false);
+              }}
+            >
+              <span aria-hidden="true" className="h-1.5 w-10 rounded-full bg-slate-300" />
+              <button type="button" onClick={() => setMoreOpen(false)} aria-label={tw("moreClose")} className="absolute right-2 top-1 grid h-11 w-11 place-items-center rounded-full text-slate-700 hover:bg-slate-100">
+                <svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round"><path d="M6 6l12 12M18 6L6 18" /></svg>
+              </button>
             </div>
-            <div className="flex-1 overflow-y-auto px-3 pb-8">
+            <div className="flex-1 overflow-y-auto px-3 pb-8" onClick={closeOnLink}>
               {orgs.length > 1 ? <div className="mb-3 px-1">{programSwitcher("light")}</div> : null}
               <nav aria-label={tw("navLabel")} className="flex flex-col gap-0.5">
                 {[nav.home, ...nav.groups.flatMap((group) => group.items), ...(nav.setup ? [nav.setup] : [])].map((item) => {

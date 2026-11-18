@@ -4,6 +4,7 @@ import { berlinDayOf } from "@/lib/berlinTime";
 import { getTranslations } from "next-intl/server";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import { SidePanel } from "@/features/ui/SidePanel";
+import { EscapeToClose } from "@/features/advisor/EscapeToClose";
 import { ChipChoice, ChipMultiChoice } from "@/features/ui/ChipChoice";
 import { UserText } from "@/features/ui/UserText";
 import { DictateTasks } from "@/features/advisor/DictateTasks";
@@ -165,7 +166,7 @@ function dueChoices(today: string, t: (key: string) => string) {
 }
 
 /** Das Formular fuer neue und bestehende Aufgaben: das Noetige vorn, Beschreibung, Checkliste und Veranstaltung auf Wunsch. */
-async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = null }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; cancelHref?: string; defaultEventId?: string | null }) {
+async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = null, focusTitle = false }: { ctx: TeamraumContext; tab: "week" | "tasks"; filter?: TaskFilter; task?: OrgTask; cancelHref?: string; defaultEventId?: string | null; focusTitle?: boolean }) {
   const t = await getTranslations("advisor.teamraum");
   const { dayOf } = helpers(ctx);
   // Ein Startup verknuepfen kann man nur mit Teams, die man sieht. Eine bestehende fremde Verknuepfung bleibt still erhalten.
@@ -183,7 +184,7 @@ async function TaskForm({ ctx, tab, filter, task, cancelHref, defaultEventId = n
       <Hidden ctx={ctx} tab={tab} filter={filter} taskId={task?.id} />
       <label className="block">
         <span className={LABEL}>{t("form.titleQuestion")}</span>
-        <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} className={INPUT} disabled={!ctx.canWrite} />
+        <input name="title" required maxLength={200} defaultValue={task?.title ?? ""} className={INPUT} disabled={!ctx.canWrite} autoFocus={focusTitle} />
       </label>
       <div>
         <span className={`${LABEL} mb-2`}>{t("form.assigneeQuestion")}</span>
@@ -844,6 +845,7 @@ export async function TeamraumBoard({
         </p>
       ) : null}
 
+      {ctx.canWrite && (options.dictateOpen || options.newOpen) ? <EscapeToClose href={closeHref} /> : null}
       {ctx.canWrite && options.dictateOpen ? (
         <section aria-labelledby="dictate-title" className={`${CARD} mt-5`}>
           <div className="flex flex-wrap items-start justify-between gap-3">
@@ -869,7 +871,7 @@ export async function TeamraumBoard({
           >
             <span aria-hidden="true" className="mx-auto mb-3 block h-[5px] w-10 rounded-full bg-slate-300 md:hidden" />
             <h2 id="new-task-title" className="mb-4 text-[19px] font-bold text-slate-950">{t("board.new")}</h2>
-            <TaskForm ctx={ctx} tab="tasks" filter={filter} cancelHref={closeHref} defaultEventId={options.eventId ?? null} />
+            <TaskForm ctx={ctx} tab="tasks" filter={filter} cancelHref={closeHref} defaultEventId={options.eventId ?? null} focusTitle />
           </section>
         </>
       ) : null}
