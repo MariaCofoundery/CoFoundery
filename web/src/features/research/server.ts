@@ -2,6 +2,7 @@ import "server-only";
 
 import { createHash } from "crypto";
 import { createClient as createSupabaseClient, type SupabaseClient } from "@supabase/supabase-js";
+import { sanitizeFeedbackPath } from "@/features/feedback/feedbackModel";
 import { RESEARCH_CONSENT_VERSION } from "@/features/research/consentVersion";
 import {
   getFounderCompatibilityBaseItem,
@@ -78,9 +79,14 @@ function asIsoTimestampOrNull(value: unknown) {
   return Number.isNaN(timestamp) ? null : new Date(timestamp).toISOString();
 }
 
+/**
+ * Die Seite ohne Abfrage und ohne Kennungen (18.11.2026): Team-, Einladungs- und andere Kennungen in der Adresse werden
+ * zu ":id", ein unbekannter Anfang wird gar nicht gespeichert. Dieselbe Regel wie beim Feedback, damit die Erklaerung
+ * "ohne Nutzerkennung" stimmt.
+ */
 function asPagePath(value: unknown) {
   const path = asTrimmedString(value, 300);
-  return path?.startsWith("/") ? path : null;
+  return path?.startsWith("/") ? sanitizeFeedbackPath(path.split(/[?#]/)[0]) : null;
 }
 
 function asDeviceClass(value: unknown) {
