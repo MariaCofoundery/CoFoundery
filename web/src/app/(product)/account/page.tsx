@@ -33,12 +33,13 @@ import { createClient, getRequestUser } from "@/lib/supabase/server";
 import { NewsletterAsk } from "@/features/newsletter/NewsletterAsk";
 import { getNewsletterState } from "@/features/newsletter/newsletterData";
 import { QuietHoursSection, getMyQuietHours } from "@/features/notifications/QuietHoursSection";
+import { DeliveryRhythmSection, getMyDeliveryRhythm } from "@/features/notifications/DeliveryRhythmSection";
 import { getPresentationLocale } from "@/i18n/presentationLocale";
 
 export default async function AccountPage({
   searchParams,
 }: {
-  searchParams: Promise<{ status?: string; connectError?: string; quiet?: string; newsletter?: string }>;
+  searchParams: Promise<{ status?: string; connectError?: string; quiet?: string; delivery?: string; newsletter?: string }>;
 }) {
   const supabase = await createClient();
   const {
@@ -184,6 +185,9 @@ export default async function AccountPage({
             {["asked", "stopped", "error"].includes(params.newsletter ?? "") ? <p role="status" className={`mb-3 rounded-2xl p-3 text-sm ${params.newsletter === "error" ? "bg-amber-50 text-amber-900" : "bg-emerald-50 text-emerald-900"}`}>{newsletterT(`newsletter.${params.newsletter}`)}</p> : null}
             <NewsletterAsk state={await getNewsletterState(supabase, user.id)} source="settings" returnTo="/account" t={newsletterT} tone="plain" />
           </div>
+
+          {/* Rhythmus (20270510120000): direkt unter den Benachrichtigungen, dort entscheidet man, was kommt - hier, wie. */}
+          <DeliveryRhythmSection rhythm={await getMyDeliveryRhythm(supabase)} status={params.delivery ?? null} />
 
           {/* Feierabend (20270317120000): direkt nach den Benachrichtigungen, dort sucht man ihn. */}
           <QuietHoursSection quiet={await getMyQuietHours(supabase)} status={params.quiet ?? null} locale={getPresentationLocale(accountLocale ?? "de")} />

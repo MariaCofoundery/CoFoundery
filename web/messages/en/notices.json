@@ -67,5 +67,33 @@
     "day4": "Thu",
     "day5": "Fri",
     "day6": "Sat"
+  },
+  "delivery": {
+    "title": "How it arrives",
+    "text": "Applies to the phone notification and the email together. What you receive is set above.",
+    "legend": "Notification rhythm",
+    "recommended": "recommended",
+    "modes": {
+      "bundled": {
+        "label": "Bundled",
+        "text": "If several notices arrive close together (within three hours), you see a single notification that updates: “3 new notices”. Emails arrive once in the morning as an overview. Anything that happens at a different time arrives on its own again."
+      },
+      "instant": {
+        "label": "Instantly",
+        "text": "Every notice on its own, as a notification and as an email – the way it used to be."
+      },
+      "quiet": {
+        "label": "Quiet",
+        "text": "No notifications on your phone. One overview by email in the morning, only when something is waiting. In the app you see everything."
+      }
+    },
+    "badge": {
+      "label": "Number on the app icon",
+      "text": "Shows how many notices are open. It updates when a notification arrives or when you open the app. On iPhone only if the app is on your Home Screen."
+    },
+    "always": "Quiet hours still apply. Messages in a conversation stay one notification per conversation (with “Quiet” they are silent too). The lock screen never shows what someone wrote.",
+    "save": "Save",
+    "saved": "Saved.",
+    "invalid": "This could not be saved. Please try again."
   }
 }

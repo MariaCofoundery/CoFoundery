@@ -4,6 +4,7 @@ import { runProgramUpdateReminders } from "@/features/advisor/programUpdateRemin
 import { runCheckInReminders } from "@/features/checkIn/checkInReminders";
 import { runOrgTaskDueNotices } from "@/features/advisor/teamraumNotifications";
 import { runThanksNotifications } from "@/features/connect/thanks/thanksNotifications";
+import { runNotificationDigests } from "@/features/notifications/notificationDigest";
 import { runNewsletterSend } from "@/features/newsletter/newsletterSend";
 import { runOnboardingReminders } from "@/features/onboarding/onboardingReminders";
 import { runSuggestionNotifications } from "@/features/connect/suggestionNotifications";
@@ -81,15 +82,18 @@ export async function GET(request: NextRequest) {
   const newsletter = await runNewsletterSend().catch(() => ({ ok: false as const, reason: "send_failed" }));
   // Danks, deren Mail beim Danke nicht rausging (Mail-Dienst kurz weg): hier nachgeholt, hoechstens 7 Tage zurueck.
   await runThanksNotifications(50).catch(() => null);
+  // Morgenuebersicht (20270510120000): eine Mail statt vieler fuer alle mit "gebuendelt" oder "ruhig". Zuletzt,
+  // damit die Hinweise dieses Laufs (Aufgaben, Erinnerungen) schon drin stehen.
+  const digests = await runNotificationDigests().catch(() => ({ ok: false as const, reason: "prepare_failed" as const }));
   const newsletterOk = newsletter.ok || ("reason" in newsletter && newsletter.reason === "not_configured");
   const result = await runSuggestionNotifications(BATCH);
-  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok && onboarding.ok && newsletterOk);
-  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok || !onboarding.ok || !newsletterOk) {
+  await recordCronHeartbeat("connect-suggestions", result.ok && reminders.ok && programUpdates.ok && orgTasks.ok && events.ok && onboarding.ok && newsletterOk && digests.ok);
+  if (!result.ok || !reminders.ok || !programUpdates.ok || !orgTasks.ok || !events.ok || !onboarding.ok || !newsletterOk || !digests.ok) {
     const status = !result.ok && result.reason === "missing_service_role" ? 503 : 500;
-    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks, events, onboarding, newsletter };
+    const body = { ...result, ok: false, checkInReminders: reminders, programUpdates, orgTasks, events, onboarding, newsletter, digests };
     await sendCronFailureAlert("connect-suggestions", status, body);
     return NextResponse.json(body, { status });
   }
 
-  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events, introductions, onboarding, newsletter }, { status: 200 });
+  return NextResponse.json({ ...result, checkInReminders: reminders, programUpdates, orgTasks, events, introductions, onboarding, newsletter, digests }, { status: 200 });
 }

@@ -29,6 +29,8 @@ const EXPORTED_TABLES = [
   { table: "onboarding_reminders", column: "user_id" },
   // Feierabend-Zeiten (seit 20270317120000).
   { table: "notification_quiet_hours", column: "user_id" },
+  // Rhythmus der Benachrichtigungen (seit 20270510120000). Das Buendel-Fenster ist ein fluechtiger Zaehler und bleibt draussen.
+  { table: "notification_delivery_prefs", column: "user_id" },
   // Welche Mitteilungen der Plattform diese Person gesehen oder weggeklickt hat.
   { table: "announcement_receipts", column: "user_id" },
 

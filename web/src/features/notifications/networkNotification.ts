@@ -4,6 +4,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { getNetworkNotificationEmailCopy } from "@/features/email/emailMessages";
 import { createInAppNotice } from "@/features/notifications/inAppNotice";
 import { deliverPushToUser } from "@/features/notifications/pushDelivery";
+import { getDeliveryMode } from "@/features/notifications/deliveryMode";
 import { getNotificationRecipient } from "@/lib/email/notificationRecipient";
 import { sendNetworkNotificationEmail } from "@/lib/email/sendNetworkNotificationEmail";
 import { getPublicAppOrigin } from "@/lib/publicAppOrigin";
@@ -85,8 +86,9 @@ export async function notifyNetwork(
     // Ausser bei einer Nachricht: Die steht im Postfach, mit Zaehler je
     // Gespraech. Ein Hinweis daneben, der sagt "da ist eine Nachricht", waere
     // Rauschen neben der Sache selbst.
+    let noticeCreated = false;
     if (params.kind !== "message") {
-      await createInAppNotice(client, {
+      noticeCreated = await createInAppNotice(client, {
         kind: params.kind,
         recipientUserId: params.recipientUserId,
         subjectId: params.subjectId,
@@ -108,8 +110,16 @@ export async function notifyNetwork(
       senderName: params.senderName,
     });
 
+    // Rhythmus der Empfaengerin (18.11.2026). Gebuendelt und ruhig: die einzelne Mail entfaellt, die
+    // Morgenuebersicht (notificationDigest.ts) zaehlt den Hinweis in der App. NUR WENN DER HINWEIS
+    // WIRKLICH DA IST - sonst gaebe es weder Mail noch Uebersicht, und die Anfrage ginge verloren.
+    // Nachrichten haben keinen Hinweis (das Postfach zaehlt sie): Gebuendelt bleibt ihre Mail wie
+    // bisher, nur "ruhig" schweigt.
+    const mode = await getDeliveryMode(params.recipientUserId);
+    const skipMail = params.kind === "message" ? mode === "quiet" : mode !== "instant" && noticeCreated;
+
     await Promise.all([
-      sendNetworkNotificationEmail({
+      skipMail ? Promise.resolve(null) : sendNetworkNotificationEmail({
         recipientEmail: recipient.email,
         kind: params.kind,
         senderName: params.senderName,
@@ -125,7 +135,8 @@ export async function notifyNetwork(
         // Je Anlass und Ort eine Marke: Ein zweiter Hinweis zum selben
         // Gespraech ersetzt den ersten, statt sich daneben zu stapeln.
         tag: `${params.kind}:${params.path}`,
-      }),
+        // Ein Gespraech ist eine Meldung je Gespraech (die Marke ersetzt schon) - nie in ein Buendel.
+      }, { rhythm: params.kind === "message" ? "immediate" : "bundle" }),
     ]);
   } catch {
     // Bewusst stumm: Eine Benachrichtigung ist eine Beigabe, kein Teil der

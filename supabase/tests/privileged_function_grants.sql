@@ -51,6 +51,12 @@ select extensions.plan(7);
 -- KEIN LECK: sie nimmt den Adressnamen (slug) und antwortet NUR mit dem Namen - kein Status, keine Zeiten, keine Teilnehmenden. Wer einen
 -- Adressnamen errät, erfährt einen Veranstaltungsnamen, den die Veranstalterin ohnehin auf den QR-Code druckt.
 --
+-- DAZUGEKOMMEN AM 18.11.2026: die fuenf oeffentlichen Blog-Funktionen (20270505120000, 20270506120000):
+-- public_list_blog_posts, public_get_blog_post, public_list_blog_categories, public_blog_sitemap,
+-- public_blog_category_sitemap. Der Blog ist ausdruecklich oeffentlich und braucht keine Anmeldung. GEPRUEFT UND KEIN
+-- LECK: Jede liefert NUR Beitraege mit status = 'published' und nur Spalten, die auf der Seite stehen; Entwuerfe, freigegebene
+-- und nicht veroeffentlichte Beitraege, Admin-Felder und Konten kommen nie heraus (blog_posts.sql prueft das).
+--
 -- Der Wachhund hat also nicht gebellt, weil etwas offen war, sondern weil eine
 -- Ausnahme hinzukam, ueber die ein Mensch entscheiden muss. Das ist seine
 -- Aufgabe - und deshalb bleibt die Liste eine Liste und wird keine Regel
@@ -75,7 +81,12 @@ select extensions.is(
        'is_valid_team_program_invite',
        'is_valid_team_program_code',
        'is_valid_advisor_org_invite',
-       'get_public_event_name'
+       'get_public_event_name',
+       'public_list_blog_posts',
+       'public_get_blog_post',
+       'public_list_blog_categories',
+       'public_blog_sitemap',
+       'public_blog_category_sitemap'
      )),
   '',
   'keine security-definer-Funktion ohne Aufruferpruefung ist fuer anon ausfuehrbar');

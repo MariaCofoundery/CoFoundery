@@ -92,7 +92,7 @@ export async function sendTestPushAction(): Promise<{ ok: boolean; sent: number 
     body: t("account.push.testBody"),
     url: "/account#post",
     tag: "test",
-  });
+  }, { rhythm: "test" });
 
   return { ok: sent > 0, sent };
 }

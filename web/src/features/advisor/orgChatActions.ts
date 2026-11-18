@@ -65,7 +65,7 @@ async function pushChatMessage(client: Awaited<ReturnType<typeof createClient>>,
         body: t("body"),
         url: teamraumChatHref(row.org_id, row.chat_id),
         tag: `org_chat:${row.chat_id}`,
-      });
+      }, { rhythm: "immediate" });
     }),
   );
 }

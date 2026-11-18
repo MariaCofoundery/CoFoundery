@@ -2,6 +2,8 @@ import "server-only";
 
 import { createClient } from "@supabase/supabase-js";
 import { sendWebPush, getVapidKeys } from "@/lib/push/sendWebPush";
+import { getDeliveryMode } from "@/features/notifications/deliveryMode";
+import { BUNDLE_WINDOW_MINUTES, BUNDLED_PUSH_PATH, bundledPushCopy } from "@/features/notifications/deliveryRhythm";
 
 /**
  * Eine Mitteilung an alle Geraete eines Menschen.
@@ -35,7 +37,20 @@ export type PushPayload = {
    * zweite daneben zu legen. Ein Gespraech soll nicht als Stapel erscheinen.
    */
   tag?: string;
+  /** Zahl am App-Symbol; die Auslieferung setzt sie, die Anrufer nicht. */
+  badge?: number;
+  /** Still ersetzen: kein Ton, kein erneutes Aufleuchten. */
+  quiet?: boolean;
 };
+
+/**
+ * Wie sich eine Mitteilung zum Rhythmus der Empfaengerin verhaelt (18.11.2026).
+ *   bundle    - der Normalfall: erste im Fenster sofort, weitere ersetzen sie still.
+ *   immediate - nie buendeln (Chat: eine Meldung je Gespraech, die Marke ersetzt schon).
+ *   test      - der Probeknopf: immer sofort, auch bei "ruhig" - er prueft den Weg, nicht den Rhythmus.
+ * "Ruhig" schweigt bei bundle und immediate; Feierabend schweigt bei allen.
+ */
+export type PushRhythm = "bundle" | "immediate" | "test";
 
 /** Nach so vielen Fehlversuchen in Folge gilt eine Adresse als verloren. */
 const MAX_FAILURES = 8;
@@ -50,7 +65,7 @@ function privilegedClient() {
   });
 }
 
-export async function deliverPushToUser(userId: string, payload: PushPayload) {
+export async function deliverPushToUser(userId: string, payload: PushPayload, options: { rhythm?: PushRhythm } = {}) {
   // Ohne Schluessel gibt es diesen Kanal nicht. Dann auch nicht die Abfrage.
   if (!getVapidKeys()) return { sent: 0, removed: 0 };
 
@@ -76,6 +91,32 @@ export async function deliverPushToUser(userId: string, payload: PushPayload) {
     failure_count: number;
   }[];
 
+  const rhythm = options.rhythm ?? "bundle";
+  let outgoing: PushPayload = payload;
+  if (rhythm === "immediate") {
+    if ((await getDeliveryMode(userId)) === "quiet") return { sent: 0, removed: 0 };
+  } else if (rhythm === "bundle") {
+    // Erst hier, nach Feierabend und nach der Frage, ob es ueberhaupt ein Geraet gibt: Eine
+    // Mitteilung, die nirgends ankommt, soll kein Fenster belegen.
+    const { data: slotData } = await client.rpc("claim_push_slot", { p_user_id: userId, p_window_minutes: BUNDLE_WINDOW_MINUTES });
+    const slot = (Array.isArray(slotData) ? slotData[0] : slotData) as
+      | { action?: string; bundled_count?: number; badge_count?: number; badge?: boolean; window_epoch?: number }
+      | null
+      | undefined;
+    // Ohne Antwort (Datenbank kurz weg): so senden wie gedacht. Eine Mitteilung zu viel ist besser als keine.
+    if (slot?.action === "skip") return { sent: 0, removed: 0 };
+    if (slot) {
+      const windowTag = slot.window_epoch && slot.window_epoch > 0 ? `bundle:${slot.window_epoch}` : undefined;
+      outgoing = { ...payload, ...(windowTag ? { tag: windowTag } : {}) };
+      if (slot.action === "join") {
+        const { data: core } = await client.from("person_core").select("locale").eq("user_id", userId).maybeSingle();
+        const copy = bundledPushCopy(String((core as { locale?: string } | null)?.locale ?? "de"), slot.bundled_count ?? 2);
+        outgoing = { ...outgoing, title: copy.title, body: copy.body, url: BUNDLED_PUSH_PATH, quiet: true };
+      }
+      if (slot.badge && typeof slot.badge_count === "number") outgoing = { ...outgoing, badge: slot.badge_count };
+    }
+  }
+
   let sent = 0;
   let removed = 0;
 
@@ -86,7 +127,7 @@ export async function deliverPushToUser(userId: string, payload: PushPayload) {
       row,
       result: await sendWebPush(
         { endpoint: row.endpoint, p256dh: row.p256dh, auth: row.auth },
-        payload
+        outgoing
       ),
     }))
   );

@@ -564,6 +564,15 @@ export default function DatenschutzPage() {
               einen Schnellschalter; in dieser Zeit schicken wir keine Mitteilung aufs Gerät, Hinweise
               in der App bleiben.
             </p>
+            <p>
+              Mit dem Rhythmus in deinem Konto legst du fest, wie Hinweise ankommen: gebündelt,
+              sofort oder ruhig. Dafür speichern wir diese Einstellung, ob die Zahl am App-Symbol
+              angezeigt werden soll, und den Zeitpunkt der letzten Morgenübersicht. Bei „gebündelt“
+              zählen wir kurzzeitig mit, wie viele Mitteilungen im laufenden Drei-Stunden-Fenster
+              an dich gegangen sind, damit mehrere zu einer werden. Die Morgenübersicht ist eine
+              E-Mail mit Art und Anzahl wartender Hinweise, nie mit Namen oder Inhalten. Ohne
+              Einstellung gilt „gebündelt“.
+            </p>
             <List
               items={[
                 "Die Mitteilung wird verschlüsselt an den Push-Dienst deines Browsers übergeben (z. B. Apple, Google, Mozilla, Microsoft) und dort höchstens 24 Stunden zur Zustellung bereitgehalten.",

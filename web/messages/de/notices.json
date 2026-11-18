@@ -67,5 +67,33 @@
     "day4": "Do",
     "day5": "Fr",
     "day6": "Sa"
+  },
+  "delivery": {
+    "title": "Wie es ankommt",
+    "text": "Gilt für die Nachricht aufs Handy und für die Mail zusammen. Was du bekommst, stellst du oben ein.",
+    "legend": "Rhythmus der Benachrichtigungen",
+    "recommended": "empfohlen",
+    "modes": {
+      "bundled": {
+        "label": "Gebündelt",
+        "text": "Kommen mehrere Hinweise kurz nacheinander (innerhalb von drei Stunden), siehst du eine einzige Nachricht, die sich aktualisiert: „3 neue Hinweise“. Mails kommen einmal am Morgen als Übersicht. Was zu einem anderen Zeitpunkt entsteht, kommt wieder einzeln."
+      },
+      "instant": {
+        "label": "Sofort",
+        "text": "Jeder Hinweis einzeln, als Nachricht und als Mail – so wie es früher war."
+      },
+      "quiet": {
+        "label": "Ruhig",
+        "text": "Keine Nachrichten aufs Handy. Einmal morgens eine Übersicht per Mail, nur wenn etwas wartet. In der App siehst du alles."
+      }
+    },
+    "badge": {
+      "label": "Zahl am App-Symbol",
+      "text": "Zeigt, wie viele Hinweise offen sind. Sie aktualisiert sich, wenn eine Nachricht ankommt oder du die App öffnest. Auf dem iPhone nur, wenn die App auf dem Home-Bildschirm liegt."
+    },
+    "always": "Feierabend-Zeiten gelten weiter. Nachrichten in einem Gespräch bleiben eine Meldung je Gespräch (bei „Ruhig“ entfallen auch sie). Auf dem Sperrbildschirm steht nie, was jemand geschrieben hat.",
+    "save": "Speichern",
+    "saved": "Gespeichert.",
+    "invalid": "Das konnte nicht gespeichert werden. Bitte versuche es noch einmal."
   }
 }

@@ -47,15 +47,31 @@ self.addEventListener("push", (event) => {
   // sonst einen Antippen-Weg nach draussen bauen.
   const url = typeof payload.url === "string" && payload.url.startsWith("/") ? payload.url : "/start";
 
+  // Zahl am App-Symbol (18.11.2026). Nur wenn der Browser es kann (iPhone: App auf dem Home-Bildschirm)
+  // und die Person sie nicht abgeschaltet hat - dann schickt der Server keine Zahl mit.
+  const badge = typeof payload.badge === "number" && payload.badge >= 0 ? Math.floor(payload.badge) : null;
+
   event.waitUntil(
-    self.registration.showNotification(title, {
-      body,
-      icon: "/icons/icon-192.png",
-      // Gleiche Marke ersetzt eine noch ungelesene Mitteilung, statt eine
-      // zweite daneben zu legen.
-      tag: typeof payload.tag === "string" ? payload.tag : undefined,
-      data: { url },
-    })
+    (async () => {
+      await self.registration.showNotification(title, {
+        body,
+        icon: "/icons/icon-192.png",
+        // Gleiche Marke ersetzt eine noch ungelesene Mitteilung, statt eine
+        // zweite daneben zu legen. Beim Buendeln ersetzt die Sammelmeldung die erste
+        // des Fensters - dann ohne Ton und ohne erneutes Aufleuchten.
+        tag: typeof payload.tag === "string" ? payload.tag : undefined,
+        renotify: false,
+        silent: payload.quiet === true ? true : undefined,
+        data: { url },
+      });
+      if (badge !== null && self.navigator && typeof self.navigator.setAppBadge === "function") {
+        try {
+          await self.navigator.setAppBadge(badge);
+        } catch {
+          // Kein Symbol-Recht oder nicht unterstuetzt: Die Mitteilung steht, das reicht.
+        }
+      }
+    })()
   );
 });
 

@@ -9,6 +9,7 @@ import { countPendingRecommendationConsents } from "@/features/recommendations/r
 import { getPersonCore } from "@/features/profile/personCoreData";
 import { getOwnProfileImage } from "@/features/profile/profileData";
 import { getWaitingInAppNoticeCount } from "@/features/notifications/inAppNoticeData";
+import { AppBadgeSync } from "@/features/notifications/AppBadgeSync";
 import { WelcomeLetterGate } from "@/features/profile/WelcomeLetterGate";
 import { ProductShell } from "@/features/navigation/ProductShell";
 import { teamIdFromPath } from "@/features/align/alignModel";
@@ -140,6 +141,14 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             : 0,
         }))
     : Promise.resolve({ isPlatformAdmin: false, adminAttentionCount: 0 });
+
+  // Zahl am App-Symbol (20270510120000): ob die Person sie will. Keine Zeile heisst ja. Startet vor dem grossen
+  // Warten, damit es nebenher laeuft.
+  const badgeEnabledPromise: Promise<boolean> = user
+    ? Promise.resolve(supabase.from("notification_delivery_prefs").select("badge").maybeSingle())
+        .then(({ data }) => (data as { badge?: boolean } | null)?.badge !== false)
+        .catch(() => true)
+    : Promise.resolve(true);
 
   const [roleViews, personCore, profileImage, hasConnect, hasConnectAccount, incomingOpenRequestCount, incomingConnectContactCount, unreadConnectMessageCount, waitingNoticeCount, researchConsentState, newConnectSuggestionCount] = user
     ? await Promise.all([
@@ -274,6 +283,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
           >
             {children}
           </ProductShell>
+          {user?.id ? <AppBadgeSync count={waitingNoticeCount} enabled={await badgeEnabledPromise} /> : null}
           {user?.id ? <WelcomeLetterGate client={supabase as unknown as SupabaseClient} userId={user.id} /> : null}
         </I18nProvider>
       </body>
