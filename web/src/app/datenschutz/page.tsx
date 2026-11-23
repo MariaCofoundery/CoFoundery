@@ -428,8 +428,8 @@ export default function DatenschutzPage() {
               oder Microsoft (siehe Abschnitt 15).
             </p>
             <p>
-              Weitere externe Dienste, an die im laufenden Betrieb Nutzerdaten gehen, setzen wir
-              nicht ein. Schriftarten liefern wir selbst aus; es werden keine Inhalte von
+              Für Gespräche nutzen wir Zoom (Abschnitt 20b). Weitere externe Dienste, an die im
+              laufenden Betrieb Nutzerdaten gehen, setzen wir nicht ein. Schriftarten liefern wir selbst aus; es werden keine Inhalte von
               Drittservern wie Google Fonts oder externen Bild-Diensten nachgeladen.
             </p>
             <Sub>Übermittlung in Drittländer</Sub>
@@ -1053,6 +1053,111 @@ export default function DatenschutzPage() {
             {/*
               LEGAL REVIEW REQUIRED: Betriebsangabe, im Repo nicht belegbar (Anbieter laut Maria seit
               18.11.2026 IONOS, vorher stand hier Gmail). Vor Veröffentlichung bestätigen.
+            */}
+          </BulletSection>
+
+          <BulletSection number="20b" title="Zoom (Online-Meetings und Videokonferenzen)">
+            <p>
+              Wir nutzen das Tool „Zoom“, um Online-Meetings und Videokonferenzen durchzuführen
+              (nachfolgend: „Online-Meetings“), zum Beispiel für Gespräche mit Nutzenden, Partnern
+              und Advisors. „Zoom“ ist ein Service der Zoom Communications, Inc., die ihren Sitz in
+              den USA hat.
+            </p>
+            <Sub>Verantwortlicher</Sub>
+            <p>
+              Verantwortlich für die Datenverarbeitung, die im unmittelbaren Zusammenhang mit der
+              Durchführung von Online-Meetings steht, sind wir (Abschnitt 1 und Impressum).
+              Soweit du die Internetseite von Zoom aufrufst, ist der Anbieter von Zoom für die
+              Datenverarbeitung verantwortlich. Ein Aufruf der Internetseite ist für die Nutzung
+              von Zoom jedoch nur erforderlich, um dir die Software für die Nutzung von Zoom
+              herunterzuladen.
+            </p>
+            <Sub>Welche Daten werden verarbeitet?</Sub>
+            <p>
+              Bei der Nutzung von Zoom werden verschiedene Datenarten verarbeitet. Der Umfang der
+              Daten hängt dabei auch davon ab, welche Angaben du vor oder bei der Teilnahme an
+              einem Online-Meeting machst. Folgende personenbezogene Daten sind Gegenstand der
+              Verarbeitung:
+            </p>
+            <List
+              items={[
+                "Angaben zum Benutzer: Vorname, Nachname, Telefon (optional), E-Mail-Adresse, Passwort (wenn „Single-Sign-On“ nicht verwendet wird), Profilbild (optional).",
+                "Meeting-Metadaten: Thema, Beschreibung (optional), Teilnehmer-IP-Adressen, Geräte- und Hardware-Informationen.",
+                "Text-, Audio- und Videodaten: Du hast gegebenenfalls die Möglichkeit, in einem Online-Meeting die Chat-, Fragen- oder Umfragefunktionen zu nutzen. Insoweit werden deine Texteingaben verarbeitet, um sie im Online-Meeting anzuzeigen und gegebenenfalls zu protokollieren. Um die Anzeige von Video und die Wiedergabe von Audio zu ermöglichen, werden während der Dauer des Meetings die Daten vom Mikrofon deines Endgeräts sowie von einer etwaigen Videokamera des Endgeräts verarbeitet. Du kannst die Kamera oder das Mikrofon jederzeit selbst über die Zoom-Anwendungen abschalten bzw. stummstellen.",
+                "Bei Aufzeichnungen (optional): MP4-Datei aller Video-, Audio- und Präsentationsaufnahmen, M4A-Datei aller Audioaufnahmen, Textdatei des Chats.",
+              ]}
+            />
+            <Sub>Umfang der Verarbeitung und Aufzeichnungen</Sub>
+            <p>
+              Wenn wir Online-Meetings aufzeichnen wollen, teilen wir dir das im Vorfeld transparent
+              mit und bitten dich – soweit erforderlich – um deine Zustimmung. Die Tatsache der
+              Aufzeichnung wird dir zudem in der Zoom-Anwendung angezeigt. Aufzeichnungen erfolgen
+              ausschließlich manuell und lokal auf unseren Endgeräten; eine automatische
+              Aufzeichnung oder Speicherung in der Cloud findet nicht statt. Eine automatisierte
+              Entscheidungsfindung im Sinne des Art. 22 DSGVO kommt nicht zum Einsatz.
+            </p>
+            <Sub>Rechtsgrundlagen</Sub>
+            <p>
+              Rechtsgrundlage für die Datenverarbeitung bei der Durchführung von Online-Meetings
+              ist Art. 6 Abs. 1 lit. b DSGVO, soweit die Meetings im Rahmen von Vertragsbeziehungen
+              (oder zur Anbahnung eines Vertrags) durchgeführt werden. Besteht keine vertragliche
+              Beziehung, ist die Rechtsgrundlage Art. 6 Abs. 1 lit. f DSGVO. Unser berechtigtes
+              Interesse besteht in diesen Fällen an der effektiven Durchführung von
+              Online-Meetings. Wenn wir im Einzelfall deine Einwilligung einholen (z. B. für die
+              Aufzeichnung eines Meetings), erfolgt die Verarbeitung auf Grundlage von Art. 6
+              Abs. 1 lit. a DSGVO.
+            </p>
+            <Sub>Empfänger und Weitergabe von Daten</Sub>
+            <p>
+              Personenbezogene Daten, die im Zusammenhang mit der Teilnahme an Online-Meetings
+              verarbeitet werden, geben wir grundsätzlich nicht an Dritte weiter, sofern sie nicht
+              gerade zur Weitergabe bestimmt sind. Bitte beachte, dass Inhalte aus Online-Meetings
+              wie auch bei persönlichen Besprechungen häufig gerade dazu dienen, Informationen mit
+              Kundinnen und Kunden, Interessierten oder Dritten zu kommunizieren, und damit zur
+              Weitergabe bestimmt sind.
+            </p>
+            <p>
+              Weiterer Empfänger: Der Anbieter von Zoom erhält notwendigerweise Kenntnis von den
+              genannten Daten, soweit dies im Rahmen unseres Auftragsverarbeitungsvertrags (Data
+              Processing Addendum) mit Zoom vorgesehen ist.
+            </p>
+            <Sub>Datenverarbeitung außerhalb der EU</Sub>
+            <p>
+              Da Zoom ein US-Anbieter ist, erfolgt die Datenverarbeitung teilweise in einem
+              Drittland. Dies ist durch einen Auftragsverarbeitungsvertrag nach Art. 28 DSGVO, die
+              Zertifizierung der Zoom Communications, Inc. unter dem EU-U.S. Data Privacy Framework
+              (DPF) sowie die EU-Standardvertragsklauseln abgesichert.
+            </p>
+            <Sub>Weiterführende Informationen zum Datenschutz bei Zoom</Sub>
+            <p>
+              Weitere Einzelheiten zur Erhebung und Verarbeitung deiner Daten durch Zoom sowie zu
+              deinen Rechten und Einstellungsmöglichkeiten zum Schutz deiner Privatsphäre findest
+              du in der Datenschutzerklärung von Zoom unter{" "}
+              <a
+                href="https://www.zoom.com/de/trust/privacy/privacy-statement/"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.zoom.com/de/trust/privacy/privacy-statement/
+              </a>{" "}
+              sowie in den speziellen DSGVO-Hinweisen von Zoom unter{" "}
+              <a
+                href="https://www.zoom.com/de/trust/gdpr/"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.zoom.com/de/trust/gdpr/
+              </a>
+              .
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED: Text von Maria am 23.11.2026 eingefügt und in „du“ umgeschrieben;
+              Betriebsangaben (nur manuelle, lokale Aufzeichnung; Auftragsverarbeitungsvertrag, DPF
+              und Standardvertragsklauseln für ihren Zoom-Tarif) hat sie nach eigener Angabe im
+              Zoom-Konto geprüft. Rechtsgrundlagen und Wortlaut von der Beratung prüfen lassen.
+              Die Telefon-Einwahl ist bewusst gestrichen (wird nicht genutzt).
             */}
           </BulletSection>
 

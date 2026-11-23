@@ -25,3 +25,10 @@ test("Impressum und Datenschutz nennen dieselbe Telefonnummer", () => {
   assert.match(impressum, /Telefon: \+49176 76 467099/);
   assert.match(body, /Telefon: \+49176 76 467099/);
 });
+
+test("Zoom steht in Teil B mit echten Links und ohne Telefon-Einwahl", () => {
+  assert.match(body, /number="20b" title="Zoom/);
+  assert.match(body, /href="https:\/\/www\.zoom\.com\/de\/trust\/privacy\/privacy-statement\/"/);
+  assert.match(body, /href="https:\/\/www\.zoom\.com\/de\/trust\/gdpr\/"/);
+  assert.doesNotMatch(body, /Einwahl mit dem Telefon/);
+});
