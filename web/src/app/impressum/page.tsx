@@ -20,6 +20,7 @@ export default function ImpressumPage() {
 
         <div>
           <p className="font-semibold text-slate-900">Maria Schulz</p>
+          <p>Einzelunternehmen</p>
           <p>Am Juliusturm 89, 13597 Berlin</p>
           <p>Deutschland</p>
         </div>
@@ -31,7 +32,7 @@ export default function ImpressumPage() {
 
         <div>
           <p className="font-semibold text-slate-900">Hinweis</p>
-          <p>Dieses Projekt befindet sich aktuell in einer privaten, nicht-kommerziellen Testphase.</p>
+          <p>Made2Found wird als Einzelunternehmen betrieben. Das Angebot ist bisher nicht kommerziell: Es gibt derzeit weder Einnahmen noch Werbung noch andere Angebote, die Geld einbringen.</p>
         </div>
       </section>
     </main>
