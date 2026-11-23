@@ -27,6 +27,7 @@ export default function ImpressumPage() {
 
         <div>
           <p className="font-semibold text-slate-900">Kontakt</p>
+          <p>Telefon: +49176 76 467099</p>
           <p>E-Mail: hello@cofoundery.de</p>
         </div>
 

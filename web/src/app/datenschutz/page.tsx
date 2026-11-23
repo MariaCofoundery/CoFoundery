@@ -1,6 +1,22 @@
 import Link from "next/link";
 
 /*
+ * AUFBAU SEIT 23.11.2026: Teil A (A1 bis A5) sind Bausteine aus dem kostenlosen Datenschutz-Generator
+ * von eRecht24 (PDF vom 23.11.2026), Teil B (1 bis 26) ist eigener Text. Die Quellenzeile
+ * „Quelle: https://www.e-recht24.de“ am Ende von A5 muss stehen bleiben. Änderungen am
+ * Generator-Text, bewusst und einzeln:
+ *   - A1: „Kontaktformular“ ersetzt durch Registrierung und E-Mail (es gibt kein Kontaktformular).
+ *   - A2: Hinweis auf Teil B für Supabase, Resend und IONOS ergänzt (der Generator kennt nur Vercel).
+ *   - A3: Verantwortliche Stelle mit „Einzelunternehmen“ und Telefon (beruflich, von Maria zur
+ *     Veröffentlichung freigegeben); Pflichtangaben unverändert.
+ *   - A4: „Telefax“ gestrichen (kein Fax); Verweis auf Teil B, Abschnitt 21 für die Cookie-Liste.
+ *   - A5: Satz über Auswertung von Öffnung, IP-Adresse, Geräten und Klicks gestrichen (Messung bei
+ *     Resend am 18.11.2026 ausgeschaltet), „Newsletterdiensteanbieter“ durch Resend ersetzt.
+ *   - Die Anrede im Generator-Text ist „Sie“, in Teil B „du“. LEGAL REVIEW REQUIRED: angleichen.
+ *   - LEGAL REVIEW REQUIRED: allgemeine Beispiele zu Warenkorb, Zahlungsdiensten und Verträgen im
+ *     Generator-Text passen nur teilweise (kein Shop); Ton und Dopplungen zwischen A4/A5 und
+ *     Teil B (Abschnitte 15b, 21, 22) von der Beratung glätten lassen.
+ *
  * ERGÄNZT AM 17.11.2026 (gegen den Code geprüft): Abschnitte 6c (Werte), 11b (Danke und Herz),
  * 15 (Unterabschnitt Erinnerungen), 15b (Newsletter, mit und ohne Konto) und 15c (öffentlicher
  * Blog), dazu Zeilen in 3, 21, 22, 23 und 24. Was nicht belegbar ist
@@ -78,7 +94,12 @@ export default function DatenschutzPage() {
               verarbeitet, wofür, auf welcher Grundlage, wie lange – und welche Rechte du hast. Sie
               beschreibt den tatsächlichen technischen Stand des Produkts.
             </p>
-            <p className="mt-2 text-sm text-slate-500">Stand: 18. November 2026</p>
+            <p className="mt-4 text-sm leading-7 text-slate-700">
+              Teil A enthält allgemeine Hinweise und Pflichtangaben. Er beruht auf dem
+              Datenschutz-Generator von eRecht24 (Stand 23.11.2026) und ist an Made2Found
+              angepasst. Teil B ist eigener Text und beschreibt das Produkt im Einzelnen.
+            </p>
+            <p className="mt-2 text-sm text-slate-500">Stand: 23. November 2026</p>
           </div>
 
           <div className="flex flex-wrap gap-3">
@@ -98,12 +119,258 @@ export default function DatenschutzPage() {
         </header>
 
         <div className="grid gap-6">
+          <p className="text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            Teil A · Allgemeine Hinweise und Pflichtangaben
+          </p>
+
+          <BulletSection number="A1" title="Datenschutz auf einen Blick">
+            <Sub>Allgemeine Hinweise</Sub>
+            <p>
+              Die folgenden Hinweise geben einen einfachen Überblick darüber, was mit Ihren personenbezogenen Daten passiert, wenn Sie diese Website besuchen. Personenbezogene Daten sind alle Daten, mit denen Sie persönlich identifiziert werden können. Ausführliche Informationen zum Thema Datenschutz entnehmen Sie unserer unter diesem Text aufgeführten Datenschutzerklärung.
+            </p>
+            <Sub>Datenerfassung auf dieser Website</Sub>
+            <Sub>Wer ist verantwortlich für die Datenerfassung auf dieser Website?</Sub>
+            <p>
+              Die Datenverarbeitung auf dieser Website erfolgt durch den Websitebetreiber. Dessen Kontaktdaten können Sie dem Abschnitt „Hinweis zur verantwortlichen Stelle“ in dieser Datenschutzerklärung entnehmen.
+            </p>
+            <Sub>Wie erfassen wir Ihre Daten?</Sub>
+            <p>
+              Ihre Daten werden zum einen dadurch erhoben, dass Sie uns diese mitteilen. Hierbei kann es sich z. B. um Daten handeln, die Sie bei der Registrierung eingeben oder uns per E-Mail senden.
+            </p>
+            <p>
+              Andere Daten werden automatisch oder nach Ihrer Einwilligung beim Besuch der Website durch unsere IT-Systeme erfasst. Das sind vor allem technische Daten (z. B. Internetbrowser, Betriebssystem oder Uhrzeit des Seitenaufrufs). Die Erfassung dieser Daten erfolgt automatisch, sobald Sie diese Website betreten.
+            </p>
+            <Sub>Wofür nutzen wir Ihre Daten?</Sub>
+            <p>
+              Ein Teil der Daten wird erhoben, um eine fehlerfreie Bereitstellung der Website zu gewährleisten. Andere Daten können zur Analyse Ihres Nutzerverhaltens verwendet werden. Sofern über die Website Verträge geschlossen oder angebahnt werden können, werden die übermittelten Daten auch für Vertragsangebote, Bestellungen oder sonstige Auftragsanfragen verarbeitet.
+            </p>
+            <Sub>Welche Rechte haben Sie bezüglich Ihrer Daten?</Sub>
+            <p>
+              Sie haben jederzeit das Recht, unentgeltlich Auskunft über Herkunft, Empfänger und Zweck Ihrer gespeicherten personenbezogenen Daten zu erhalten. Sie haben außerdem ein Recht, die Berichtigung oder Löschung dieser Daten zu verlangen. Wenn Sie eine Einwilligung zur Datenverarbeitung erteilt haben, können Sie diese Einwilligung jederzeit für die Zukunft widerrufen. Außerdem haben Sie das Recht, unter bestimmten Umständen die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen. Des Weiteren steht Ihnen ein Beschwerderecht bei der zuständigen Aufsichtsbehörde zu.
+            </p>
+            <p>
+              Hierzu sowie zu weiteren Fragen zum Thema Datenschutz können Sie sich jederzeit an uns wenden.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="A2" title="Hosting">
+            <p>
+              Wir hosten die Inhalte unserer Website bei folgendem Anbieter:
+            </p>
+            <Sub>Externes Hosting</Sub>
+            <p>
+              Diese Website wird extern gehostet. Die personenbezogenen Daten, die auf dieser Website erfasst werden, werden auf den Servern des Hosters / der Hoster gespeichert. Hierbei kann es sich v. a. um IP-Adressen, Kontaktanfragen, Meta- und Kommunikationsdaten, Vertragsdaten, Kontaktdaten, Namen, Websitezugriffe und sonstige Daten, die über eine Website generiert werden, handeln.
+            </p>
+            <p>
+              Das externe Hosting erfolgt zum Zwecke der Vertragserfüllung gegenüber unseren potenziellen und bestehenden Kunden (Art. 6 Abs. 1 lit. b DSGVO) und im Interesse einer sicheren, schnellen und effizienten Bereitstellung unseres Online-Angebots durch einen professionellen Anbieter (Art. 6 Abs. 1 lit. f DSGVO). Sofern eine entsprechende Einwilligung abgefragt wurde, erfolgt die Verarbeitung ausschließlich auf Grundlage von Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG, soweit die Einwilligung die Speicherung von Cookies oder den Zugriff auf Informationen im Endgerät des Nutzers (z. B. Device-Fingerprinting) im Sinne des TDDDG umfasst. Die Einwilligung ist jederzeit widerrufbar.
+            </p>
+            <p>
+              Unser(e) Hoster wird bzw. werden Ihre Daten nur insoweit verarbeiten, wie dies zur Erfüllung seiner Leistungspflichten erforderlich ist und unsere Weisungen in Bezug auf diese Daten befolgen.
+            </p>
+            <p>
+              Wir setzen folgende(n) Hoster ein:
+            </p>
+            <p>
+              Vercel Inc., 440 N Barranca Ave #4133, Covina, CA 91723, USA
+              <br />
+              Datenschutzkontakt: privacy@vercel.com
+              <br />
+              EU-Vertreter: EDPO (European Data Protection Office), Avenue Huart Hamoir 71, 1030 Brüssel, Belgien
+              <br />
+              Zweck und Daten: Hosting, Serverfunktionen und Zeitpläne. Verarbeitet werden Aufrufe, IP-Adresse und Protokolle.
+              <br />
+              Serverstandort: London, Vereinigtes Königreich (Region lhr1)
+              <br />
+              Übermittlung in die USA: EU-U.S. Data Privacy Framework (Vercel ist zertifiziert), zusätzlich Standardvertragsklauseln im Vertrag zur Auftragsverarbeitung (vercel.com/legal/dpa)
+            </p>
+            <Sub>Auftragsverarbeitung</Sub>
+            <p>
+              Wir haben einen Vertrag über Auftragsverarbeitung (AVV) zur Nutzung des oben genannten Dienstes geschlossen. Hierbei handelt es sich um einen datenschutzrechtlich vorgeschriebenen Vertrag, der gewährleistet, dass dieser die personenbezogenen Daten unserer Websitebesucher nur nach unseren Weisungen und unter Einhaltung der DSGVO verarbeitet.
+            </p>
+            <p>
+              Weitere Dienstleister, etwa für Datenbank, Anmeldung und E-Mail-Versand, nennen wir in Teil B, Abschnitt 3 und 20.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="A3" title="Allgemeine Hinweise und Pflichtinformationen">
+            <Sub>Datenschutz</Sub>
+            <p>
+              Die Betreiber dieser Seiten nehmen den Schutz Ihrer persönlichen Daten sehr ernst. Wir behandeln Ihre personenbezogenen Daten vertraulich und entsprechend den gesetzlichen Datenschutzvorschriften sowie dieser Datenschutzerklärung.
+            </p>
+            <p>
+              Wenn Sie diese Website benutzen, werden verschiedene personenbezogene Daten erhoben. Personenbezogene Daten sind Daten, mit denen Sie persönlich identifiziert werden können. Die vorliegende Datenschutzerklärung erläutert, welche Daten wir erheben und wofür wir sie nutzen. Sie erläutert auch, wie und zu welchem Zweck das geschieht.
+            </p>
+            <p>
+              Wir weisen darauf hin, dass die Datenübertragung im Internet (z. B. bei der Kommunikation per E-Mail) Sicherheitslücken aufweisen kann. Ein lückenloser Schutz der Daten vor dem Zugriff durch Dritte ist nicht möglich.
+            </p>
+            <Sub>Hinweis zur verantwortlichen Stelle</Sub>
+            <p>
+              Die verantwortliche Stelle für die Datenverarbeitung auf dieser Website ist:
+            </p>
+            <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
+              <p>Maria Schulz (Einzelunternehmen)</p>
+              <p>Am Juliusturm 89</p>
+              <p>13597 Berlin</p>
+              <p>Telefon: +49176 76 467099</p>
+              <p>E-Mail: hello@cofoundery.de</p>
+            </div>
+            <p>
+              Verantwortliche Stelle ist die natürliche oder juristische Person, die allein oder gemeinsam mit anderen über die Zwecke und Mittel der Verarbeitung von personenbezogenen Daten (z. B. Namen, E-Mail-Adressen o. Ä.) entscheidet.
+            </p>
+            <Sub>Speicherdauer</Sub>
+            <p>
+              Soweit innerhalb dieser Datenschutzerklärung keine speziellere Speicherdauer genannt wurde, verbleiben Ihre personenbezogenen Daten bei uns, bis der Zweck für die Datenverarbeitung entfällt. Wenn Sie ein berechtigtes Löschersuchen geltend machen oder eine Einwilligung zur Datenverarbeitung widerrufen, werden Ihre Daten gelöscht, sofern wir keine anderen rechtlich zulässigen Gründe für die Speicherung Ihrer personenbezogenen Daten haben (z. B. steuer- oder handelsrechtliche Aufbewahrungsfristen); im letztgenannten Fall erfolgt die Löschung nach Fortfall dieser Gründe.
+            </p>
+            <Sub>Allgemeine Hinweise zu den Rechtsgrundlagen der Datenverarbeitung auf dieser Website</Sub>
+            <p>
+              Sofern Sie in die Datenverarbeitung eingewilligt haben, verarbeiten wir Ihre personenbezogenen Daten auf Grundlage von Art. 6 Abs. 1 lit. a DSGVO bzw. Art. 9 Abs. 2 lit. a DSGVO, sofern besondere Datenkategorien nach Art. 9 Abs. 1 DSGVO verarbeitet werden. Im Falle einer ausdrücklichen Einwilligung in die Übertragung personenbezogener Daten in Drittstaaten erfolgt die Datenverarbeitung außerdem auf Grundlage von Art. 49 Abs. 1 lit. a DSGVO. Sofern Sie in die Speicherung von Cookies oder in den Zugriff auf Informationen in Ihr Endgerät (z. B. via Device-Fingerprinting) eingewilligt haben, erfolgt die Datenverarbeitung zusätzlich auf Grundlage von § 25 Abs. 1 TDDDG. Die Einwilligung ist jederzeit widerrufbar. Sind Ihre Daten zur Vertragserfüllung oder zur Durchführung vorvertraglicher Maßnahmen erforderlich, verarbeiten wir Ihre Daten auf Grundlage des Art. 6 Abs. 1 lit. b DSGVO. Des Weiteren verarbeiten wir Ihre Daten, sofern diese zur Erfüllung einer rechtlichen Verpflichtung erforderlich sind, auf Grundlage von Art. 6 Abs. 1 lit. c DSGVO. Die Datenverarbeitung kann ferner auf Grundlage unseres berechtigten Interesses nach Art. 6 Abs. 1 lit. f DSGVO erfolgen. Über die jeweils im Einzelfall einschlägigen Rechtsgrundlagen wird in den folgenden Absätzen dieser Datenschutzerklärung informiert.
+            </p>
+            <Sub>Empfänger von personenbezogenen Daten</Sub>
+            <p>
+              Im Rahmen unserer Geschäftstätigkeit arbeiten wir mit verschiedenen externen Stellen zusammen. Dabei ist teilweise auch eine Übermittlung von personenbezogenen Daten an diese externen Stellen erforderlich. Wir geben personenbezogene Daten nur dann an externe Stellen weiter, wenn dies im Rahmen einer Vertragserfüllung erforderlich ist, wenn wir gesetzlich hierzu verpflichtet sind (z. B. Weitergabe von Daten an Steuerbehörden), wenn wir ein berechtigtes Interesse nach Art. 6 Abs. 1 lit. f DSGVO an der Weitergabe haben oder wenn eine sonstige Rechtsgrundlage die Datenweitergabe erlaubt. Beim Einsatz von Auftragsverarbeitern geben wir personenbezogene Daten unserer Kunden nur auf Grundlage eines gültigen Vertrags über Auftragsverarbeitung weiter. Im Falle einer gemeinsamen Verarbeitung wird ein Vertrag über gemeinsame Verarbeitung geschlossen.
+            </p>
+            <Sub>Widerruf Ihrer Einwilligung zur Datenverarbeitung</Sub>
+            <p>
+              Viele Datenverarbeitungsvorgänge sind nur mit Ihrer ausdrücklichen Einwilligung möglich. Sie können eine bereits erteilte Einwilligung jederzeit widerrufen. Die Rechtmäßigkeit der bis zum Widerruf erfolgten Datenverarbeitung bleibt vom Widerruf unberührt.
+            </p>
+            <Sub>Widerspruchsrecht gegen die Datenerhebung in besonderen Fällen sowie gegen Direktwerbung (Art. 21 DSGVO)</Sub>
+            <p>
+              WENN DIE DATENVERARBEITUNG AUF GRUNDLAGE VON ART. 6 ABS. 1 LIT. E ODER F DSGVO ERFOLGT, HABEN SIE JEDERZEIT DAS RECHT, AUS GRÜNDEN, DIE SICH AUS IHRER BESONDEREN SITUATION ERGEBEN, GEGEN DIE VERARBEITUNG IHRER PERSONENBEZOGENEN DATEN WIDERSPRUCH EINZULEGEN; DIES GILT AUCH FÜR EIN AUF DIESE BESTIMMUNGEN GESTÜTZTES PROFILING. DIE JEWEILIGE RECHTSGRUNDLAGE, AUF DENEN EINE VERARBEITUNG BERUHT, ENTNEHMEN SIE DIESER DATENSCHUTZERKLÄRUNG. WENN SIE WIDERSPRUCH EINLEGEN, WERDEN WIR IHRE BETROFFENEN PERSONENBEZOGENEN DATEN NICHT MEHR VERARBEITEN, ES SEI DENN, WIR KÖNNEN ZWINGENDE SCHUTZWÜRDIGE GRÜNDE FÜR DIE VERARBEITUNG NACHWEISEN, DIE IHRE INTERESSEN, RECHTE UND FREIHEITEN ÜBERWIEGEN ODER DIE VERARBEITUNG DIENT DER GELTENDMACHUNG, AUSÜBUNG ODER VERTEIDIGUNG VON RECHTSANSPRÜCHEN (WIDERSPRUCH NACH ART. 21 ABS. 1 DSGVO).
+            </p>
+            <p>
+              WERDEN IHRE PERSONENBEZOGENEN DATEN VERARBEITET, UM DIREKTWERBUNG ZU BETREIBEN, SO HABEN SIE DAS RECHT, JEDERZEIT WIDERSPRUCH GEGEN DIE VERARBEITUNG SIE BETREFFENDER PERSONENBEZOGENER DATEN ZUM ZWECKE DERARTIGER WERBUNG EINZULEGEN; DIES GILT AUCH FÜR DAS PROFILING, SOWEIT ES MIT SOLCHER DIREKTWERBUNG IN VERBINDUNG STEHT. WENN SIE WIDERSPRECHEN, WERDEN IHRE PERSONENBEZOGENEN DATEN ANSCHLIESSEND NICHT MEHR ZUM ZWECKE DER DIREKTWERBUNG VERWENDET (WIDERSPRUCH NACH ART. 21 ABS. 2 DSGVO).
+            </p>
+            <Sub>Beschwerderecht bei der zuständigen Aufsichtsbehörde</Sub>
+            <p>
+              Im Falle von Verstößen gegen die DSGVO steht den Betroffenen ein Beschwerderecht bei einer Aufsichtsbehörde, insbesondere in dem Mitgliedstaat ihres gewöhnlichen Aufenthalts, ihres Arbeitsplatzes oder des Orts des mutmaßlichen Verstoßes zu. Das Beschwerderecht besteht unbeschadet anderweitiger verwaltungsrechtlicher oder gerichtlicher Rechtsbehelfe.
+            </p>
+            <Sub>Recht auf Datenübertragbarkeit</Sub>
+            <p>
+              Sie haben das Recht, Daten, die wir auf Grundlage Ihrer Einwilligung oder in Erfüllung eines Vertrags automatisiert verarbeiten, an sich oder an einen Dritten in einem gängigen, maschinenlesbaren Format aushändigen zu lassen. Sofern Sie die direkte Übertragung der Daten an einen anderen Verantwortlichen verlangen, erfolgt dies nur, soweit es technisch machbar ist.
+            </p>
+            <Sub>Auskunft, Berichtigung und Löschung</Sub>
+            <p>
+              Sie haben im Rahmen der geltenden gesetzlichen Bestimmungen jederzeit das Recht auf unentgeltliche Auskunft über Ihre gespeicherten personenbezogenen Daten, deren Herkunft und Empfänger und den Zweck der Datenverarbeitung und ggf. ein Recht auf Berichtigung oder Löschung dieser Daten. Hierzu sowie zu weiteren Fragen zum Thema personenbezogene Daten können Sie sich jederzeit an uns wenden.
+            </p>
+            <Sub>Recht auf Einschränkung der Verarbeitung</Sub>
+            <p>
+              Sie haben das Recht, die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen. Hierzu können Sie sich jederzeit an uns wenden. Das Recht auf Einschränkung der Verarbeitung besteht in folgenden Fällen:
+            </p>
+            <List
+              items={[
+                "Wenn Sie die Richtigkeit Ihrer bei uns gespeicherten personenbezogenen Daten bestreiten, benötigen wir in der Regel Zeit, um dies zu überprüfen. Für die Dauer der Prüfung haben Sie das Recht, die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.",
+                "Wenn die Verarbeitung Ihrer personenbezogenen Daten unrechtmäßig geschah/geschieht, können Sie statt der Löschung die Einschränkung der Datenverarbeitung verlangen.",
+                "Wenn wir Ihre personenbezogenen Daten nicht mehr benötigen, Sie sie jedoch zur Ausübung, Verteidigung oder Geltendmachung von Rechtsansprüchen benötigen, haben Sie das Recht, statt der Löschung die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.",
+                "Wenn Sie einen Widerspruch nach Art. 21 Abs. 1 DSGVO eingelegt haben, muss eine Abwägung zwischen Ihren und unseren Interessen vorgenommen werden. Solange noch nicht feststeht, wessen Interessen überwiegen, haben Sie das Recht, die Einschränkung der Verarbeitung Ihrer personenbezogenen Daten zu verlangen.",
+              ]}
+            />
+            <p>
+              Wenn Sie die Verarbeitung Ihrer personenbezogenen Daten eingeschränkt haben, dürfen diese Daten – von ihrer Speicherung abgesehen – nur mit Ihrer Einwilligung oder zur Geltendmachung, Ausübung oder Verteidigung von Rechtsansprüchen oder zum Schutz der Rechte einer anderen natürlichen oder juristischen Person oder aus Gründen eines wichtigen öffentlichen Interesses der Europäischen Union oder eines Mitgliedstaats verarbeitet werden.
+            </p>
+            <Sub>SSL- bzw. TLS-Verschlüsselung</Sub>
+            <p>
+              Diese Seite nutzt aus Sicherheitsgründen und zum Schutz der Übertragung vertraulicher Inhalte, wie zum Beispiel Bestellungen oder Anfragen, die Sie an uns als Seitenbetreiber senden, eine SSL- bzw. TLS-Verschlüsselung. Eine verschlüsselte Verbindung erkennen Sie daran, dass die Adresszeile des Browsers von „http://“ auf „https://“ wechselt und an dem Schloss-Symbol in Ihrer Browserzeile.
+            </p>
+            <p>
+              Wenn die SSL- bzw. TLS-Verschlüsselung aktiviert ist, können die Daten, die Sie an uns übermitteln, nicht von Dritten mitgelesen werden.
+            </p>
+            <Sub>Widerspruch gegen Werbe-E-Mails</Sub>
+            <p>
+              Der Nutzung von im Rahmen der Impressumspflicht veröffentlichten Kontaktdaten zur Übersendung von nicht ausdrücklich angeforderter Werbung und Informationsmaterialien wird hiermit widersprochen. Die Betreiber der Seiten behalten sich ausdrücklich rechtliche Schritte im Falle der unverlangten Zusendung von Werbeinformationen, etwa durch Spam-E-Mails, vor.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="A4" title="Datenerfassung auf dieser Website">
+            <Sub>Cookies</Sub>
+            <p>
+              Unsere Internetseiten verwenden so genannte „Cookies“. Cookies sind kleine Datenpakete und richten auf Ihrem Endgerät keinen Schaden an. Sie werden entweder vorübergehend für die Dauer einer Sitzung (Session-Cookies) oder dauerhaft (permanente Cookies) auf Ihrem Endgerät gespeichert. Session-Cookies werden nach Ende Ihres Besuchs automatisch gelöscht. Permanente Cookies bleiben auf Ihrem Endgerät gespeichert, bis Sie diese selbst löschen oder eine automatische Löschung durch Ihren Webbrowser erfolgt.
+            </p>
+            <p>
+              Cookies können von uns (First-Party-Cookies) oder von Drittunternehmen stammen (sog. Third-Party-Cookies). Third-Party-Cookies ermöglichen die Einbindung bestimmter Dienstleistungen von Drittunternehmen innerhalb von Webseiten (z. B. Cookies zur Abwicklung von Zahlungsdienstleistungen).
+            </p>
+            <p>
+              Cookies haben verschiedene Funktionen. Zahlreiche Cookies sind technisch notwendig, da bestimmte Webseitenfunktionen ohne diese nicht funktionieren würden (z. B. die Warenkorbfunktion oder die Anzeige von Videos). Andere Cookies können zur Auswertung des Nutzerverhaltens oder zu Werbezwecken verwendet werden.
+            </p>
+            <p>
+              Cookies, die zur Durchführung des elektronischen Kommunikationsvorgangs, zur Bereitstellung bestimmter, von Ihnen erwünschter Funktionen (z. B. für die Warenkorbfunktion) oder zur Optimierung der Website (z. B. Cookies zur Messung des Webpublikums) erforderlich sind (notwendige Cookies), werden auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO gespeichert, sofern keine andere Rechtsgrundlage angegeben wird. Der Websitebetreiber hat ein berechtigtes Interesse an der Speicherung von notwendigen Cookies zur technisch fehlerfreien und optimierten Bereitstellung seiner Dienste. Sofern eine Einwilligung zur Speicherung von Cookies und vergleichbaren Wiedererkennungstechnologien abgefragt wurde, erfolgt die Verarbeitung ausschließlich auf Grundlage dieser Einwilligung (Art. 6 Abs. 1 lit. a DSGVO und § 25 Abs. 1 TDDDG); die Einwilligung ist jederzeit widerrufbar.
+            </p>
+            <p>
+              Sie können Ihren Browser so einstellen, dass Sie über das Setzen von Cookies informiert werden und Cookies nur im Einzelfall erlauben, die Annahme von Cookies für bestimmte Fälle oder generell ausschließen sowie das automatische Löschen der Cookies beim Schließen des Browsers aktivieren. Bei der Deaktivierung von Cookies kann die Funktionalität dieser Website eingeschränkt sein.
+            </p>
+            <p>
+              Sofern weitere Cookies und Dienste auf dieser Website eingesetzt werden, können Sie dies dieser Datenschutzerklärung entnehmen. Welche Cookies Made2Found setzt, steht in Teil B, Abschnitt 21.
+            </p>
+            <Sub>Server-Log-Dateien</Sub>
+            <p>
+              Der Provider der Seiten erhebt und speichert automatisch Informationen in so genannten Server-Log-Dateien, die Ihr Browser automatisch an uns übermittelt. Dies sind:
+            </p>
+            <List
+              items={[
+                "Browsertyp und Browserversion",
+                "verwendetes Betriebssystem",
+                "Referrer URL",
+                "Hostname des zugreifenden Rechners",
+                "Uhrzeit der Serveranfrage",
+                "IP-Adresse",
+              ]}
+            />
+            <p>
+              Eine Zusammenführung dieser Daten mit anderen Datenquellen wird nicht vorgenommen.
+            </p>
+            <p>
+              Die Erfassung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. f DSGVO. Der Websitebetreiber hat ein berechtigtes Interesse an der technisch fehlerfreien Darstellung und der Optimierung seiner Website – hierzu müssen die Server-Log-Files erfasst werden.
+            </p>
+            <Sub>Anfrage per E-Mail oder Telefon</Sub>
+            <p>
+              Wenn Sie uns per E-Mail oder Telefon kontaktieren, wird Ihre Anfrage inklusive aller daraus hervorgehenden personenbezogenen Daten (Name, Anfrage) zum Zwecke der Bearbeitung Ihres Anliegens bei uns gespeichert und verarbeitet. Diese Daten geben wir nicht ohne Ihre Einwilligung weiter.
+            </p>
+            <p>
+              Die Verarbeitung dieser Daten erfolgt auf Grundlage von Art. 6 Abs. 1 lit. b DSGVO, sofern Ihre Anfrage mit der Erfüllung eines Vertrags zusammenhängt oder zur Durchführung vorvertraglicher Maßnahmen erforderlich ist. In allen übrigen Fällen beruht die Verarbeitung auf unserem berechtigten Interesse an der effektiven Bearbeitung der an uns gerichteten Anfragen (Art. 6 Abs. 1 lit. f DSGVO) oder auf Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO) sofern diese abgefragt wurde; die Einwilligung ist jederzeit widerrufbar.
+            </p>
+            <p>
+              Die von Ihnen an uns per Kontaktanfragen übersandten Daten verbleiben bei uns, bis Sie uns zur Löschung auffordern, Ihre Einwilligung zur Speicherung widerrufen oder der Zweck für die Datenspeicherung entfällt (z. B. nach abgeschlossener Bearbeitung Ihres Anliegens). Zwingende gesetzliche Bestimmungen – insbesondere gesetzliche Aufbewahrungsfristen – bleiben unberührt.
+            </p>
+          </BulletSection>
+
+          <BulletSection number="A5" title="Newsletter">
+            <Sub>Newsletterdaten</Sub>
+            <p>
+              Wenn Sie den auf der Website angebotenen Newsletter beziehen möchten, benötigen wir von Ihnen eine E-Mail-Adresse sowie Informationen, welche uns die Überprüfung gestatten, dass Sie der Inhaber der angegebenen E-Mail-Adresse sind und mit dem Empfang des Newsletters einverstanden sind. Diese Daten verwenden wir für den Versand der angeforderten Informationen und geben diese nicht an Dritte weiter. Der Versand läuft über unseren E-Mail-Dienstleister Resend (Teil B, Abschnitt 3). Eine Öffnungs- oder Klickmessung findet nicht statt.
+            </p>
+            <p>
+              Die Verarbeitung der in das Newsletteranmeldeformular eingegebenen Daten erfolgt ausschließlich auf Grundlage Ihrer Einwilligung (Art. 6 Abs. 1 lit. a DSGVO). Die erteilte Einwilligung zur Speicherung der Daten, der E-Mail-Adresse sowie deren Nutzung zum Versand des Newsletters können Sie jederzeit widerrufen, etwa über den „Austragen“-Link im Newsletter. Die Rechtmäßigkeit der bereits erfolgten Datenverarbeitungsvorgänge bleibt vom Widerruf unberührt.
+            </p>
+            <p>
+              Die von Ihnen zum Zwecke des Newsletter-Bezugs bei uns hinterlegten Daten werden von uns bis zu Ihrer Austragung aus dem Newsletter gespeichert und nach der Abbestellung des Newsletters oder nach Zweckfortfall aus der Newsletterverteilerliste gelöscht. Wir behalten uns vor, E-Mail-Adressen aus unserem Newsletterverteiler nach eigenem Ermessen im Rahmen unseres berechtigten Interesses nach Art. 6 Abs. 1 lit. f DSGVO zu löschen oder zu sperren.
+            </p>
+            <p>
+              Daten, die zu anderen Zwecken bei uns gespeichert wurden, bleiben hiervon unberührt.
+            </p>
+            <p>
+              Nach Ihrer Austragung aus der Newsletterverteilerliste wird Ihre E-Mail-Adresse bei uns ggf. in einer Blacklist gespeichert, sofern dies zur Verhinderung künftiger Mailings erforderlich ist. Die Daten aus der Blacklist werden nur für diesen Zweck verwendet und nicht mit anderen Daten zusammengeführt. Dies dient sowohl Ihrem Interesse als auch unserem Interesse an der Einhaltung der gesetzlichen Vorgaben beim Versand von Newslettern (berechtigtes Interesse im Sinne des Art. 6 Abs. 1 lit. f DSGVO). Die Speicherung in der Blacklist ist zeitlich nicht befristet. Sie können der Speicherung widersprechen, sofern Ihre Interessen unser berechtigtes Interesse überwiegen.
+            </p>
+            <p>
+              Ausführlich beschreiben wir den Newsletter, auch die Anmeldung ohne Konto, in Teil B, Abschnitt 15b.
+            </p>
+            <p>
+              Quelle:{" "}
+              <a href="https://www.e-recht24.de" className="underline" target="_blank" rel="noopener noreferrer">
+                https://www.e-recht24.de
+              </a>
+            </p>
+          </BulletSection>
+
+          <p className="pt-4 text-[11px] uppercase tracking-[0.22em] text-slate-500">
+            Teil B · So funktioniert Made2Found
+          </p>
+
           <BulletSection number="1" title="Verantwortlicher">
             <p>Verantwortlich für die Datenverarbeitung bei Made2Found ist:</p>
             <div className="rounded-2xl border border-dashed border-slate-300 bg-slate-50/80 p-4 text-sm text-slate-700">
-              <p>Maria Schulz</p>
+              <p>Maria Schulz (Einzelunternehmen)</p>
               <p>Am Juliusturm 89</p>
               <p>13597 Berlin</p>
+              <p>Telefon: +49176 76 467099</p>
               <p>E-Mail: hello@cofoundery.de</p>
             </div>
             <p>
@@ -152,7 +419,7 @@ export default function DatenschutzPage() {
               items={[
                 "Vercel – Hosting der Website und der Serverfunktionen. Die Serverfunktionen laufen nach unserer Konfiguration in der Region London (Vereinigtes Königreich).",
                 "Supabase – Datenbank, Anmeldung (Authentifizierung) und Dateispeicher, z. B. für Profilfotos. Die Datenbank liegt in der Region London (Vereinigtes Königreich).",
-                "Resend – Versand von E-Mails aus dem Produkt, z. B. Einladungen, Benachrichtigungen und der Newsletter.",
+                "Resend – Versand von E-Mails aus dem Produkt, z. B. Anmelde-Mails, Einladungen, Benachrichtigungen und der Newsletter. Der Versand läuft über die Region Irland (EU).",
               ]}
             />
             <p>
@@ -189,7 +456,7 @@ export default function DatenschutzPage() {
             <p>
               Die Anmeldung funktioniert ohne Passwort: Du gibst deine E-Mail-Adresse ein und
               erhältst einen Anmeldelink bzw. einen Code per E-Mail. Die Anmeldung läuft über
-              Supabase.
+              Supabase, die Anmelde-E-Mails verschicken wir über Resend.
             </p>
             <List
               items={[

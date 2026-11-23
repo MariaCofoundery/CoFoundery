@@ -11,7 +11,7 @@ test("the privacy text covers the newsletter (with and without account) and the 
   assert.match(page, /<BulletSection number="15b" title="Newsletter">/);
   assert.match(page, /<BulletSection number="15c" title="Der öffentliche Blog">/);
   for (const phrase of ["Double-Opt-in", "Sperre", "Art. 6 Abs. 1 lit. a DSGVO", "§ 7 Abs. 2 Nr. 3", "14 Tagen", "kein Cookie", "darf in Mails erscheinen", "Resend"]) assert.ok(page.includes(phrase), phrase);
-  assert.match(page, /Stand: 18\. November 2026/);
+  assert.match(page, /Stand: 23\. November 2026/);
 });
 
 test("what the text promises is what the code does: 14 days, a daily purge, closed table, no account link", () => {
