@@ -32,6 +32,11 @@ export default function ImpressumPage() {
         </div>
 
         <div>
+          <p className="font-semibold text-slate-900">Umsatzsteuer-ID</p>
+          <p>Umsatzsteuer-Identifikationsnummer gemäß § 27a Umsatzsteuergesetz: DE340583737</p>
+        </div>
+
+        <div>
           <p className="font-semibold text-slate-900">Hinweis</p>
           <p>Made2Found wird als Einzelunternehmen betrieben. Das Angebot ist bisher nicht kommerziell: Es gibt derzeit weder Einnahmen noch Werbung noch andere Angebote, die Geld einbringen.</p>
         </div>

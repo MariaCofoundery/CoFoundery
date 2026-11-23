@@ -32,3 +32,16 @@ test("Zoom steht in Teil B mit echten Links und ohne Telefon-Einwahl", () => {
   assert.match(body, /href="https:\/\/www\.zoom\.com\/de\/trust\/gdpr\/"/);
   assert.doesNotMatch(body, /Einwahl mit dem Telefon/);
 });
+
+test("Registrierung, Mindestalter, Betriebsart und LinkedIn stehen in Teil B", () => {
+  assert.match(body, /ohne sie können wir kein Konto bereitstellen/);
+  assert.match(body, /Made2Found richtet sich an Menschen ab 18 Jahren/);
+  assert.match(body, /wird als Einzelunternehmen betrieben und ist derzeit nicht kommerziell/);
+  assert.match(body, /number="20c" title="LinkedIn-Unternehmensseite"/);
+  assert.match(body, /Art\. 6 Abs\. 1 lit\. b DSGVO\)\.\s*<\/p>/);
+});
+
+test("das Impressum nennt die Umsatzsteuer-ID", () => {
+  const impressum = readFileSync(new URL("../../../app/impressum/page.tsx", import.meta.url), "utf8");
+  assert.match(impressum, /§ 27a Umsatzsteuergesetz: DE340583737/);
+});

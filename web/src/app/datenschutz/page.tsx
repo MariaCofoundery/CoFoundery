@@ -377,6 +377,16 @@ export default function DatenschutzPage() {
               Made2Found ist der neue Name von CoFoundery. Die E-Mail-Adresse
               hello@cofoundery.de gilt weiterhin.
             </p>
+            <p>
+              Made2Found wird als Einzelunternehmen betrieben und ist derzeit nicht kommerziell:
+              Es gibt keine Einnahmen und keine Werbung. Das kann sich künftig ändern, etwa durch
+              kostenpflichtige Tarife. Wir passen diese Erklärung dann rechtzeitig an.
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED: Absatz zur Betriebsart am 23.11.2026 auf Wunsch eingefügt. Ob er
+              in die Datenschutzerklärung, das Impressum oder die Nutzungsbedingungen gehört, klärt
+              die Beratung.
+            */}
           </BulletSection>
 
           <BulletSection number="2" title="Worum es bei Made2Found geht – und was wir nicht tun">
@@ -396,6 +406,16 @@ export default function DatenschutzPage() {
                 "Forschung ist freiwillig. Das Produkt funktioniert ohne deine Teilnahme genauso.",
               ]}
             />
+            <p>
+              Made2Found richtet sich an Menschen ab 18 Jahren. Wir verarbeiten wissentlich keine
+              Daten von Personen unter 18 Jahren. Wird uns bekannt, dass sich eine Person unter 18
+              registriert hat, löschen wir das Konto.
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED: Mindestalter 18 am 23.11.2026 eingefügt. Die Nutzungsbedingungen
+              mit demselben Satz stehen noch aus; eine Bestätigung bei der Registrierung ist nicht
+              gebaut. Art. 8 DSGVO (16 Jahre in Deutschland) und Wirksamkeit der Aussage klären.
+            */}
           </BulletSection>
 
           <BulletSection number="3" title="Hosting, Infrastruktur und Empfänger">
@@ -463,6 +483,8 @@ export default function DatenschutzPage() {
                 "verarbeitet werden deine E-Mail-Adresse, der Anmeldezeitpunkt und technische Sitzungsdaten",
                 "die Sprache, in der du Made2Found nutzt, damit die Anmelde-E-Mail in dieser Sprache ankommt",
                 "nach der Anmeldung halten Sitzungs-Cookies dich angemeldet (Abschnitt 21)",
+                "die E-Mail-Adresse ist für die Registrierung erforderlich; ohne sie können wir kein Konto bereitstellen",
+                "wir speichern diese Daten, solange dein Konto besteht; du kannst es jederzeit in deinen Kontoeinstellungen löschen (Abschnitt 24)",
               ]}
             />
             <p>Rechtsgrundlage ist die Bereitstellung des Produkts (Art. 6 Abs. 1 lit. b DSGVO).</p>
@@ -768,6 +790,10 @@ export default function DatenschutzPage() {
                 "Das Ergebnis ist ein Vorschlag. Übernommen wird nur, was du bestätigst.",
               ]}
             />
+            <p>
+              Rechtsgrundlage ist, dass du die Vorschläge an der jeweiligen Stelle ausdrücklich
+              anforderst und wir damit deinen Auftrag ausführen (Art. 6 Abs. 1 lit. b DSGVO).
+            </p>
             {/*
               LEGAL REVIEW REQUIRED: Rechtsgrundlage der optionalen KI-Vorschläge (Ausführung einer
               ausdrücklichen Nutzeranfrage, lit. b, oder Einwilligung, lit. a). Technisch belegt:
@@ -954,6 +980,7 @@ export default function DatenschutzPage() {
               items={[
                 "Diese Ereignisse speichern wir ohne deinen Namen, ohne E-Mail-Adresse und ohne Nutzerkennung.",
                 "Sie enthalten keine ausgewählten Antworten, keine Freitexte und keine Auswertungen.",
+                "Die aufgerufene Seite speichern wir ohne Kennungen: Statt der Adresse deines Teams steht dort zum Beispiel „/teams/:id“. Adressen mit unbekanntem Anfang speichern wir nicht.",
                 "Sie werden automatisch gelöscht (Abschnitt 23).",
               ]}
             />
@@ -1161,6 +1188,44 @@ export default function DatenschutzPage() {
             */}
           </BulletSection>
 
+          <BulletSection number="20c" title="LinkedIn-Unternehmensseite">
+            <p>
+              Wir betreiben eine Unternehmensseite bei LinkedIn. Für Nutzende in der EU ist die
+              LinkedIn Ireland Unlimited Company, Dublin, Irland, Anbieter von LinkedIn. Wenn du
+              die Seite besuchst oder mit ihr interagierst, verarbeitet LinkedIn Daten über dich,
+              auch außerhalb unseres Einflusses.
+            </p>
+            <p>
+              Für die Auswertungen der Seite (Seiten-Insights) sind wir und LinkedIn gemeinsam
+              verantwortlich (Art. 26 DSGVO). Grundlage ist das „Page Insights Joint Controller
+              Addendum“ von LinkedIn. Wir erhalten nur zusammengefasste Statistiken, keine Daten
+              einzelner Besucherinnen und Besucher. Zweck ist Öffentlichkeitsarbeit und die
+              Messung der Reichweite. Rechtsgrundlage ist unser berechtigtes Interesse (Art. 6
+              Abs. 1 lit. f DSGVO).
+            </p>
+            <p>
+              Informationen zur Verarbeitung durch LinkedIn und zu deinen Rechten findest du in der
+              Datenschutzrichtlinie von LinkedIn unter{" "}
+              <a
+                href="https://www.linkedin.com/legal/privacy-policy"
+                className="underline"
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                https://www.linkedin.com/legal/privacy-policy
+              </a>
+              . Der Besuch unserer eigenen Website setzt keine Verbindung zu LinkedIn voraus.
+            </p>
+            {/*
+              LEGAL REVIEW REQUIRED: Entwurf vom 23.11.2026 nach den Pflichtinhalten aus der Praxis
+              (gemeinsame Verantwortlichkeit für Page Insights, Addendum, Zwecke, Rechtsgrundlage,
+              Link zur Datenschutzrichtlinie). Nicht geprüft: genaue Anschrift der LinkedIn Ireland
+              Unlimited Company, Adresse der Datenschutzrichtlinie, Wortlaut des Addendums
+              (legal.linkedin.com leitet auf den Login um), ob die Insights genutzt werden und der
+              Impressumslink auf der Unternehmensseite. Instagram erst nach Anlage eintragen.
+            */}
+          </BulletSection>
+
           <BulletSection number="21" title="Cookies und Speicherung im Browser">
             <p>
               Wir verwenden nur Speicherungen, die für die Funktionen nötig sind, die du nutzt.
@@ -1206,7 +1271,8 @@ export default function DatenschutzPage() {
               Serverfunktionen protokollieren Fehler; diese Einträge können technische Kennungen
               und in Einzelfällen eine E-Mail-Adresse enthalten. Wir nutzen Protokolle nur für
               Betrieb, Fehlersuche und Sicherheit (Art. 6 Abs. 1 lit. f DSGVO). Das gilt auch für
-              den öffentlichen Blog.
+              den öffentlichen Blog. Die Protokolle bei Vercel werden nach kurzer Zeit gelöscht
+              (nach Angaben von Vercel im von uns genutzten Tarif derzeit nach etwa einer Stunde).
             </p>
             {/*
               LEGAL REVIEW REQUIRED: Aufbewahrungsdauer der Protokolle bei Vercel und Supabase ist
