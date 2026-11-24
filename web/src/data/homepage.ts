@@ -59,7 +59,7 @@ const de = {
   // Bruecke
   bridge: {
     label: "Worum es uns geht",
-    lines: ["Das Gute verstärken.", "Das Herausfordernde angehen."],
+    lines: ["Das Gute verstärken.", "Herausforderndes angehen."],
     paragraphs: [
       "Du kennst das vielleicht: Du arbeitest mit den richtigen Menschen und plötzlich läuft es. Man beflügelt sich gegenseitig und jede:r bringt ein, was er oder sie am besten kann.",
       "Das ist kein Zufall. Es passiert, wenn man auf das schaut, was gut läuft, seine Stärken kennt und sie gezielt einsetzt.",
@@ -141,8 +141,8 @@ const de = {
     label: "Warum es Made2Found gibt",
     title: "„Gemeinsam schaffen wir das meiste.“",
     paragraphs: [
-      "Ich habe keine Lust mehr auf das ewige „alles ist schlecht“. Ich will anpacken, etwas aufbauen und uns dabei gegenseitig unterstützen.",
-      "Viele Startups scheitern an Konflikten im Gründungsteam. Vieles davon lässt sich verhindern, wenn man vorher die richtigen Gespräche führt.",
+      "Ich habe keine Lust mehr auf das ewige „alles ist schlecht“. Ich will anpacken, etwas aufbauen und dass wir uns wieder mehr gegenseitig unterstützen.",
+      "Viele Startups scheitern an Konflikten im Gründungsteam, aber wenn man vorher die richtigen Gespräche führt und eine stabile Basis aufbaut, kann man sich als junges Unternehmen vor solchen Brüchen schützen.",
       "Und für viele Probleme gibt es irgendwo jemanden, der eine Lösung hat oder sie finden kann. Man muss das Problem nur sichtbar machen. Dafür baue ich Made2Found.",
     ],
     sig: "Maria",
@@ -329,8 +329,8 @@ const en: typeof de = {
     label: "Why Made2Found exists",
     title: "“Together we can do most things.”",
     paragraphs: [
-      "I am tired of the endless “everything is bad”. I want to get stuck in, build something and support each other along the way.",
-      "Many startups fail because of conflicts in the founding team. A lot of that can be prevented if you have the right conversations beforehand.",
+      "I am tired of the endless “everything is bad”. I want to get stuck in, build something and have us support each other more again.",
+      "Many startups fail because of conflicts in the founding team, but if you have the right conversations beforehand and build a stable foundation, a young company can protect itself from such ruptures.",
       "And for many problems, somewhere there is someone who has a solution or can find one. You only have to make the problem visible. That is why I am building Made2Found.",
     ],
     sig: "Maria",

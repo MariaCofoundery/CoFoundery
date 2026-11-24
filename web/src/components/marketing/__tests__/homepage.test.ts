@@ -143,3 +143,22 @@ test("the first-screen reassurance line is grammatical and keeps its last word t
   assert.match(de, /Deine Antworten siehst erst einmal nur\u00a0du\.$/);
   assert.doesNotMatch(allText("de"), /Antworten sieht/);
 });
+
+test("the bridge heading is two short lines that never wrap (24.11.2026: 'Herausforderndes angehen.')", () => {
+  assert.deepEqual(getHomepageContent("de").bridge.lines, ["Das Gute verstärken.", "Herausforderndes angehen."]);
+  assert.match(css, /\.bridge h2 \{[^}]*white-space: nowrap/);
+});
+
+test("on the phone the topic question opens right under the tapped topic and the list does not move by itself", () => {
+  assert.match(topics, /styles\.inlineQ/);
+  assert.match(topics, /max-width: 899px/);
+  assert.match(css, /\.focus \{[^}]*display: none/);
+  assert.match(css, /@media \(min-width: 900px\)[^\n]*\.focus \{ display: flex/);
+});
+
+test("Maria's word carries her wording of 24.11.2026 (de) and a matching english version", () => {
+  const de = getHomepageContent("de").founder.paragraphs;
+  assert.match(de[0], /und dass wir uns wieder mehr gegenseitig unterstützen\.$/);
+  assert.match(de[1], /eine stabile Basis aufbaut, kann man sich als junges Unternehmen vor solchen Brüchen schützen\.$/);
+  assert.equal(getHomepageContent("en").founder.paragraphs.length, de.length);
+});
