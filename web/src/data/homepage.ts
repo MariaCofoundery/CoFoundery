@@ -6,8 +6,9 @@
 // Bewusst NICHT enthalten:
 //   - Stimmen oder Zitate anderer ("Was andere sagen"): Es gibt noch keine echten, freigegebenen. Marias
 //     Wort ist ihre eigene Aussage und kein Zitat.
-//   - Zahlen, Erfolgsquoten, Versprechen. Die Beispiele (Anna und Ben, Mara, Jonas ...) sind erfunden und
-//     sagen das.
+//   - Zahlen, Erfolgsquoten, Versprechen. Die Beispiele (Anna und Ben, Mara, Jonas ...) sind erfunden. Das
+//     sichtbare Etikett heisst nur "Beispiel" (Wunsch von Maria, 24.11.2026); die Beschriftungen fuer
+//     Vorlesehilfen (windowLabel) sagen weiterhin "erfunden".
 //   - Scores, Typen, Ranglisten. Wo die Seite sie verneint, steht der Satz in HOMEPAGE_ALLOWED_CLAIMS,
 //     damit der Test ihn genau dort zulaesst und sonst nirgends.
 //
@@ -37,7 +38,7 @@ const de = {
   login: "Login", start: "Jetzt starten",
   navSo: "So funktioniert es", navAreas: "Find, Align, Connect",
   accessRequest: "Zugang anfragen",
-  example: "Beispiel mit erfundenen Daten",
+  example: "Beispiel",
 
   // Scrollreise
   journey: {
@@ -232,7 +233,7 @@ const en: typeof de = {
   login: "Log in", start: "Get started",
   navSo: "How it works", navAreas: "Find, Align, Connect",
   accessRequest: "Request access",
-  example: "Example with made-up data",
+  example: "Example",
 
   journey: {
     ariaLabel: "What Made2Found is about",

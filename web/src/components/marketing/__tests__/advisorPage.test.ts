@@ -51,9 +51,11 @@ test("advisors only see what teams share: the page says so and keeps the shares 
   }
 });
 
-test("every example is labelled as made up and the page invents no voices", () => {
-  assert.match(getAdvisorPageContent("de").hero.example, /erfunden/);
-  assert.match(getAdvisorPageContent("en").hero.example, /made-up/);
+test("every example is labelled as an example, the screen-reader labels say made up, and the page invents no voices", () => {
+  assert.equal(getAdvisorPageContent("de").hero.example, "Beispiel");
+  assert.equal(getAdvisorPageContent("en").hero.example, "Example");
+  assert.match(getAdvisorPageContent("de").features.team.windowLabel, /erfundenen/);
+  assert.match(getAdvisorPageContent("en").features.team.windowLabel, /made-up/);
   assert.equal((page.match(/\{c\.hero\.example\}/g) ?? []).length >= 3, true);
   assert.doesNotMatch(page, /Was andere sagen|Platzhalter|testimonial/i);
 });

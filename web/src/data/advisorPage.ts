@@ -6,7 +6,8 @@
 //   - "Im Moment kostenlos", Zugang ueber Code wie bei allen
 //   - fuer Programme ein Gespraechsangebot statt eines Preises
 //
-// Alle Beispiele (Aufgaben, Termine, Namen) sind erfunden und sagen das. Was Advisor von einem Team sehen,
+// Alle Beispiele (Aufgaben, Termine, Namen) sind erfunden; das sichtbare Etikett heisst nur "Beispiel" (Wunsch
+// von Maria, 24.11.2026), die Beschriftungen fuer Vorlesehilfen sagen "erfunden". Was Advisor von einem Team sehen,
 // steht nur mit "freigibt": Arbeitsprofil, Teambericht und Founder Setup sind getrennte Freigaben.
 //
 // Bewusst NICHT enthalten: Preise, Zahlen, Stimmen anderer, Versprechen ueber Erfolg. "Im Moment kostenlos" ist
@@ -29,7 +30,7 @@ const de = {
     access: "Zugang anfragen",
     price: FREE_NOW.de,
     fine: "Zugang mit Code.",
-    example: "Beispiel mit erfundenen Daten",
+    example: "Beispiel",
   },
 
   features: {
@@ -124,7 +125,7 @@ const en: typeof de = {
     access: "Request access",
     price: FREE_NOW.en,
     fine: "Access with a code.",
-    example: "Example with made-up data",
+    example: "Example",
   },
 
   features: {

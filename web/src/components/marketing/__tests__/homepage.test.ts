@@ -56,9 +56,12 @@ test("the homepage makes no unproven promises or numbers", () => {
   }
 });
 
-test("every example says it uses made-up data", () => {
-  assert.match(getHomepageContent("de").example, /erfunden/);
-  assert.match(getHomepageContent("en").example, /made-up/);
+test("every example is labelled as an example, and the screen-reader labels say the data is made up", () => {
+  // Das sichtbare Etikett ist nur "Beispiel" (Maria, 24.11.2026); die Vorlesebeschriftungen bleiben ausfuehrlich.
+  assert.equal(getHomepageContent("de").example, "Beispiel");
+  assert.equal(getHomepageContent("en").example, "Example");
+  assert.match(getHomepageContent("de").overview.find.windowLabel, /erfundenen/);
+  assert.match(getHomepageContent("en").overview.find.windowLabel, /made-up/);
   assert.equal((page.match(/\{c\.example\}/g) ?? []).length >= 2, true);
 });
 
