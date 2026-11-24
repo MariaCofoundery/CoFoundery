@@ -346,6 +346,10 @@
 @keyframes leitPulse { 0%, 100% { opacity: .7; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
 .leitNode { animation: leitTwinkle 4s ease-in-out infinite; }
 @keyframes leitTwinkle { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+.leitFlow { stroke-dasharray: 3 7; animation: leitFlow 3s linear infinite; }
+@keyframes leitFlow { to { stroke-dashoffset: -20; } }
+.leitDot { offset-rotate: 0deg; animation: leitTravel 6s ease-in-out infinite; }
+@keyframes leitTravel { 0% { offset-distance: 0%; opacity: 0; } 15% { opacity: 1; } 85% { opacity: 1; } 100% { offset-distance: 100%; opacity: 0; } }
 @media (min-width: 900px) { .advHeroGrid { grid-template-columns: 1.4fr 1fr; gap: 56px; } }
 .chipOn { background: var(--purple); color: #fff; }
 .afterChips { margin-top: 16px; }
