@@ -20,6 +20,9 @@ const FIND_NOTE_EN = "There is no ranking by fit and no score.";
 const PRICE_DE = "Im Moment ist Made2Found kostenlos.";
 const PRICE_EN = "Right now, Made2Found is free.";
 
+/** Der Preissatz, einmal definiert, damit alle oeffentlichen Seiten dasselbe sagen. */
+export const FREE_NOW: { de: string; en: string } = { de: PRICE_DE, en: PRICE_EN };
+
 /** Genau diese Saetze duerfen Woerter wie "Score" oder "kostenlos" enthalten (siehe Test). */
 export const HOMEPAGE_ALLOWED_CLAIMS = {
   de: [FAQ_NO_SCORE_DE, FIND_NOTE_DE, PRICE_DE],
@@ -174,7 +177,7 @@ const de = {
       title: "Begleitung, wenn ihr sie wollt.",
       text: "Erfahrung von Menschen, die Teams weiterbringen. Sie sehen nur, was ihr freigebt.",
       bullets: ["Expert:innen und Mentoring", "Programme und individuelle Begleitung", "Teams entwickeln und stärken"],
-      more: "Mehr für Advisor und Accelerator →", moreHref: "/start",
+      more: "Mehr für Advisor und Accelerator →", moreHref: "/fuer-advisor",
       windowLabel: "Beispiel der Freigaben für eine Begleitung",
       bar: "Team", barPage: "Freigaben",
       shareTitle: "Wer darf was sehen?", shareSub: "Jede Freigabe gilt für sich und lässt sich zurücknehmen.",
@@ -219,7 +222,7 @@ const de = {
   },
 
   // Fuss und Metadaten
-  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung", phone: "Aufs Handy (PDF)",
+  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung", forAdvisors: "Für Advisor", phone: "Aufs Handy (PDF)",
   seoTitle: "Made2Found – Erst reden. Dann gründen.",
   seoDescription: "Finde raus, wie du arbeitest, seht, wo ihr verschieden tickt, und haltet Rollen, Zeit, Geld und Entscheidungen fest. Made2Found für Mitgründer:innen, in der geschlossenen Beta.",
 };
@@ -361,7 +364,7 @@ const en: typeof de = {
       title: "Support, when you want it.",
       text: "Experience from people who move teams forward. They only see what you share.",
       bullets: ["Experts and mentoring", "Programs and individual support", "Develop and strengthen teams"],
-      more: "More for advisors and accelerators →", moreHref: "/start",
+      more: "More for advisors and accelerators →", moreHref: "/fuer-advisor",
       windowLabel: "Example of the shares for a support relationship",
       bar: "Team", barPage: "Shares",
       shareTitle: "Who may see what?", shareSub: "Every share stands on its own and can be taken back.",
@@ -402,7 +405,7 @@ const en: typeof de = {
     accessCta: "Request access by email",
   },
 
-  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach", phone: "On your phone (PDF)",
+  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach", forAdvisors: "For advisors", phone: "On your phone (PDF)",
   seoTitle: "Made2Found – Talk first. Then found.",
   seoDescription: "Find out how you work, see where you tick differently, and put roles, time, money and decisions in writing. Made2Found for co-founders, in closed beta.",
 };

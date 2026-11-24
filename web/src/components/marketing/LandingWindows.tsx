@@ -1,3 +1,4 @@
+import type { getAdvisorPageContent } from "@/data/advisorPage";
 import type { getHomepageContent } from "@/data/homepage";
 import styles from "./landing.module.css";
 
@@ -117,6 +118,53 @@ export function AdvisorWindow({ c }: { c: Content["net"]["advisor"] }) {
             <span className={`${styles.tg} ${share.on ? "" : styles.tgOff}`} />
           </div>
         ))}
+      </div>
+    </div>
+  );
+}
+
+type AdvisorContent = ReturnType<typeof getAdvisorPageContent>["features"];
+const TASK_TAG = { open: styles.tagSeek, due: styles.tagProblem, done: styles.tagOffer } as const;
+
+/** Teamraum: Aufgaben mit Zustand, wer sie macht, und ein Kommentar (alles erfunden). */
+export function TeamroomWindow({ c }: { c: AdvisorContent["team"] }) {
+  return (
+    <div className={styles.win} role="img" aria-label={c.windowLabel} data-par>
+      <div className={styles.winBar}><span>{c.bar} › <b>{c.barPage}</b></span><span className={styles.lg}>DE&nbsp;&nbsp;EN</span></div>
+      <div className={styles.winBody} aria-hidden="true">
+        <p className={styles.shareTitle}>{c.title2}</p>
+        <div className={styles.lst}>
+          {c.tasks.map((task) => (
+            <div key={task.title} className={styles.li2}>
+              <span className={`${styles.tag} ${TASK_TAG[task.tone]}`}>{task.status}</span>
+              <div><b>{task.title}</b><small>{task.who}</small></div>
+              <span />
+            </div>
+          ))}
+        </div>
+        <p className={styles.winNote}>{c.comment}</p>
+      </div>
+    </div>
+  );
+}
+
+/** Programmplan: Formate zum Antippen und die Termine der Woche (alles erfunden). */
+export function ProgramWindow({ c }: { c: AdvisorContent["program"] }) {
+  return (
+    <div className={styles.win} role="img" aria-label={c.windowLabel} data-par>
+      <div className={styles.winBar}><span>{c.bar} › <b>{c.barPage}</b></span><span className={styles.lg}>DE&nbsp;&nbsp;EN</span></div>
+      <div className={styles.winBody} aria-hidden="true">
+        <div className={styles.chips}>{c.formats.map((f, i) => <span key={f} className={i === 4 ? `${styles.chip} ${styles.chipOn}` : styles.chip}>{f}</span>)}</div>
+        <p className={`${styles.shareTitle} ${styles.afterChips}`}>{c.title2}</p>
+        <div className={styles.lst}>
+          {c.events.map((event) => (
+            <div key={event.title} className={styles.li2}>
+              <span className={`${styles.tag} ${styles.tagSeek}`}>{event.when}</span>
+              <div><b>{event.title}</b><small>{event.kind}</small></div>
+              <span />
+            </div>
+          ))}
+        </div>
       </div>
     </div>
   );

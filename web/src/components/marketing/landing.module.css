@@ -326,3 +326,36 @@
   .btn { border: 1px solid ButtonText; }
 }
 @media (max-width: 899px) { .hero2 svg { width: 90px; } .ban b { font-size: 21px; } }
+
+/* ---------- Advisor-Seite (/fuer-advisor) ---------- */
+.advHero { position: relative; overflow: hidden; isolation: isolate; background: linear-gradient(165deg, #0b0c1a 0%, #1a1250 55%, #34209a 100%); color: var(--night-ink); }
+.advHero::after { content: ""; position: absolute; z-index: -1; right: -10%; top: -30%; width: 60%; height: 90%; background: radial-gradient(closest-side, rgba(109, 73, 224, .5), transparent); }
+.advHeroGrid { display: grid; gap: 40px; align-items: center; padding-block: clamp(56px, 8vw, 104px); }
+.advHero .label { color: var(--lilac); }
+.advHero h1 { font-size: clamp(22px, 6.6vw, 52px); line-height: 1.1; letter-spacing: -.02em; margin-top: 18px; white-space: nowrap; }
+.advHero h1 span { display: block; }
+.advHero h1 .two { color: var(--lilac); }
+.advSub { margin: 22px 0 0; font-size: 20px; line-height: 1.5; color: var(--night-soft); max-width: 30em; }
+.advHero .ctaRow { margin-top: 30px; }
+.advHero .btnPrimary { background: #fff; color: var(--night); }
+.advHero .btnPrimary:hover { background: #e6e0ff; }
+.advFine { margin: 16px 0 0; font-size: 14px; line-height: 1.5; color: var(--night-soft); max-width: 40em; }
+.heroArt { display: grid; place-items: center; }
+.leitstern { width: min(100%, 520px); height: auto; display: block; }
+.leitPulse { transform-box: fill-box; transform-origin: center; animation: leitPulse 5s ease-in-out infinite; }
+@keyframes leitPulse { 0%, 100% { opacity: .7; transform: scale(.96); } 50% { opacity: 1; transform: scale(1.04); } }
+.leitNode { animation: leitTwinkle 4s ease-in-out infinite; }
+@keyframes leitTwinkle { 0%, 100% { opacity: .55; } 50% { opacity: 1; } }
+@media (min-width: 900px) { .advHeroGrid { grid-template-columns: 1.4fr 1fr; gap: 56px; } }
+.chipOn { background: var(--purple); color: #fff; }
+.afterChips { margin-top: 16px; }
+.stepsList { list-style: none; margin: 0; padding: 0; display: grid; gap: 20px; }
+.step { border: 1px solid var(--line); border-radius: 26px; padding: 28px; background: #fff; display: grid; gap: 10px; align-content: start; }
+.stepNum { font-family: var(--display); font-size: 12px; letter-spacing: .14em; color: var(--purple-deep); }
+.step h3 { font-size: 26px; line-height: 1.15; letter-spacing: -.015em; }
+.step p { margin: 0; color: #3b4866; font-size: 18px; }
+@media (min-width: 900px) { .stepsList { grid-template-columns: repeat(3, 1fr); gap: 24px; } }
+.talk { display: grid; gap: 18px; align-items: center; border: 1px solid var(--line); border-radius: 28px; padding: 32px 28px; background: #fff; }
+.talk h2 { font-size: clamp(28px, 4.4vw, 40px); line-height: 1.1; letter-spacing: -.02em; }
+.talk p { margin: 6px 0 0; color: var(--body); font-size: 19px; }
+@media (min-width: 900px) { .talk { grid-template-columns: 1fr auto; padding: 40px 44px; } }
