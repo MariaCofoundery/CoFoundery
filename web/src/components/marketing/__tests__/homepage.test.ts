@@ -136,3 +136,10 @@ test("scroll effects never hide what is visible on load and never touch client c
   assert.doesNotMatch(page, /<FaqAccordion[^>]*data-rv/);
   assert.doesNotMatch(page, /<SetupTopics[^>]*data-rv/);
 });
+
+test("the first-screen reassurance line is grammatical and keeps its last word together", () => {
+  // Fehler vom 24.11.2026: "Deine Antworten sieht erst einmal nur du" (es muss "siehst" heissen), und das "du" stand allein in der naechsten Zeile.
+  const de = getHomepageContent("de").journey.fine;
+  assert.match(de, /Deine Antworten siehst erst einmal nur\u00a0du\.$/);
+  assert.doesNotMatch(allText("de"), /Antworten sieht/);
+});

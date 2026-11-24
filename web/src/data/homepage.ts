@@ -42,7 +42,8 @@ const de = {
     label: "Made2Found",
     headline: ["Erst reden.", "Dann gründen."],
     sub: "Finden. Verstehen. Festhalten. Die Plattform für alle, die gemeinsam gründen.",
-    fine: "Dauert ein paar Minuten. Deine Antworten sieht erst einmal nur du.",
+    // "nur du" mit geschuetztem Leerzeichen: das "du" soll nie allein in einer neuen Zeile stehen.
+    fine: "Dauert ein paar Minuten. Deine Antworten siehst erst einmal nur\u00a0du.",
     scroll: "Weiter scrollen",
     dotsLabel: "Kapitel",
     dots: ["Start", "Find", "Align", "Founder Setup", "Connect", "Advisor"],
