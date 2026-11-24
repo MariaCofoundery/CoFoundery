@@ -57,7 +57,7 @@ test("Ort und Suche kommen aus den Bereichen der Leiste", () => {
 
 test("die Shell: Founder-Ansicht und Connect allein bekommen die Seitenleiste, sonst bleibt alles wie es war", () => {
   const shell = code("src/features/navigation/ProductShell.tsx");
-  assert.match(shell, /const useFounderShell = !useWorkspace && !isSuspendedConnectOnly && \(isConnectOnly \|\| \(isFounderView && hasFounder\)\)/);
+  assert.match(shell, /const useFounderShell = chrome === "founder";/);
   // Die Bereiche haben eine Quelle: navigationItems. Die Leiste liest sie, sie baut keine eigenen.
   assert.match(shell, /navigationItems\.flatMap\(\(item\) =>\s*item\.key/);
   for (const key of ["home", "align", "find", "connect", "events"]) assert.match(shell, new RegExp(`key: "${key}"`), key);

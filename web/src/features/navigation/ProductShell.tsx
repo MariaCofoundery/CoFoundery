@@ -30,7 +30,7 @@ import { WorkspaceChrome } from "@/features/navigation/workspace/WorkspaceChrome
 import { FounderChrome } from "@/features/navigation/founder/FounderChrome";
 import type { FounderAreaKey, FounderNavItem, FounderNavPrefs } from "@/features/navigation/founder/founderNav";
 import { getIncomingRequestBadgePresentation } from "@/features/discovery/discoveryIntroTypes";
-import { isWorkspacePath } from "@/features/navigation/workspace/workspaceNav";
+import { chooseChrome } from "@/features/navigation/chromeChoice";
 import type { AdvisorOrgListEntry } from "@/features/dashboard/dashboardRoleData";
 
 type Props = {
@@ -847,7 +847,8 @@ export function ProductShell({
   // In der Advisor-Ansicht steht jetzt EINE Seitenleiste mit allen Stationen und oben eine schlanke Leiste
   // (Organisation, Suche, "+ Neu", Nachrichten, Profil); auf dem Handy fuenf Reiter unten. Die Founder-Ansicht
   // und Connect behalten die Leiste oben. Reine Darstellung - jede Seite prueft ihren Zugang selbst.
-  const useWorkspace = hasAdvisor && resolvedActiveView === "advisor" && !isConnectOnly && !isSuspendedConnectOnly && isWorkspacePath(pathname);
+  const chrome = chooseChrome({ hasFounder, hasAdvisor, hasConnect, hasConnectAccount, activeView: resolvedActiveView, pathname });
+  const useWorkspace = chrome === "workspace";
   if (useWorkspace) {
     return (
       <ProductNavigationOverrideContext.Provider value={setNavigationOverride}>
@@ -879,7 +880,7 @@ export function ProductShell({
   // und fuer Konten nur mit Connect (dort sind die Unterpunkte die Leiste). Die Eintraege kommen aus
   // `navigationItems` - es gibt weiter nur EINE Quelle fuer die Bereiche. Reine Darstellung: jede Seite prueft ihren
   // Zugang selbst. Wer nur Advisor ist, behaelt die Leiste oben auf den Seiten ausserhalb des Arbeitsbereichs.
-  const useFounderShell = !useWorkspace && !isSuspendedConnectOnly && (isConnectOnly || (isFounderView && hasFounder));
+  const useFounderShell = chrome === "founder";
   if (useFounderShell) {
     const areaBadgeOf = (badge: AreaBadge | undefined): FounderNavItem["badge"] => {
       if (!badge || badge.count < 1) return undefined;

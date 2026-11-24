@@ -110,7 +110,8 @@ test("Texte in beiden Sprachen, dieselben Schluessel", () => {
 
 test("die Seitenleiste ersetzt die Leiste oben nur in der Advisor-Ansicht", () => {
   const shell = source("src/features/navigation/ProductShell.tsx");
-  assert.match(shell, /const useWorkspace = hasAdvisor && resolvedActiveView === "advisor" && !isConnectOnly && !isSuspendedConnectOnly && isWorkspacePath\(pathname\);/);
+  // Die Entscheidung steht in chromeChoice.ts (Tabelle dort getestet); die Shell liest sie nur.
+  assert.match(shell, /const useWorkspace = chrome === "workspace";/);
   // Die Founder-Leiste mit ihren Bereichen steht weiter da.
   assert.match(shell, /<header className="sticky top-0 z-40 border-b border-slate-200\/80 bg-white\/78 backdrop-blur-xl print:hidden">/);
   // Der Arbeitsbereich ist reine Darstellung: kein Zugang haengt daran.
