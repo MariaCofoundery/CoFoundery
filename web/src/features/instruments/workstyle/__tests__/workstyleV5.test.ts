@@ -183,8 +183,13 @@ test("Zwischenstand nach drei Antworten: die gewählten Aussagen in den Worten d
   const flow = code("src/features/instruments/workstyle/WorkstyleV5Flow.tsx");
   assert.match(flow, /saved\.answers\.length >= INTERIM_AFTER && !saved\.submitted_at/);
   assert.match(flow, /data-workstyle-interim/);
+  // Nur am Handy: am Laptop kommt nichts zwischen die Fragen; beim erneuten Durchlauf auch am Handy nicht.
+  assert.match(flow, /window\.matchMedia\("\(max-width: 699px\)"\)\.matches\) setInterim\(true\)/);
+  assert.match(flow, /setStarted\(true\); setInterimSeen\(true\);/);
+  assert.match(flow, /data-workstyle-phone-preview/);
+  assert.match(flow, /min-\[700px\]:hidden/);
   for (const locale of ["de", "en"]) {
     const bundle = read(`messages/${locale}/workstyleFlow.json`);
-    for (const key of ["interim_title", "interim_text", "interim_note", "interim_continue", "interim_strong", "interim_lean"]) assert.ok(bundle[key], `${locale}: ${key}`);
+    for (const key of ["interim_title", "interim_text", "interim_note", "interim_continue", "interim_strong", "interim_lean", "phone_preview_note"]) assert.ok(bundle[key], `${locale}: ${key}`);
   }
 });

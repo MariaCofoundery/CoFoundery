@@ -3,7 +3,7 @@
 import { createClient } from "@/lib/supabase/server";
 
 /**
- * Die Erinnerungsfrage nach dem ersten Erfolg ("Soll ich dich morgen erinnern?"): Ja oder Nein danke.
+ * Die Erinnerungsfrage beim Pausieren im Fragebogen ("Möchtest du erst mal eine Pause einlegen und später weitermachen?"): Ja oder Nein.
  *
  * Beides wird festgehalten, damit nicht noch einmal gefragt wird; nur ein Ja erlaubt Mails (hoechstens zwei). Die Frage
  * ist eine ausdrueckliche Entscheidung, nichts ist vorbelegt. Ein Fehler stoert den Fragebogen nicht.

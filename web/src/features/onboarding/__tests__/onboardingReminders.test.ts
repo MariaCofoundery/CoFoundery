@@ -79,10 +79,15 @@ test("die Zustimmung steckt im Knopf „Gerade keine Zeit“ oder in der Frage n
   assert.match(action, /if \(later\) redirect\(LATER\)/);
   // Erst nach der Markierung "eingefuehrt", und ein Fehler macht den Einstieg nicht rueckgaengig.
   assert.ok(action.indexOf("markOnboardingComplete(client") < action.indexOf("set_onboarding_reminder"));
-  // Die zweite Stelle: nach dem ersten Erfolg im Fragebogen, einmal, Ja oder Nein danke.
+  // Die zweite Stelle: beim Pausieren im Fragebogen ("Später weitermachen"), einmal, Ja oder Nein. Nicht mehr auf der Zwischenkarte.
   const flow = code("src/features/instruments/workstyle/WorkstyleV5Flow.tsx");
   assert.match(flow, /data-workstyle-reminder/);
   assert.match(flow, /answerReminderAction\(true\)[\s\S]*?answerReminderAction\(false\)/);
+  assert.match(flow, /onClick=\{\(\) => setPauseOpen\(true\)\}/);
+  const interimCard = flow.slice(flow.indexOf("data-workstyle-interim"), flow.indexOf("{open > 0 && !interim"));
+  assert.doesNotMatch(interimCard, /answerReminderAction|data-workstyle-reminder/, "die Zwischenkarte fragt nicht mehr nach Mails");
+  // Wer schon entschieden hat, wird nicht noch einmal gefragt: dann ist es ein einfacher Link.
+  assert.match(flow, /reminderAsked\s*\?\s*<Link href="\/dashboard"/);
   assert.match(code("src/features/onboarding/reminderActions.ts"), /p_source: "midway"/);
   assert.match(code("src/app/(product)/research/workstyle-pretest/page.tsx"), /from\("onboarding_reminders"\)/);
   for (const locale of ["de", "en"]) {
@@ -90,7 +95,7 @@ test("die Zustimmung steckt im Knopf „Gerade keine Zeit“ oder in der Frage n
     for (const key of ["start", "later", "laterNote", "title"]) assert.ok(profile.welcome[key], `${locale}: welcome.${key}`);
     for (const key of ["title", "text", "doNow", "note"]) assert.ok(profile.later[key], `${locale}: later.${key}`);
     const flowText = JSON.parse(read(`messages/${locale}/workstyleFlow.json`));
-    for (const key of ["interim_reminder_title", "interim_reminder_text", "interim_reminder_yes", "interim_reminder_no"]) assert.ok(flowText[key], `${locale}: ${key}`);
+    for (const key of ["pause_title", "pause_text", "pause_yes", "pause_no", "pause_back"]) assert.ok(flowText[key], `${locale}: ${key}`);
   }
   const runner = code("src/features/onboarding/onboardingReminders.ts");
   assert.match(runner, /prepare_onboarding_reminders/);

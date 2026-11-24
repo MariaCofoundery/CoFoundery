@@ -141,10 +141,12 @@
   "interim_text": "Drei Situationen, in deinen Worten. Mehr Antworten machen das Bild genauer.",
   "interim_note": "Ein Ausschnitt aus drei von {total} Situationen. Keine Punkte, kein Typ – nur das, was du gesagt hast.",
   "interim_continue": "Weiter",
+  "phone_preview_note": "Nach 3 Situationen zeige ich dir, was du bisher gesagt hast. Du kannst jederzeit pausieren, alles wird gespeichert.",
+  "pause_title": "Möchtest du erst mal eine Pause einlegen und später weitermachen?",
+  "pause_text": "Alles ist gespeichert. Ich kann dir morgen eine kurze, freundliche Mail schicken, damit du leicht wieder einsteigst. Höchstens zwei, danach nie wieder. Abmelden geht mit einem Klick.",
+  "pause_yes": "Ja, erinnere mich bitte",
+  "pause_no": "Nein, ich melde mich selbst",
+  "pause_back": "Doch weitermachen",
   "interim_strong": "Deutlich eher",
-  "interim_lean": "Eher",
-  "interim_reminder_title": "Soll ich dich morgen erinnern?",
-  "interim_reminder_text": "Eine kurze, freundliche Mail, falls du nicht weitermachst. Höchstens zwei, danach nie wieder. Abmelden geht mit einem Klick.",
-  "interim_reminder_yes": "Ja, gern erinnern",
-  "interim_reminder_no": "Nein danke, weiter"
+  "interim_lean": "Eher"
 }

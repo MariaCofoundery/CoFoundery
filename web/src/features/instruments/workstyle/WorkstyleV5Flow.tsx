@@ -3,6 +3,7 @@
 import { useTranslations, useLocale } from "next-intl";
 
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState, useTransition } from "react";
 
 import { workstyleSessionItems, WORKSTYLE_PRETEST_V5, type WorkstyleItem } from "@/features/instruments/workstyle/registry";
@@ -54,9 +55,13 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
   // Nach "Los geht's" sofort zur ersten Frage - auch bevor es eine Antwort gibt.
   const [started, setStarted] = useState(false);
   const [confirmRetake, setConfirmRetake] = useState(false);
-  // Einmal nach der dritten Antwort: "Das hast du bisher gesagt" - der erste Moment, in dem etwas zurueckkommt.
+  // Einmal nach der dritten Antwort, nur am Handy (unter 700 Pixel): "Das hast du bisher gesagt" - der erste Moment, in dem
+  // etwas zurueckkommt, damit der Einstieg leichter faellt. Am Laptop kommt nichts dazwischen.
   const [interim, setInterim] = useState(false);
+  // Die Erinnerungsfrage steht beim Pausieren ("Später weitermachen"), nicht mehr auf der Zwischenkarte.
   const [reminderAsked, setReminderAsked] = useState(reminderDecided);
+  const [pauseOpen, setPauseOpen] = useState(false);
+  const router = useRouter();
   const [interimSeen, setInterimSeen] = useState(() => (initialSession?.answers.length ?? 0) >= INTERIM_AFTER);
   const [error, setError] = useState("");
   const [pending, startTransition] = useTransition();
@@ -85,6 +90,7 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
         <p className="leading-7 text-slate-700">{t("there_are_no_right_or_wrong_answers")}</p>
         <p className="rounded-2xl bg-violet-50/60 p-4 font-medium leading-7 text-slate-900" data-workstyle-instruction>{WORKSTYLE_PRETEST_V5.instruction?.[locale === "en" ? "en" : "de"]}</p>
         <p className="leading-7 text-slate-700">{t("each_response_is_saved_straight_away_you")}</p>
+        <p className="rounded-2xl bg-emerald-50 p-4 leading-7 text-slate-900 min-[700px]:hidden" data-workstyle-phone-preview>{t("phone_preview_note")}</p>
       </div>
       <div className="space-y-3 rounded-2xl bg-violet-50/60 p-5">
         <p className="font-semibold text-slate-900">{t("your_workstyle_profile_is_based_on")} {items.length} {t("situations")}</p>
@@ -109,14 +115,7 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
         </li>)}
       </ul>
       <p className="mt-4 text-sm leading-6 text-slate-600">{t("interim_note", { total: items.length })}</p>
-      {!reminderAsked ? <div className="mt-6 rounded-2xl border-2 border-violet-600 bg-white p-5" data-workstyle-reminder>
-        <p className="text-lg font-semibold text-slate-950">{t("interim_reminder_title")}</p>
-        <p className="mt-1 leading-7 text-slate-700">{t("interim_reminder_text")}</p>
-        <div className="mt-4 grid gap-3 sm:grid-cols-2">
-          <button className={button} disabled={pending} onClick={() => run(async () => { await answerReminderAction(true); setReminderAsked(true); setInterim(false); })}>{t("interim_reminder_yes")}</button>
-          <button className={secondary} disabled={pending} onClick={() => run(async () => { await answerReminderAction(false); setReminderAsked(true); setInterim(false); })}>{t("interim_reminder_no")}</button>
-        </div>
-      </div> : <button className={`${button} mt-6`} onClick={() => setInterim(false)}>{t("interim_continue")}</button>}
+      <button className={`${button} mt-6`} onClick={() => setInterim(false)}>{t("interim_continue")}</button>
     </div>}
 
     {open > 0 && !interim && <>
@@ -135,14 +134,30 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
           const saved = { ...s, submitted_at: result.submitted_at,
             answers: [...s.answers.filter(answer => answer.item_key !== result.answer.item_key), result.answer] };
           setSession(saved);
-          if (!interimSeen && saved.answers.length >= INTERIM_AFTER && !saved.submitted_at) { setInterim(true); setInterimSeen(true); }
+          if (!interimSeen && saved.answers.length >= INTERIM_AFTER && !saved.submitted_at) {
+            setInterimSeen(true);
+            if (window.matchMedia("(max-width: 699px)").matches) setInterim(true);
+          }
           // Naechste offene Frage nach der aktuellen, sonst die erste offene.
           const next = items.findIndex((candidate, index) => index > position && !answered(saved, candidate));
           setPosition(next !== -1 ? next : firstOpen(saved));
         })} />
       <p className="mt-6 text-center text-sm text-slate-600">
-        {t("each_response_is_saved_m074")} <Link href="/dashboard" className="font-medium text-slate-900 underline">{t("continue_later_m075")}</Link>
+        {t("each_response_is_saved_m074")}{" "}
+        {reminderAsked
+          ? <Link href="/dashboard" className="font-medium text-slate-900 underline">{t("continue_later_m075")}</Link>
+          : <button type="button" className="min-h-11 font-medium text-slate-900 underline" aria-expanded={pauseOpen} onClick={() => setPauseOpen(true)}>{t("continue_later_m075")}</button>}
       </p>
+      {pauseOpen && !reminderAsked && <div className="mt-4 rounded-2xl border-2 border-violet-600 bg-white p-5" data-workstyle-reminder>
+        <p className="text-lg font-semibold text-slate-950">{t("pause_title")}</p>
+        <p className="mt-1 leading-7 text-slate-700">{t("pause_text")}</p>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {/* Beide Wege gehen zum Dashboard; nur ein Ja erlaubt Mails. Nichts ist vorbelegt. */}
+          <button className={button} disabled={pending} onClick={() => run(async () => { await answerReminderAction(true); setReminderAsked(true); router.push("/dashboard"); })}>{t("pause_yes")}</button>
+          <button className={secondary} disabled={pending} onClick={() => run(async () => { await answerReminderAction(false); setReminderAsked(true); router.push("/dashboard"); })}>{t("pause_no")}</button>
+        </div>
+        <button type="button" className="mt-3 min-h-11 text-sm font-medium text-slate-700 underline" onClick={() => setPauseOpen(false)}>{t("pause_back")}</button>
+      </div>}
     </>}
 
     {open === 0 && profileDone && <>
@@ -164,7 +179,7 @@ export function WorkstyleV5Flow({ initialSession, context = null, previousVersio
             <div className="mt-3 flex flex-wrap gap-3">
               <button className={secondary} disabled={pending} onClick={() => run(async () => {
                 const result = await startWorkstyleV5(true); if (!result.ok) return setError(serverError(result.error));
-                setSession(result.session); setPosition(0); setConfirmRetake(false); setStarted(true);
+                setSession(result.session); setPosition(0); setConfirmRetake(false); setStarted(true); setInterimSeen(true);
               })}>{t("start_again")}</button>
               <button className={secondary} onClick={() => setConfirmRetake(false)}>{t("cancel_m097")}</button>
             </div>
