@@ -1,11 +1,18 @@
-import { AreasExplainer } from "@/features/onboarding/AreasExplainer";
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
-import { HomepageNav } from "@/components/marketing/HomepageNav";
-import styles from "@/components/marketing/homepage.module.css";
-import { getHomepageContent } from "@/data/homepage";
 import { BrandLogo } from "@/components/brand/BrandLogo";
-import { getBetaAccessRequestHref } from "@/features/auth/betaAccess";
+import { FaqAccordion } from "@/components/marketing/FaqAccordion";
+import { FloatingStart } from "@/components/marketing/FloatingStart";
+import { HomepageNav } from "@/components/marketing/HomepageNav";
+import { LandingEffects } from "@/components/marketing/LandingEffects";
+import { AdvisorWindow, AlignWindow, ConnectWindow, FindWindow, LandingIcon } from "@/components/marketing/LandingWindows";
+import { SetupTopics } from "@/components/marketing/SetupTopics";
+import { StarJourney } from "@/components/marketing/StarJourney";
+import styles from "@/components/marketing/homepage.module.css";
+import land from "@/components/marketing/landing.module.css";
+import { getHomepageContent } from "@/data/homepage";
+import { BETA_ACCESS_REQUEST_EMAIL, getBetaAccessRequestHref } from "@/features/auth/betaAccess";
 import { BRAND_NAME } from "@/features/brand";
 import { InstalledAppEntry } from "@/features/navigation/InstalledAppEntry";
 import { getRequestLocale } from "@/i18n/getLocale";
@@ -22,144 +29,190 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
-const AREA_ICONS: Record<string, React.ReactNode> = {
-  align: <><circle cx="12" cy="8" r="3.6" /><path d="M5 20c.8-3.8 3.6-5.8 7-5.8s6.2 2 7 5.8" /></>,
-  find: <><circle cx="11" cy="11" r="6.5" /><path d="M16 16l4.5 4.5" /></>,
-  connect: <><circle cx="6" cy="12" r="2.4" /><circle cx="18" cy="6" r="2.4" /><circle cx="18" cy="18" r="2.4" /><path d="M8.2 11l7.6-3.8M8.2 13l7.6 3.8" /></>,
-};
-const END_CARD_CLASS = ["endViolet", "endTeal", "endAmber"] as const;
-const AREA_TILE_CLASS = { align: "tileViolet", find: "tileTeal", connect: "tileBlue" } as const;
-
-function Arrow() {
-  return <svg className={styles.arrow} viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>;
-}
-
+/**
+ * Startseite fuer Besucher ohne Konto. Reihenfolge (mit Maria abgestimmt am 24.11.2026): Scrollreise,
+ * Bruecke, "Wo stehst du gerade?", Find und Align, Founder Setup, Marias Wort, Netzwerk, Ergebnisse,
+ * Fragen, Schluss. Alle Knoepfe gehen nach /start (Konto, Zugangscode) oder zum Kasten "Zugang zur
+ * Beta"; jeder Abschnitt, der etwas will, hat denselben Knopf mit demselben Text.
+ */
 export default async function Page() {
-  const content = getHomepageContent(await getRequestLocale());
+  const c = getHomepageContent(await getRequestLocale());
+  const o = c.overview;
+  const primary = `${land.btn} ${land.btnLg} ${land.btnPrimary}`;
   return (
     <div className={styles.page}>
       <InstalledAppEntry />
-      <a className={styles.skipLink} href="#inhalt">{content.skip}</a>
+      <a className={styles.skipLink} href="#inhalt">{c.skip}</a>
       <HomepageNav />
       <main id="inhalt" tabIndex={-1}>
-        <section className={`${styles.container} ${styles.heroWrap}`} aria-labelledby="hero-title">
-          <div className={styles.hero}>
-            <div className={`${styles.blob} ${styles.blobOne}`} aria-hidden="true" />
-            <div className={`${styles.blob} ${styles.blobTwo}`} aria-hidden="true" />
-            <div className={`${styles.blob} ${styles.blobThree}`} aria-hidden="true" />
-            <div className={styles.heroCopy}>
-              <p className={`${styles.rise} ${styles.d1} ${styles.kicker}`}>{content.kicker}</p>
-              <h1 id="hero-title" className={`${styles.rise} ${styles.d2}`}>
-                {content.headline[0]}<span className={styles.grad}>{content.headline[1]}</span><br />{content.headline[2]}
-              </h1>
-              <p className={`${styles.rise} ${styles.d3} ${styles.lead}`}>{content.lead}</p>
-              <div className={`${styles.rise} ${styles.d4} ${styles.heroActions}`}>
-                <Link href="/start" className={styles.ctaButton}>{content.start}<Arrow /></Link>
-                <Link href="/login" className={styles.loginButton}>{content.login}</Link>
-              </div>
-              <p className={`${styles.rise} ${styles.d4} ${styles.fine}`}>
-                {content.fineStart}<br />{content.fineBeta}{" "}
-                <a href={getBetaAccessRequestHref()}>{content.fineRequest}</a>
-              </p>
+        <div className={land.land}>
+          <div id="so" className={land.anchor}>
+            <StarJourney content={c.journey} startLabel={c.start} accessLabel={c.accessRequest} />
+          </div>
+          <div className={land.fade} aria-hidden="true" />
+
+          {/* Bruecke */}
+          <section className={`${land.wrap} ${land.section} ${land.bridge}`} aria-labelledby="why-title">
+            <div>
+              <p className={land.label} data-rv>{c.bridge.label}</p>
+              <h2 id="why-title" data-rv>
+                <span className={`${land.mk} ${land.mkT}`}>{c.bridge.lines[0]}</span><br />
+                <span className={`${land.mk} ${land.mkA}`}>{c.bridge.lines[1]}</span>
+              </h2>
             </div>
-            <div className={styles.deck} role="img" aria-label={content.deckLabel}>
-              {content.deck.map((card, index) => (
-                <div key={card.kind} className={`${styles.card} ${styles[`card${index}` as "card0"]} ${styles[`tone_${card.tone}` as "tone_blue"]}`}>
-                  <span className={styles.cardKind}><i />{card.kind}</span>
-                  <p>{card.text}</p>
+            <div className={land.bridgeText}>
+              {c.bridge.paragraphs.map((text) => <p key={text} data-rv>{text}</p>)}
+              <div className={land.ctaRow} data-rv><Link href="/start" className={primary}>{c.start}</Link></div>
+            </div>
+          </section>
+
+          {/* Tueren */}
+          <section className={`${land.wrap} ${land.section}`} aria-labelledby="doors-title">
+            <h2 id="doors-title" className={land.doorsTitle} data-rv>{c.doors.title}</h2>
+            <div className={land.doorGrid}>
+              {c.doors.items.map((door) => (
+                <Link key={door.title} href={door.href} className={land.door} data-rv>
+                  <LandingIcon kind={door.icon} />
+                  <span className={land.doorKicker}>{door.kicker}</span>
+                  <b>{door.title}</b>
+                  <span className={land.doorText}>{door.text}</span>
+                  <span className={land.doorGo}>{door.cta}</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          {/* Find und Align */}
+          <section id="bereiche" className={`${land.wrap} ${land.section} ${land.anchor}`} aria-labelledby="overview-title">
+            <div className={land.overHead}>
+              <p className={land.label} data-rv>{o.label}</p>
+              <h2 id="overview-title" data-rv>{o.title}</h2>
+              <p className={land.sub} data-rv>{o.sub}</p>
+            </div>
+            <div className={land.chap}>
+              <div className={land.copy}>
+                <p className={land.label} data-rv><i />{o.find.label}</p>
+                <h3 data-rv>{o.find.title}</h3>
+                <p data-rv>{o.find.text}</p>
+                <ul className={land.checks}>{o.find.bullets.map((b) => <li key={b} data-rv>{b}</li>)}</ul>
+              </div>
+              <div className={`${land.panel} ${land.panelFind} ${land.starry}`} data-rv="scale">
+                <span className={land.ex}>{c.example}</span>
+                <FindWindow c={o.find} />
+              </div>
+            </div>
+            <div className={`${land.chap} ${land.chapAlign} ${land.chapFlip}`}>
+              <div className={land.copy}>
+                <p className={land.label} data-rv><i />{o.align.label}</p>
+                <h3 data-rv>{o.align.title}</h3>
+                <p data-rv>{o.align.text}</p>
+                <ul className={land.checks}>{o.align.bullets.map((b) => <li key={b} data-rv>{b}</li>)}</ul>
+              </div>
+              <div className={`${land.panel} ${land.panelAlign}`} data-rv="scale">
+                <span className={land.ex}>{c.example}</span>
+                <AlignWindow c={o.align} />
+              </div>
+            </div>
+          </section>
+
+          {/* Founder Setup */}
+          <section className={`${land.wrap} ${land.section}`} aria-labelledby="setup-title">
+            <div className={land.setupBox}>
+              <div data-rv>
+                <p className={land.label}>{c.setup.label}</p>
+                <h2 id="setup-title">{c.setup.title}</h2>
+                <p className={land.setupIntro}>{c.setup.intro}</p>
+              </div>
+              <div data-rv><SetupTopics topics={c.setup.topics} note={c.setup.note} more={c.setup.more} /></div>
+            </div>
+          </section>
+
+          {/* Marias Wort */}
+          <section className={`${land.wrap} ${land.section}`} aria-labelledby="founder-title">
+            <div className={land.founderBox}>
+              <div className={land.photo} data-rv>
+                <Image src="/brand/maria.jpg" alt={c.founder.photoAlt} width={720} height={720} sizes="(min-width: 900px) 420px, 90vw" />
+              </div>
+              <div className={land.founderText}>
+                <p className={land.label} data-rv>{c.founder.label}</p>
+                <h2 id="founder-title" data-rv>{c.founder.title}</h2>
+                {c.founder.paragraphs.map((text) => <p key={text} data-rv>{text}</p>)}
+                <p className={land.sig} data-rv>{c.founder.sig}</p>
+              </div>
+            </div>
+          </section>
+
+          {/* Netzwerk */}
+          <section id="netzwerk" className={`${land.wrap} ${land.section} ${land.anchor}`} aria-labelledby="net-title">
+            <div className={land.netHead}>
+              <p className={land.label} data-rv>{c.net.label}</p>
+              <h2 id="net-title" data-rv>{c.net.title}</h2>
+              <p className={land.sub} data-rv>{c.net.sub}</p>
+            </div>
+            <div className={land.duo}>
+              <article className={`${land.big} ${land.bigConnect} ${land.starry}`} data-rv="scale">
+                <p className={land.label}>{c.net.connect.label}</p>
+                <h3>{c.net.connect.title}</h3>
+                <p>{c.net.connect.text}</p>
+                <ul className={land.checks}>{c.net.connect.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+                <ConnectWindow c={c.net.connect} />
+                <Link href={c.net.connect.moreHref} className={land.more}>{c.net.connect.more}</Link>
+              </article>
+              <article className={`${land.big} ${land.bigAdvisor} ${land.starry}`} data-rv="scale">
+                <p className={land.label}>{c.net.advisor.label}</p>
+                <h3>{c.net.advisor.title}</h3>
+                <p>{c.net.advisor.text}</p>
+                <ul className={land.checks}>{c.net.advisor.bullets.map((b) => <li key={b}>{b}</li>)}</ul>
+                <AdvisorWindow c={c.net.advisor} />
+                <Link href={c.net.advisor.moreHref} className={land.more}>{c.net.advisor.more}</Link>
+              </article>
+            </div>
+          </section>
+
+          {/* Ergebnisse */}
+          <section className={`${land.wrap} ${land.section} ${land.out}`} aria-labelledby="outcomes-title">
+            <h2 id="outcomes-title" data-rv>{c.outcomes.title}</h2>
+            <div className={land.outGrid}>
+              {c.outcomes.items.map((item) => (
+                <div key={item.title} className={land.outItem} data-rv>
+                  <LandingIcon kind={item.icon} />
+                  <h3>{item.title}</h3>
+                  <p>{item.text}</p>
                 </div>
               ))}
             </div>
-          </div>
-        </section>
+            <div className={land.ctaRow} data-rv><Link href="/start" className={primary}>{c.start}</Link></div>
+          </section>
 
-        <section className={`${styles.container} ${styles.why}`} aria-labelledby="why-title">
-          <div>
-            <p className={styles.label}>{content.whyLabel}</p>
-            <h2 id="why-title" className={styles.whyTitle}>
-              <span className={styles.markTeal}>{content.whyTitle[0]}</span><br />
-              <span className={styles.markAmber}>{content.whyTitle[1]}</span>
-            </h2>
-          </div>
-          <div className={styles.whyText}>{content.whyText.map((text) => <p key={text}>{text}</p>)}</div>
-        </section>
+          {/* Haeufige Fragen */}
+          <section className={`${land.wrap} ${land.section} ${land.faq}`} aria-labelledby="faq-title">
+            <h2 id="faq-title" data-rv>{c.faq.title}</h2>
+            <div data-rv><FaqAccordion items={c.faq.items} /></div>
+          </section>
 
-        <section id="so" className={`${styles.container} ${styles.block}`} aria-labelledby="example-title">
-          <h2 id="example-title" className={styles.h2}>{content.exampleTitle}</h2>
-          <p className={styles.muted}>{content.exampleLead}</p>
-          <div className={styles.example}>
-            <span className={styles.exampleTag}>{content.exampleTag}</span>
-            <div className={styles.exampleHead}>
-              <span className={styles.avatars} aria-hidden="true"><span className={styles.avA}>{content.exampleNames[0][0]}</span><span className={styles.avB}>{content.exampleNames[1][0]}</span></span>
-              <b>{content.exampleNames[0]} · {content.exampleNames[1]}</b>
-            </div>
-            {content.exampleRows.map((row) => (
-              <div key={row.label} className={styles.exampleRow}>
-                <b>{row.label}</b>
-                {row.both ? (
-                  <div className={styles.exampleBoth}><span className={styles.tagBlue}>{row.bothTag}</span><p>{row.both}</p></div>
-                ) : (
-                  <>
-                    <div><span className={styles.tagViolet}>{content.exampleNames[0]}</span><p>{row.a}</p></div>
-                    <div><span className={styles.tagTeal}>{content.exampleNames[1]}</span><p>{row.b}</p></div>
-                  </>
-                )}
+          {/* Schluss und Zugang */}
+          <section className={`${land.wrap} ${land.closeSec}`} aria-labelledby="closing-title">
+            <div id="landing-close" className={land.closeBox}>
+              <h2 id="closing-title">{c.closing.title[0]}<span>{c.closing.title[1]}</span></h2>
+              <div className={land.ctaRow}>
+                <Link href="/start" className={primary}>{c.start}</Link>
+                <Link href="/login" className={`${land.btn} ${land.btnLg} ${land.btnQuiet}`}>{c.login}</Link>
               </div>
-            ))}
-            <div className={styles.exampleQuestion}>
-              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5h14v10H10l-5 4V5zM9 9h6M9 12h4" /></svg>
-              <div><b>{content.exampleQuestionTitle}</b><p>{content.exampleQuestion}</p></div>
+              <div id="zugang" className={`${land.access} ${land.anchor}`}>
+                <b>{c.closing.accessTitle}</b>
+                <p>{c.closing.accessText} <span className={land.mail}>{BETA_ACCESS_REQUEST_EMAIL}</span></p>
+                <a href={getBetaAccessRequestHref()} className={`${land.btn} ${land.btnGhost} ${land.accessLink}`}>{c.closing.accessCta}</a>
+              </div>
             </div>
-          </div>
-        </section>
-
-        <section className={`${styles.container} ${styles.block}`} aria-labelledby="end-title">
-          <h2 id="end-title" className={styles.h2}>{content.endTitle}</h2>
-          <ol className={styles.endGrid}>
-            {content.end.map((item, index) => (
-              <li key={item.title} className={`${styles.endCard} ${styles[END_CARD_CLASS[index]]}`}>
-                <span className={styles.endNumber} aria-hidden="true">{index + 1}</span>
-                <h3>{item.title}</h3>
-                <p>{item.text}</p>
-              </li>
-            ))}
-          </ol>
-        </section>
-
-        <section id="bereiche" className={`${styles.container} ${styles.block}`} aria-labelledby="areas-title">
-          <h2 id="areas-title" className={styles.h2Small}>{content.areasTitle}</h2>
-          <p className={styles.muted}>{content.areasLead}</p>
-          {/* Die kleine Erklärung der vier Bereiche, 16 Sekunden, still (Entwurf 15.11.2026): weiter unten, nicht im ersten Blick. */}
-          <div data-home-areas-explainer style={{ maxWidth: 440, margin: "20px 0 8px" }}><AreasExplainer /></div>
-          <div className={styles.areaGrid}>
-            {content.areas.map((area) => (
-              <article key={area.id} id={area.id} className={styles.area}>
-                <span className={`${styles.tile} ${styles[AREA_TILE_CLASS[area.id as keyof typeof AREA_TILE_CLASS]]}`}>
-                  <svg viewBox="0 0 24 24" aria-hidden="true">{AREA_ICONS[area.id]}</svg>
-                </span>
-                <h3>{area.label}</h3>
-                <p>{area.text}</p>
-              </article>
-            ))}
-          </div>
-          <p className={styles.advisor}>{content.advisorLine} <Link href="/start">{content.advisorLink}</Link></p>
-        </section>
-
-        <section className={`${styles.container} ${styles.bandWrap}`} aria-labelledby="band-title">
-          <div className={styles.band}>
-            <div className={`${styles.blob} ${styles.blobBand}`} aria-hidden="true" />
-            <h2 id="band-title">{content.bandTitle[0]}<br />{content.bandTitle[1]}</h2>
-            <div className={styles.heroActions}>
-              <Link href="/start" className={styles.ctaButton}>{content.start}<Arrow /></Link>
-              <Link href="/login" className={styles.loginButton}>{content.login}</Link>
-            </div>
-          </div>
-        </section>
+          </section>
+        </div>
       </main>
       <footer className={`${styles.container} ${styles.footer}`}>
-        <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{content.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
-        <nav aria-label={content.legal}><Link href="/impressum">{content.legal}</Link><Link href="/datenschutz">{content.privacy}</Link><Link href="/informierte-entscheidungen">{content.stance}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{content.phone}</a></nav>
+        <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{c.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
+        <nav aria-label={c.legal}><Link href="/impressum">{c.legal}</Link><Link href="/datenschutz">{c.privacy}</Link><Link href="/informierte-entscheidungen">{c.stance}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{c.phone}</a></nav>
       </footer>
+      <LandingEffects />
+      <FloatingStart label={c.start} endId="landing-close" />
     </div>
   );
 }

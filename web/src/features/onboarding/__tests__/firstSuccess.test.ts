@@ -41,10 +41,15 @@ test("German and English have the same keys for both previews", () => {
   }
 });
 
-test("the public home page carries the small areas explainer further down, inside the areas section", () => {
+test("the small areas explainer stays in the app; the public home page explains the areas with its own scroll journey", () => {
+  // Bis 24.11.2026 stand die kleine Erklaerung der Bereiche auf der Startseite (Entwurf 15.11.2026). Die neue
+  // Startseite erklaert Find, Align, Founder Setup, Connect und Begleitung selbst (Scrollreise, Entwurf mit
+  // Maria vom 24.11.2026); die Erklaerung bleibt dort, wo Menschen schon angemeldet sind.
   const page = read("src/app/(marketing)/page.tsx");
-  assert.match(page, /<section id="bereiche"[\s\S]*data-home-areas-explainer[\s\S]*<AreasExplainer \/>[\s\S]*areaGrid/);
-  assert.ok(page.indexOf("heroWrap") < page.indexOf("<AreasExplainer"), "not in the first view");
+  assert.doesNotMatch(page, /AreasExplainer/);
+  assert.match(page, /<StarJourney/);
+  assert.match(read("src/app/hallo/page.tsx"), /AreasExplainer/);
+  assert.match(read("src/features/profile/journey/ProfileJourney.tsx"), /AreasExplainer/);
 });
 
 test("the profile setup ends with an optional photo step, only when there is no photo yet, and Connect no longer shows a second upload form", () => {

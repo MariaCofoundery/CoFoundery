@@ -1,60 +1,138 @@
 import assert from "node:assert/strict";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import test from "node:test";
-import { getHomepageContent } from "@/data/homepage";
+import { getHomepageContent, HOMEPAGE_ALLOWED_CLAIMS } from "@/data/homepage";
 
 const page = readFileSync("src/app/(marketing)/page.tsx", "utf8");
 const nav = readFileSync("src/components/marketing/HomepageNav.tsx", "utf8");
+const journey = readFileSync("src/components/marketing/StarJourney.tsx", "utf8");
+const effects = readFileSync("src/components/marketing/LandingEffects.tsx", "utf8");
+const topics = readFileSync("src/components/marketing/SetupTopics.tsx", "utf8");
+const faq = readFileSync("src/components/marketing/FaqAccordion.tsx", "utf8");
+const floating = readFileSync("src/components/marketing/FloatingStart.tsx", "utf8");
+const css = readFileSync("src/components/marketing/landing.module.css", "utf8");
 
-function allText(locale: string) {
+type Locale = "de" | "en";
+const LOCALES: Locale[] = ["de", "en"];
+
+function allText(locale: Locale) {
   return JSON.stringify(getHomepageContent(locale));
 }
+/** Der gesamte Text, ohne die wenigen Saetze, in denen Scores oder der Preis ausdruecklich genannt werden duerfen. */
+function textWithoutAllowedClaims(locale: Locale) {
+  return HOMEPAGE_ALLOWED_CLAIMS[locale].reduce((text, claim) => text.split(JSON.stringify(claim).slice(1, -1)).join(""), allText(locale));
+}
 
-test("de and en carry the same structure", () => {
-  const shape = (value: unknown): unknown =>
-    Array.isArray(value) ? value.map(shape) : value && typeof value === "object" ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, shape(v)])) : typeof value;
-  const keys = (locale: string) => JSON.stringify(shape(getHomepageContent(locale)), (_k, v) => v);
-  // Optional example fields (a/b vs both) differ per row, so compare the top-level keys and list lengths.
-  const de = getHomepageContent("de");
-  const en = getHomepageContent("en");
-  assert.deepEqual(Object.keys(de), Object.keys(en));
-  for (const key of Object.keys(de) as (keyof typeof de)[]) {
-    if (Array.isArray(de[key])) assert.equal((en[key] as unknown[]).length, (de[key] as unknown[]).length, String(key));
-  }
-  assert.ok(keys("de") && keys("en"));
+function shape(value: unknown): unknown {
+  if (Array.isArray(value)) return value.map(shape);
+  if (value && typeof value === "object") return Object.fromEntries(Object.entries(value).map(([key, inner]) => [key, shape(inner)]));
+  return typeof value;
+}
+
+test("de and en carry exactly the same structure, down to the list lengths", () => {
+  assert.deepEqual(shape(getHomepageContent("de")), shape(getHomepageContent("en")));
 });
 
-test("the homepage names no score, ranking or compatibility verdict", () => {
-  for (const locale of ["de", "en"]) {
-    assert.doesNotMatch(allText(locale), /kompatibel|compatib|score|punkte|prozent|percent|ranking|rangliste|passt zu|traffic light|ampel/i, locale);
+test("the homepage names no score, ranking or compatibility verdict, except where it denies them", () => {
+  for (const locale of LOCALES) {
+    assert.doesNotMatch(textWithoutAllowedClaims(locale), /kompatibel|compatib|score|punkte|prozent|percent|ranking|rangliste|rangfolge|passt zu|traffic light|ampel/i, locale);
+  }
+});
+
+test("the few sentences that mention a score or the price are exactly the allowed ones, and say no", () => {
+  for (const locale of LOCALES) {
+    const [noScore, findNote, price] = HOMEPAGE_ALLOWED_CLAIMS[locale];
+    for (const claim of HOMEPAGE_ALLOWED_CLAIMS[locale]) assert.ok(allText(locale).includes(JSON.stringify(claim).slice(1, -1)), `${locale}: ${claim} is on the page`);
+    assert.match(noScore, locale === "de" ? /^Nein\./ : /^No\./);
+    assert.match(findNote, locale === "de" ? /keine Rangfolge .* keinen Score/ : /no ranking .* no score/);
+    // "Im Moment kostenlos" ist eine Angabe von Maria, bewusst befristet formuliert.
+    assert.match(price, locale === "de" ? /^Im Moment ist .* kostenlos\.$/ : /^Right now, .* is free\.$/);
   }
 });
 
 test("the homepage makes no unproven promises or numbers", () => {
-  for (const locale of ["de", "en"]) {
-    assert.doesNotMatch(allText(locale), /kostenlos|free of charge|gratis|\d+\s*%|garantiert|guarantee/i, locale);
+  for (const locale of LOCALES) {
+    assert.doesNotMatch(textWithoutAllowedClaims(locale), /kostenlos|free of charge|gratis|\d+\s*%|garantiert|guarantee|bleibt kostenlos|always free/i, locale);
   }
 });
 
-test("the example result says its names are made up", () => {
-  assert.match(getHomepageContent("de").exampleTag, /erfunden/);
-  assert.match(getHomepageContent("en").exampleTag, /made-up/);
+test("every example says it uses made-up data", () => {
+  assert.match(getHomepageContent("de").example, /erfunden/);
+  assert.match(getHomepageContent("en").example, /made-up/);
+  assert.equal((page.match(/\{c\.example\}/g) ?? []).length >= 2, true);
 });
 
-test("no invented voices: the testimonial block stays out until real quotes exist", () => {
+test("no invented voices: Maria's own word is her statement, the testimonial block stays out", () => {
   assert.doesNotMatch(page, /Was andere sagen|Platzhalter|testimonial/i);
+  assert.ok(existsSync("public/brand/maria.jpg"));
+  assert.match(page, /src="\/brand\/maria\.jpg"/);
 });
 
 test("every call to action leads into the sign-in, and the closed beta stays visible", () => {
   assert.equal((page.match(/href="\/start"/g) ?? []).length >= 3, true);
   assert.match(page, /href="\/login"/);
   assert.match(page, /getBetaAccessRequestHref\(\)/);
+  assert.match(page, /id="zugang"/);
   assert.match(nav, /href="\/start"/);
   assert.match(nav, /href="\/login"/);
+  assert.match(journey, /href="\/start"/);
+  assert.match(journey, /href="#zugang"/);
+  assert.match(floating, /href="\/start"/);
 });
 
-test("sections keep their order: hero, why, example, end result, areas, band", () => {
-  const order = ["hero-title", "why-title", "example-title", "end-title", "areas-title", "band-title"].map((id) => page.indexOf(`"${id}"`));
-  assert.ok(order.every((index) => index > 0));
+test("anchors that links point to exist", () => {
+  assert.match(nav, /\/#so/);
+  assert.match(nav, /\/#bereiche/);
+  assert.match(page, /id="so"/);
+  assert.match(page, /id="bereiche"/);
+  for (const door of getHomepageContent("de").doors.items) {
+    if (door.href.startsWith("#")) assert.match(page, new RegExp(`id="${door.href.slice(1)}"`), door.href);
+  }
+});
+
+test("sections keep their order: journey, why, doors, overview, setup, founder, network, outcomes, faq, closing", () => {
+  const ids = ["so", "why-title", "doors-title", "overview-title", "setup-title", "founder-title", "net-title", "outcomes-title", "faq-title", "closing-title"];
+  const order = ids.map((id) => page.indexOf(`"${id}"`));
+  assert.ok(order.every((index) => index > 0), "every section id is on the page");
   assert.deepEqual([...order].sort((a, b) => a - b), order);
+});
+
+test("the journey has one chapter per area and a way to jump to each", () => {
+  for (const locale of LOCALES) {
+    const j = getHomepageContent(locale).journey;
+    assert.equal(j.chapters.length, 5);
+    assert.equal(j.dots.length, 6);
+    assert.equal(j.headline.length, 2);
+  }
+});
+
+test("less motion: nothing moves in time, text only fades, and the page stays complete", () => {
+  assert.match(journey, /prefers-reduced-motion: reduce/);
+  assert.match(effects, /prefers-reduced-motion: reduce/);
+  assert.match(topics, /prefers-reduced-motion: reduce/);
+  assert.match(css, /@media \(prefers-reduced-motion: reduce\)/);
+});
+
+test("the journey only runs while it is in view and cleans up after itself", () => {
+  assert.match(journey, /IntersectionObserver/);
+  assert.match(journey, /cancelAnimationFrame/);
+  assert.match(journey, /removeEventListener\("scroll"/);
+});
+
+test("the questions open one at a time, with proper button semantics", () => {
+  assert.match(faq, /useState<number \| null>/);
+  assert.match(faq, /aria-expanded=\{isOpen\}/);
+  assert.match(faq, /aria-controls/);
+  assert.match(faq, /role="region"/);
+});
+
+test("the topic list stops changing by itself once someone touches it", () => {
+  assert.match(topics, /manual\.current = true/);
+  assert.match(topics, /if \(manual\.current\)/);
+});
+
+test("scroll effects never hide what is visible on load and never touch client components' classes", () => {
+  assert.match(effects, /getBoundingClientRect\(\)\.top >= vh \* 0\.9/);
+  assert.doesNotMatch(page, /<FaqAccordion[^>]*data-rv/);
+  assert.doesNotMatch(page, /<SetupTopics[^>]*data-rv/);
 });
