@@ -10,7 +10,7 @@ export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const origin = getPublicAppOrigin();
   const client = await createClient();
   const { data, error } = await client.rpc("list_public_network_sitemap");
-  const staticPages: MetadataRoute.Sitemap = ["", "/fuer-advisor", "/impressum", "/datenschutz", "/informierte-entscheidungen"].map((path) => ({
+  const staticPages: MetadataRoute.Sitemap = ["", "/fuer-advisor", "/netzwerk", "/impressum", "/datenschutz", "/informierte-entscheidungen"].map((path) => ({
     url: `${origin}${path}`,
     changeFrequency: path ? "yearly" : "weekly",
     priority: path ? 0.3 : 1,

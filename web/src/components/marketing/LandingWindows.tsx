@@ -1,4 +1,5 @@
 import type { getAdvisorPageContent } from "@/data/advisorPage";
+import type { getNetworkPageContent } from "@/data/networkPage";
 import type { getHomepageContent } from "@/data/homepage";
 import styles from "./landing.module.css";
 
@@ -165,6 +166,41 @@ export function ProgramWindow({ c }: { c: AdvisorContent["program"] }) {
             </div>
           ))}
         </div>
+      </div>
+    </div>
+  );
+}
+
+type NetworkContent = ReturnType<typeof getNetworkPageContent>["features"];
+
+/** Formular "Etwas einstellen": Art waehlen, Beschreibung, Veroeffentlichen (erfundene Eingabe). */
+export function ComposeWindow({ c }: { c: NetworkContent["post"] }) {
+  return (
+    <div className={styles.win} role="img" aria-label={c.windowLabel} data-par>
+      <div className={styles.winBar}><span>{c.bar} › <b>{c.barPage}</b></span><span className={styles.lg}>DE&nbsp;&nbsp;EN</span></div>
+      <div className={styles.winBody} aria-hidden="true">
+        <div className={styles.tabs}>{c.kinds.map((k, i) => <span key={k} className={i === 2 ? styles.tabOn : undefined}>{k}</span>)}</div>
+        <p className={styles.shareTitle}>{c.question}</p>
+        <p className={styles.shareSub}>{c.hint}</p>
+        <div className={styles.field}>{c.sample}</div>
+        <div className={styles.formRow}><span className={`${styles.btnMini}`}>{c.publish}</span></div>
+      </div>
+    </div>
+  );
+}
+
+/** Benachrichtigungsregel "Sag uns, was du suchst": zwei Felder und der Hinweis zur Mail (erfundene Eingabe). */
+export function AlertWindow({ c }: { c: NetworkContent["alert"] }) {
+  return (
+    <div className={styles.win} role="img" aria-label={c.windowLabel} data-par>
+      <div className={styles.winBar}><span>{c.bar} › <b>{c.barPage}</b></span><span className={styles.lg}>DE&nbsp;&nbsp;EN</span></div>
+      <div className={styles.winBody} aria-hidden="true">
+        <p className={styles.fieldLabel}>{c.question}</p>
+        <div className={styles.field}>{c.sample}</div>
+        <p className={styles.fieldLabel}>{c.placeLabel}</p>
+        <div className={styles.field}>{c.place}</div>
+        <div className={styles.formRow}><span className={styles.btnMini}>{c.save}</span></div>
+        <p className={styles.winNote}>{c.note}</p>
       </div>
     </div>
   );

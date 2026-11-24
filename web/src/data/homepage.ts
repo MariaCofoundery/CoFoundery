@@ -163,7 +163,7 @@ const de = {
       title: "Du siehst ein Problem? Mach es sichtbar.",
       text: "Jemand anderes findet vielleicht die Lösung. Und wenn du etwas kannst oder anzubieten hast, zeig es.",
       bullets: ["Menschen, Teams und Projekte finden", "Kontakte knüpfen, helfen, danken", "Chancen und Herausforderungen teilen"],
-      more: "Mehr zu Connect →", moreHref: "/connect",
+      more: "Mehr zu Connect →", moreHref: "/netzwerk",
       windowLabel: "Beispiel der Seite Connect mit erfundenen Einträgen",
       bar: "Connect", barPage: "Entdecken", view: "Ansehen →",
       rows: [
@@ -223,7 +223,7 @@ const de = {
   },
 
   // Fuss und Metadaten
-  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung", forAdvisors: "Für Advisor", phone: "Aufs Handy (PDF)",
+  footer: "Menschen, Fähigkeiten und Vorhaben zusammenbringen.", legal: "Impressum", privacy: "Datenschutz", stance: "Unsere Haltung", forAdvisors: "Für Advisor", network: "Netzwerk", phone: "Aufs Handy (PDF)",
   seoTitle: "Made2Found – Erst reden. Dann gründen.",
   seoDescription: "Finde raus, wie du arbeitest, seht, wo ihr verschieden tickt, und haltet Rollen, Zeit, Geld und Entscheidungen fest. Made2Found für Mitgründer:innen, in der geschlossenen Beta.",
 };
@@ -350,7 +350,7 @@ const en: typeof de = {
       title: "See a problem? Make it visible.",
       text: "Someone else may find the solution. And if you can do something or have something to offer, show it.",
       bullets: ["Find people, teams and projects", "Make contacts, help, say thanks", "Share opportunities and challenges"],
-      more: "More about Connect →", moreHref: "/connect",
+      more: "More about Connect →", moreHref: "/netzwerk",
       windowLabel: "Example of the Connect page with made-up entries",
       bar: "Connect", barPage: "Discover", view: "View →",
       rows: [
@@ -406,7 +406,7 @@ const en: typeof de = {
     accessCta: "Request access by email",
   },
 
-  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach", forAdvisors: "For advisors", phone: "On your phone (PDF)",
+  footer: "Bringing people, skills and ventures together.", legal: "Legal notice", privacy: "Privacy policy", stance: "Our approach", forAdvisors: "For advisors", network: "Network", phone: "On your phone (PDF)",
   seoTitle: "Made2Found – Talk first. Then found.",
   seoDescription: "Find out how you work, see where you tick differently, and put roles, time, money and decisions in writing. Made2Found for co-founders, in closed beta.",
 };

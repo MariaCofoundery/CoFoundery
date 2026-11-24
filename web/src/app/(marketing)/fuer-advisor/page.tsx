@@ -160,7 +160,7 @@ export default async function AdvisorPage() {
       </main>
       <footer className={`${styles.container} ${styles.footer}`}>
         <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{home.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
-        <nav aria-label={home.legal}><Link href="/impressum">{home.legal}</Link><Link href="/datenschutz">{home.privacy}</Link><Link href="/informierte-entscheidungen">{home.stance}</Link><Link href="/fuer-advisor">{home.forAdvisors}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{home.phone}</a></nav>
+        <nav aria-label={home.legal}><Link href="/impressum">{home.legal}</Link><Link href="/datenschutz">{home.privacy}</Link><Link href="/informierte-entscheidungen">{home.stance}</Link><Link href="/netzwerk">{home.network}</Link><Link href="/fuer-advisor">{home.forAdvisors}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{home.phone}</a></nav>
       </footer>
       <LandingEffects />
       <FloatingStart label={home.start} endId="landing-close" />

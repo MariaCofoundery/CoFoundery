@@ -209,7 +209,7 @@ export default async function Page() {
       </main>
       <footer className={`${styles.container} ${styles.footer}`}>
         <div><Link href="/" className={styles.footerBrand}><BrandLogo className={styles.footerLogo} claim claimClassName={styles.footerClaimText} sizes="208px" /></Link><p>{c.footer}</p><span>© 2026 {BRAND_NAME}</span></div>
-        <nav aria-label={c.legal}><Link href="/impressum">{c.legal}</Link><Link href="/datenschutz">{c.privacy}</Link><Link href="/informierte-entscheidungen">{c.stance}</Link><Link href="/fuer-advisor">{c.forAdvisors}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{c.phone}</a></nav>
+        <nav aria-label={c.legal}><Link href="/impressum">{c.legal}</Link><Link href="/datenschutz">{c.privacy}</Link><Link href="/informierte-entscheidungen">{c.stance}</Link><Link href="/netzwerk">{c.network}</Link><Link href="/fuer-advisor">{c.forAdvisors}</Link><a href="/made2found-aufs-handy.pdf" target="_blank" rel="noopener">{c.phone}</a></nav>
       </footer>
       <LandingEffects />
       <FloatingStart label={c.start} endId="landing-close" />
