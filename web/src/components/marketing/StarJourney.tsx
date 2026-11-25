@@ -317,14 +317,12 @@ export function StarJourney({ content, startLabel, accessLabel }: { content: Jou
         <div className={styles.txts}>
           {chapters.map((c, i) => <div key={c.ghost} className={styles.ghost} data-ghost={i + 1} aria-hidden="true">{c.ghost}</div>)}
           <article className={`${styles.txt} ${styles.txtFirst}`} data-txt="0">
-            <p className={styles.label}>{content.label}</p>
             <h1><span data-w>{content.headline[0]}</span><span className={styles.two} data-w>{content.headline[1]}</span></h1>
             <p>{content.sub}</p>
             <div className={styles.ctaRow}>
               <Link href="/start" className={`${styles.btn} ${styles.btnLg} ${styles.btnPrimary}`}>{startLabel}</Link>
               <a href="#zugang" className={`${styles.btn} ${styles.btnLg} ${styles.btnGhost}`}>{accessLabel}</a>
             </div>
-            <p className={styles.fine}>{content.fine}</p>
             <span className={styles.hint}>{content.scroll} <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
           </article>
           {chapters.map((c, i) => (

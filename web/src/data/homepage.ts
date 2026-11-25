@@ -43,11 +43,8 @@ const de = {
   // Scrollreise
   journey: {
     ariaLabel: "Worum es bei Made2Found geht",
-    label: "Made2Found",
     headline: ["Erst reden.", "Dann gründen."],
     sub: "Finden. Verstehen. Festhalten. Die Plattform für alle, die gemeinsam gründen.",
-    // "nur du" mit geschuetztem Leerzeichen: das "du" soll nie allein in einer neuen Zeile stehen.
-    fine: "Dauert ein paar Minuten. Deine Antworten siehst erst einmal nur\u00a0du.",
     scroll: "Weiter scrollen",
     dotsLabel: "Kapitel",
     dots: ["Start", "Find", "Align", "Founder Setup", "Connect", "Advisor"],
@@ -237,10 +234,8 @@ const en: typeof de = {
 
   journey: {
     ariaLabel: "What Made2Found is about",
-    label: "Made2Found",
     headline: ["Talk first.", "Then found."],
     sub: "Find. Understand. Put it in writing. The platform for everyone who founds together.",
-    fine: "Takes a few minutes. For now, only you see your answers.",
     scroll: "Keep scrolling",
     dotsLabel: "Chapters",
     dots: ["Start", "Find", "Align", "Founder Setup", "Connect", "Advisor"],

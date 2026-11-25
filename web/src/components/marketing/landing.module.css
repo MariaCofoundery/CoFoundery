@@ -54,7 +54,6 @@
 .txt .ctaRow { margin-top: 30px; pointer-events: auto; }
 .txt .ctaRow .btnPrimary { background: #fff; color: var(--night); }
 .txt .ctaRow .btnPrimary:hover { background: #e6e0ff; }
-.txt .fine { margin-top: 14px; font-size: 14px; color: var(--night-soft); text-wrap: pretty; max-width: 38em; }
 .hint { margin-top: 32px; display: inline-flex; align-items: center; gap: 10px; font-family: var(--display); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--night-soft); }
 .hint svg { width: 16px; height: 16px; fill: none; stroke: currentColor; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; animation: nudge 2.4s cubic-bezier(.22, 1, .36, 1) infinite; }
 @keyframes nudge { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(4px); } }

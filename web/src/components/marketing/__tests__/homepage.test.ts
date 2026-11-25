@@ -140,11 +140,17 @@ test("scroll effects never hide what is visible on load and never touch client c
   assert.doesNotMatch(page, /<SetupTopics[^>]*data-rv/);
 });
 
-test("the first-screen reassurance line is grammatical and keeps its last word together", () => {
-  // Fehler vom 24.11.2026: "Deine Antworten sieht erst einmal nur du" (es muss "siehst" heissen), und das "du" stand allein in der naechsten Zeile.
-  const de = getHomepageContent("de").journey.fine;
-  assert.match(de, /Deine Antworten siehst erst einmal nur\u00a0du\.$/);
-  assert.doesNotMatch(allText("de"), /Antworten sieht/);
+test("the first screen is light: the headline, one sentence, two buttons - no label above the headline and no reassurance line (Maria, 25.11.2026)", () => {
+  // Rueckmeldung zur Startseite: zu viel "typisches KI-Design". Darum stehen "Made2Found" ueber der Ueberschrift und
+  // "Dauert ein paar Minuten ..." unter den Knoepfen nicht mehr da; die Aussage zum Datenschutz steht in den Fragen.
+  for (const locale of LOCALES) {
+    const content = getHomepageContent(locale).journey as Record<string, unknown>;
+    assert.equal("label" in content, false, `${locale}: no label above the headline`);
+    assert.equal("fine" in content, false, `${locale}: no reassurance line`);
+  }
+  assert.doesNotMatch(journey, /content\.label|content\.fine/);
+  assert.doesNotMatch(allText("de"), /Dauert ein paar Minuten\. Deine Antworten/);
+  assert.match(allText("de"), /Erst einmal nur du\./, "the privacy statement is still in the questions");
 });
 
 test("the bridge heading is two short lines that never wrap (24.11.2026: 'Herausforderndes angehen.')", () => {
