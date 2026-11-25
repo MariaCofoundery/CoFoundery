@@ -163,6 +163,7 @@ test("Das alte Gespräch (Fassung 2) gibt es nicht mehr: ein offenes wird beim S
   assert.match(page, /activeState\.guideVersion >= 3/);
   assert.doesNotMatch(page, /autosaveStrengthsAnswerAction|saveStrengthsAnswerAction|skipStrengthsQuestionAction|completeStrengthsInterviewAction/);
   const start = code("src/features/strengths/strengthsDiscoverActions.ts");
-  assert.match(start, /if \(open\) await complete\(client, open\.sessionId\)/);
+  // Nur beenden, nicht weiterleiten: `complete` schickt zu den Ergebnissen und liess das neue Gespraech nie entstehen (25.11.2026).
+  assert.match(start, /if \(open && !\(await closeSession\(client, open\.sessionId\)\)\) back\("start"\)/);
   assert.doesNotMatch(code("src/features/strengths/strengthsInterviewActions.ts"), /startStrengthsInterviewAction|saveStrengthsAnswerAction/);
 });

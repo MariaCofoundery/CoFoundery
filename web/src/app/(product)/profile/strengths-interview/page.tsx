@@ -102,7 +102,7 @@ export default async function StrengthsInterviewPage({
           href="/me/profile"
           className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline"
         >
-          ← {t("backToStrengths")}
+          ← {t("backToMe")}
         </Link>
         <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
           <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
@@ -132,10 +132,9 @@ export default async function StrengthsInterviewPage({
                 />
               </form>
             </>
-          ) : (
-            /* Ohne erreichbare Auswertung kein Knopf, der dann nichts tut. */
-            <p className="mt-3 max-w-2xl text-sm leading-7 text-slate-700">{t("done.unavailable")}</p>
-          )}
+          ) : /* Ohne erreichbare Auswertung steht hier nichts: kein Knopf, der dann nichts tut, und auch kein Hinweis
+               darauf (Maria, 25.11.2026: Die Auswertung soll nur erscheinen, wenn sie läuft). Die Antworten bleiben
+               gespeichert und sind unten zum Nachlesen da. */ null}
         </section>
 
         {completed.job === "open" ? <ProposalWatcher>{null}</ProposalWatcher> : null}
@@ -190,7 +189,7 @@ export default async function StrengthsInterviewPage({
           href="/me/profile"
           className="inline-flex min-h-11 items-center text-sm font-medium text-slate-600 underline-offset-4 hover:underline focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-violet-500"
         >
-          ← {t("backToStrengths")}
+          ← {t("backToMe")}
         </Link>
         {state ? (
           <ol aria-label={t("discover.pick.round")} className="m-0 ml-auto flex list-none gap-1 rounded-full bg-[#efedf7] p-1">

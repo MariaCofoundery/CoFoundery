@@ -62,15 +62,25 @@ async function activeV3(client: Client) {
   return state && state.guideVersion >= DISCOVER_GUIDE_VERSION ? state : null;
 }
 
-async function complete(client: Client, sessionId: string): Promise<never> {
+/**
+ * Beendet ein Gespräch, OHNE die Person irgendwohin zu schicken. Das ist die Hälfte von `complete`, die auch
+ * gebraucht wird, wenn danach etwas anderes geschehen soll (ein neues Gespräch beginnen).
+ */
+async function closeSession(client: Client, sessionId: string): Promise<boolean> {
   const { error } = await client
     .from("capability_interview_sessions")
     .update({ status: "completed", completed_at: new Date().toISOString() })
     .eq("id", sessionId)
     .eq("kind", STRENGTHS_INTERVIEW);
-  if (error) back("complete");
+  if (error) return false;
   revalidatePath("/profile");
   revalidatePath("/align");
+  return true;
+}
+
+/** Ein Gespräch abschließen und die Person zu den Ergebnissen schicken. Kehrt nie zurück. */
+async function complete(client: Client, sessionId: string): Promise<never> {
+  if (!(await closeSession(client, sessionId))) back("complete");
   return onward("completed");
 }
 
@@ -80,7 +90,12 @@ export async function startDiscoverAction(formData: FormData) {
   const open = await getActiveStrengthsInterview(client);
   if (open && open.guideVersion >= DISCOVER_GUIDE_VERSION) onward();
   // Ein offenes Gespraech der frueheren Fassung wird beendet (seine Antworten bleiben), damit ein neues beginnen kann.
-  if (open) await complete(client, open.sessionId);
+  //
+  // FEHLER VOM 25.11.2026: Hier stand `await complete(...)`, und `complete` leitet zu den Ergebnissen weiter. Die
+  // Weiterleitung beendet die Handlung - das neue Gespraech wurde nie angelegt, und wer nach dem Intro auf "Weiter"
+  // tippte, landete auf der Ergebnisseite ("Auswertung") statt bei den Szenen. Erst beim zweiten "Weiter" ging es.
+  // Darum wird hier nur beendet (`closeSession`), ohne Weiterleitung.
+  if (open && !(await closeSession(client, open.sessionId))) back("start");
 
   let notes: string[] = [];
   try {
