@@ -326,8 +326,7 @@ export function StarJourney({ content, startLabel, accessLabel }: { content: Jou
             <span className={styles.hint}>{content.scroll} <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6" /></svg></span>
           </article>
           {chapters.map((c, i) => (
-            <article key={c.label} className={`${styles.txt} ${TEXT_RIGHT[i + 1] ? styles.txtRight : ""}`} data-txt={i + 1}>
-              <p className={styles.label}>{c.label}</p>
+            <article key={c.label} aria-label={c.label} className={`${styles.txt} ${TEXT_RIGHT[i + 1] ? styles.txtRight : ""}`} data-txt={i + 1}>
               <h2>{c.title.split(" ").map((w, j) => <span key={j} className={styles.word} data-w>{w}</span>)}</h2>
               <p>{c.text}</p>
             </article>

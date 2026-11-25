@@ -64,12 +64,16 @@
   .txtFirst { width: auto; }
 }
 .dots { position: absolute; right: max(12px, env(safe-area-inset-right, 0px)); top: 50%; transform: translateY(-50%); display: grid; gap: 4px; z-index: 3; }
-.dot { display: flex; align-items: center; justify-content: flex-end; gap: 10px; background: none; border: 0; color: var(--night-soft); cursor: pointer; padding: 8px 4px; min-height: 28px; font-family: var(--display); font-size: 10px; letter-spacing: .1em; text-transform: uppercase; }
+.dot { display: flex; align-items: center; justify-content: flex-end; gap: 12px; background: none; border: 0; color: var(--night-soft); cursor: pointer; padding: 9px 4px; min-height: 34px; font-family: var(--display); font-size: 14px; letter-spacing: .08em; text-transform: uppercase; }
 .dot span { opacity: 0; transform: translateX(6px); transition: opacity .3s, transform .4s cubic-bezier(.22, 1, .36, 1); display: none; }
-.dot i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid var(--night-soft); transition: background .3s, border-color .3s, transform .3s; }
+.dot i { width: 11px; height: 11px; border-radius: 50%; border: 1.5px solid var(--night-soft); transition: background .3s, border-color .3s, transform .3s; }
 .dot[aria-current="true"] i { background: var(--lilac); border-color: var(--lilac); transform: scale(1.2); }
 .dot[aria-current="true"] span, .dot:hover span { opacity: 1; transform: none; }
 @media (min-width: 900px) { .dot span { display: inline; } }
+/* Breit genug: alle Kapitel stehen in der Leiste, das aktuelle hell - sie ersetzt die kleine Überschrift über dem Text. */
+@media (min-width: 1180px) { .dot span { opacity: .55; transform: none; } .dot[aria-current="true"] span { opacity: 1; color: #fff; } }
+/* Rechts stehender Text rückt aus der breiteren Leiste heraus. */
+@media (min-width: 1180px) { .txtRight { right: max(200px, 14vw); } }
 .stick :focus-visible { outline-color: #fff; }
 .fade { height: 180px; background: linear-gradient(#4a2a7a, #f5f6fb); }
 
