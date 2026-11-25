@@ -755,5 +755,36 @@
       "rewriteLabel": "Deine Formulierung",
       "remove": "Entfernen"
     }
+  },
+  "shortProfile": {
+    "back": "Zurück zu Ich",
+    "title": "Ich in Kürze",
+    "intro": "Eine kurze Karte aus deinem Stärkenbild: ein Satz, bis zu fünf Stärken, wenn du willst, was du suchst und bietest. Sie ist nur für das Netzwerk von Made2Found gedacht, nicht für die Öffentlichkeit.",
+    "saved": "Gespeichert.",
+    "saveError": "Das Kurzprofil konnte nicht gespeichert werden. Bitte versuch es noch einmal.",
+    "noStrengths": "Du hast noch keine Stärke übernommen. Das Kurzprofil entsteht aus deinen übernommenen Stärken.",
+    "toStrengths": "Stärken entdecken",
+    "taglineLabel": "Dein Satz",
+    "taglinePlaceholder": "z. B. Ich bringe Dinge ins Rollen und halte sie zusammen.",
+    "strengthsLegend": "Bis zu fünf Stärken",
+    "strengthsHint": "Sie stehen gleichwertig nebeneinander, ohne Rangfolge. Zu jeder kannst du ein eigenes Zitat ergänzen.",
+    "quoteLabel": "Dein Zitat dazu, freiwillig",
+    "seeksLabel": "Ich suche, freiwillig",
+    "offersLabel": "Ich biete, freiwillig",
+    "shareTitle": "Im Made2Found-Netzwerk zeigen",
+    "shareEffect": "Aktive Mitglieder des Netzwerks sehen diese Karte auf deinem Netzwerkprofil.",
+    "shareOff": "Aus: nur du siehst sie. Das ist unabhängig von Team-, Advisor- und FIND-Freigaben. Es gibt keinen Link nach draußen und kein Bild zum Herunterladen.",
+    "needsNetworkProfile": "Die Karte ist erst sichtbar, wenn dein Netzwerkprofil aktiv ist.",
+    "toNetworkProfile": "Netzwerkprofil öffnen",
+    "save": "Speichern",
+    "savePending": "Wird gespeichert …",
+    "previewTitle": "So sieht die Karte aus",
+    "previewShared": "Sie ist im Netzwerk sichtbar.",
+    "previewPrivate": "Im Moment siehst nur du sie.",
+    "cardLabel": "Ich in Kürze",
+    "cardFor": "{name} in Kürze",
+    "seeks": "Ich suche",
+    "offers": "Ich biete",
+    "openLink": "Ich in Kürze ansehen"
   }
 }

@@ -63,6 +63,7 @@ export default async function StrengthsInterviewPage({
   if (!user) redirect("/login?next=/profile/strengths-interview");
 
   const client = await createClient();
+  const tShort = await getTranslations("strengths.shortProfile");
   const [t, tProfile, activeState, completed, aiAvailable, strengths, marks] = await Promise.all([
     getTranslations("strengths"),
     getTranslations("capability"),
@@ -142,6 +143,13 @@ export default async function StrengthsInterviewPage({
 
         {/* Vorschläge, bestätigte Stärken (bewerten, entfernen) - alles an einer Stelle. */}
         <StrengthsSection strengths={strengths} proposals={proposals} />
+        {strengths.length > 0 ? (
+          <p className="mt-6">
+            <Link href="/profile/kurzprofil" className="inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white">
+              {tShort("openLink")}
+            </Link>
+          </p>
+        ) : null}
         <SectionMarkToggle
           section="staerken"
           marked={marks.has("staerken")}

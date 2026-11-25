@@ -755,5 +755,36 @@
       "rewriteLabel": "Your wording",
       "remove": "Remove"
     }
+  },
+  "shortProfile": {
+    "back": "Back to Me",
+    "title": "Me in brief",
+    "intro": "A short card from your strengths picture: one sentence, up to five strengths and, if you like, what you seek and offer. It is meant only for the Made2Found network, not for the public.",
+    "saved": "Saved.",
+    "saveError": "The short profile could not be saved. Please try again.",
+    "noStrengths": "You have not taken a strength yet. The short profile is built from the strengths you have taken.",
+    "toStrengths": "Discover strengths",
+    "taglineLabel": "Your sentence",
+    "taglinePlaceholder": "e.g. I get things moving and hold them together.",
+    "strengthsLegend": "Up to five strengths",
+    "strengthsHint": "They stand side by side, without ranking. You can add your own quote to each.",
+    "quoteLabel": "Your quote for it, optional",
+    "seeksLabel": "I seek, optional",
+    "offersLabel": "I offer, optional",
+    "shareTitle": "Show in the Made2Found network",
+    "shareEffect": "Active members of the network see this card on your network profile.",
+    "shareOff": "Off: only you see it. This is independent of team, advisor and FIND shares. There is no link to the outside and no image to download.",
+    "needsNetworkProfile": "The card is only visible once your network profile is active.",
+    "toNetworkProfile": "Open network profile",
+    "save": "Save",
+    "savePending": "Saving …",
+    "previewTitle": "This is how the card looks",
+    "previewShared": "It is visible in the network.",
+    "previewPrivate": "Right now only you can see it.",
+    "cardLabel": "Me in brief",
+    "cardFor": "{name} in brief",
+    "seeks": "I seek",
+    "offers": "I offer",
+    "openLink": "View me in brief"
   }
 }

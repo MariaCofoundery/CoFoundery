@@ -16,6 +16,8 @@ import { getConnectVentures, ventureLogoUrl } from "@/features/connect/connectVe
 import { HeartBadge, ProfileThanksList, ThanksHeart } from "@/features/connect/thanks/ThanksBits";
 import { hasHeart, listProfileThanks } from "@/features/connect/thanks/thanksData";
 import { UserText } from "@/features/ui/UserText";
+import { ShortProfileCard } from "@/features/strengths/ShortProfileCard";
+import { getShortProfile } from "@/features/strengths/shortProfileData";
 
 /**
  * Die Profilseite eines Mitglieds.
@@ -57,6 +59,8 @@ export default async function ConnectPersonPage({
   const isOwn = person.user_id === user.id;
   const thankedNow = (await searchParams).thanked === "1";
   const [heart, profileThanks] = await Promise.all([hasHeart(client, userId), listProfileThanks(client, userId)]);
+  // Das Kurzprofil gibt die Zeilensicherheit nur heraus, wenn die Person das Teilen im Netzwerk eingeschaltet hat (oder es die eigene Karte ist).
+  const shortProfile = await getShortProfile(client, userId);
   const [ventures, listings, problems, connectValues] = await Promise.all([
     getConnectVentures(client, userId),
     getActiveConnectListingsByOwner(client, userId),
@@ -135,6 +139,12 @@ export default async function ConnectPersonPage({
         <section className={`${card} mt-6`}>
           <p className="whitespace-pre-line text-base leading-[1.65] text-[#0b1f3a]"><UserText text={person.bio} /></p>
         </section>
+      ) : null}
+
+      {shortProfile && (shortProfile.tagline || shortProfile.strengths.length > 0 || shortProfile.seeks || shortProfile.offers) ? (
+        <div className="mt-4">
+          <ShortProfileCard profile={shortProfile} name={person.display_name} />
+        </div>
       ) : null}
 
       <ProfileThanksList items={profileThanks} t={t} label={t("thanks.profileTitle")} />
