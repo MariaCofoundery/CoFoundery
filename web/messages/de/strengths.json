@@ -715,12 +715,12 @@
       "text": "Links deine Szenen, jeweils mit dem Satz, in dem du beschreibst, was du getan hast. Nach der letzten Runde kannst du dir Hinweise auf Stärken herausarbeiten lassen. Du entscheidest bei jedem Vorschlag selbst: passt zu mir, passt nicht, oder anders sagen.",
       "scenesLabel": "Deine Szenen",
       "skipped": "übersprungen",
-      "nextEyebrow": "Noch eine Runde, etwa 8 Minuten",
-      "nextTitle": "Energie und Blick von außen",
-      "nextText": "Drei kurze Fragen zu Energie und Dank von anderen, danach drei Gegenfragen. Die Gegenfragen werden nicht ausgewertet.",
-      "continue": "Weiter mit Runde 3",
+      "nextEyebrow": "Optional · Vertiefen",
+      "nextTitle": "Mehr Substanz, wenn du magst",
+      "nextText": "Drei Fragen zu Energie und Dank von anderen, danach drei Gegenfragen. Die Gegenfragen werden nicht ausgewertet. Danach kannst du dir Hinweise auf weitere Stärken vorschlagen lassen, wenn die Auswertung gerade erreichbar ist.",
+      "continue": "Vertiefen",
       "continuePending": "Wird vorbereitet …",
-      "finishNow": "Jetzt abschließen",
+      "finishNow": "Fertig",
       "later": "Später weitermachen",
       "saved": "Dein Stand bleibt gespeichert."
     },
@@ -732,6 +732,28 @@
       "counterNote": "Diese Frage wird nicht ausgewertet.",
       "skip": "Diese Frage überspringen",
       "notesHint": "Vielleicht fällt dir dazu etwas ein. Du musst es nicht verwenden."
+    },
+    "themes": {
+      "title": "Welche Themen zeigen sich hier?",
+      "text": "Wähle bis zu {max}, die zu dem passen, was du getan hast. Vier liegen nahe, alle anderen findest du unter „Alle Themen“. Auch keines ist in Ordnung.",
+      "showAll": "Alle Themen ansehen",
+      "hideAll": "Alle Themen ausblenden",
+      "back": "Zurück zum Text",
+      "chosen": "{count} von {max} gewählt",
+      "nextScene": "Nächste Szene",
+      "toResult": "Mein Stärkenbild ansehen"
+    },
+    "result": {
+      "eyebrow": "Dein Stärkenbild",
+      "title": "Das hast du in deinen Szenen gezeigt",
+      "text": "Das sind die Themen, die du selbst gewählt hast, gruppiert nach vier Bereichen. Sie stehen gleichwertig nebeneinander: keine Rangfolge, keine Zahl, kein Typ. Ins Profil kommt ein Thema erst, wenn du es übernimmst.",
+      "empty": "Du hast kein Thema gewählt. Das ist in Ordnung. Du kannst unten abschließen oder mit weiteren Fragen vertiefen.",
+      "inYourWords": "In deinen Worten",
+      "take": "Übernehmen",
+      "taken": "Übernommen",
+      "rewrite": "Umschreiben",
+      "rewriteLabel": "Deine Formulierung",
+      "remove": "Entfernen"
     }
   }
 }

@@ -715,12 +715,12 @@
       "text": "On the left your scenes, each with the sentence in which you describe what you did. After the last round you can have hints about strengths worked out. You decide on every suggestion yourself: fits me, does not fit, or say it differently.",
       "scenesLabel": "Your scenes",
       "skipped": "skipped",
-      "nextEyebrow": "One more round, about 8 minutes",
-      "nextTitle": "Energy and an outside view",
-      "nextText": "Three short questions about energy and thanks from others, then three counter-questions. The counter-questions are not analyzed.",
-      "continue": "On to round 3",
+      "nextEyebrow": "Optional · Go deeper",
+      "nextTitle": "More substance, if you like",
+      "nextText": "Three questions about energy and thanks from others, then three counter-questions. The counter-questions are not analyzed. Afterwards you can have further strengths suggested, if the analysis is reachable right now.",
+      "continue": "Go deeper",
       "continuePending": "Getting ready …",
-      "finishNow": "Finish now",
+      "finishNow": "Done",
       "later": "Continue later",
       "saved": "Your progress stays saved."
     },
@@ -732,6 +732,28 @@
       "counterNote": "This question is not analyzed.",
       "skip": "Skip this question",
       "notesHint": "Maybe something comes to mind. You do not have to use it."
+    },
+    "themes": {
+      "title": "Which themes show up here?",
+      "text": "Pick up to {max} that fit what you did. Four are close at hand, all others are under “All themes”. Picking none is fine too.",
+      "showAll": "See all themes",
+      "hideAll": "Hide all themes",
+      "back": "Back to the text",
+      "chosen": "{count} of {max} picked",
+      "nextScene": "Next scene",
+      "toResult": "See my strengths picture"
+    },
+    "result": {
+      "eyebrow": "Your strengths picture",
+      "title": "What you showed in your scenes",
+      "text": "These are the themes you picked yourself, grouped into four areas. They stand side by side: no ranking, no number, no type. A theme only goes into your profile once you take it.",
+      "empty": "You did not pick a theme. That is fine. You can finish below or go deeper with more questions.",
+      "inYourWords": "In your words",
+      "take": "Take it",
+      "taken": "Taken",
+      "rewrite": "Rewrite",
+      "rewriteLabel": "Your wording",
+      "remove": "Remove"
     }
   }
 }

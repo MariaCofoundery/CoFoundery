@@ -11,6 +11,7 @@ import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
 import { IntroNotesStrip } from "@/features/strengths/IntroNotesStrip";
 import { SceneCards } from "@/features/strengths/SceneCards";
 import { SceneForm } from "@/features/strengths/SceneForm";
+import { SceneThemePicker } from "@/features/strengths/SceneThemePicker";
 import { StrengthsInterim } from "@/features/strengths/StrengthsInterim";
 import { StrengthsIntro } from "@/features/strengths/StrengthsIntro";
 import {
@@ -18,7 +19,7 @@ import {
   saveRoundThreeAnswerAction,
   skipRoundThreeAction,
 } from "@/features/strengths/strengthsDiscoverActions";
-import { canSkipScene, DISCOVER_MAX_LENGTH, DISCOVER_MIN_LENGTH, ROUND_THREE_IDS, isSceneId } from "@/features/strengths/strengthsDiscoverGuide";
+import { canSkipScene, sceneThemed, DISCOVER_MAX_LENGTH, DISCOVER_MIN_LENGTH, ROUND_THREE_IDS, isSceneId } from "@/features/strengths/strengthsDiscoverGuide";
 import "@/features/align/align.css";
 import { requestStrengthProposalsAction } from "@/features/strengths/strengthsInterviewActions";
 import {
@@ -222,6 +223,15 @@ export default async function StrengthsInterviewPage({
           <StrengthsIntro />
         ) : phase?.phase === "pick" ? (
           <SceneCards introNotes={state.introNotes} />
+        ) : phase?.phase === "scene" && currentTurn && currentTurn.answer !== null && isSceneId(currentTurn.questionId) ? (
+          <SceneThemePicker
+            key={currentTurn.id}
+            turnId={currentTurn.id}
+            sceneId={currentTurn.questionId}
+            index={sceneTurns.indexOf(currentTurn) + 1}
+            total={sceneTurns.length}
+            story={currentTurn.parts.story ?? currentTurn.answer}
+          />
         ) : phase?.phase === "scene" && currentTurn ? (
           <SceneForm
             key={currentTurn.id}
@@ -232,10 +242,10 @@ export default async function StrengthsInterviewPage({
             total={sceneTurns.length}
             savedText={currentTurn.parts.story ?? ""}
             introNotes={state.introNotes}
-            canSkip={canSkipScene(state.turns.map((entry) => ({ questionId: entry.questionId, answered: entry.answer !== null, skipped: entry.skipped })))}
+            canSkip={canSkipScene(state.turns.map((entry) => ({ questionId: entry.questionId, answered: entry.answer !== null, skipped: entry.skipped, themed: sceneThemed(entry) })))}
           />
         ) : phase?.phase === "interim" ? (
-          <StrengthsInterim turns={sceneTurns} />
+          <StrengthsInterim turns={sceneTurns} confirmedThemes={strengths.flatMap((entry) => (entry.theme ? [entry.theme] : []))} />
         ) : phase?.phase === "round3" && currentTurn ? (
           <section className="mx-auto max-w-3xl rounded-3xl border border-slate-200 bg-white p-5 sm:p-6">
             <p className="text-xs font-semibold uppercase tracking-[.14em] text-violet-700">

@@ -1,57 +1,69 @@
 import { getTranslations } from "next-intl/server";
 
 import type { StrengthsTurn } from "@/features/strengths/strengthsInterviewData";
-import { isSceneId, keySentence } from "@/features/strengths/strengthsDiscoverGuide";
+import { keySentence } from "@/features/strengths/strengthsDiscoverGuide";
+import { StrengthThemeCard } from "@/features/strengths/StrengthThemeCard";
+import { domainOfTheme, evidenceLevelFor, STRENGTH_DOMAINS, type StrengthThemeId } from "@/features/strengths/strengthThemes";
 import { finishWithoutRoundThreeAction, startRoundThreeAction } from "@/features/strengths/strengthsDiscoverActions";
 import { SubmitButton } from "@/features/ui/SubmitButton";
-import { UserText } from "@/features/ui/UserText";
 import Link from "next/link";
 import "@/features/align/align.css";
 
 /**
- * Der Zwischenstand nach Runde 2 (Entwurf vom 12.11.2026).
+ * „Dein Stärkenbild“ direkt nach den drei Szenen (25.11.2026).
  *
- * ER ZEIGT, WAS DIE PERSON SELBST ERZÄHLT HAT - nicht, was eine Auswertung daraus macht. Die
- * Vorschläge zu Stärken entstehen erst nach dem Abschluss und nur auf ausdrücklichen Wunsch
- * (`request_strength_proposals`); hier etwas als Befund zu zeigen, hieße, etwas zu behaupten, das
- * niemand geprüft hat. Jede Szene steht mit dem Satz da, in dem die Person beschreibt, was sie getan hat.
+ * ES ZEIGT NUR, WAS DIE PERSON SELBST GEWÄHLT HAT: die Themen, die sie nach jeder Szene angetippt hat, gruppiert nach den vier
+ * Bereichen. Wie gut ein Thema belegt ist, folgt aus der Zahl ihrer Szenen (eine / zwei / drei) und steht in drei Worten, nicht
+ * als Zahl. Jede Karte nennt die eigene Stelle als Beleg. Ins Profil kommt ein Thema erst, wenn die Person es übernimmt.
+ * Eine KI-Auswertung gibt es nur auf ausdrücklichen Wunsch nach dem Abschluss (`request_strength_proposals`).
  */
-export async function StrengthsInterim({ turns }: { turns: StrengthsTurn[] }) {
+export async function StrengthsInterim({ turns, confirmedThemes }: { turns: StrengthsTurn[]; confirmedThemes: string[] }) {
   const t = await getTranslations("strengths");
-  const scenes = turns.filter((turn) => isSceneId(turn.questionId));
+  const scenes = turns.filter((turn) => turn.answer !== null && turn.themes !== null);
+
+  const byTheme = new Map<StrengthThemeId, StrengthsTurn[]>();
+  for (const turn of scenes) {
+    for (const theme of turn.themes ?? []) byTheme.set(theme, [...(byTheme.get(theme) ?? []), turn]);
+  }
+  const groups = STRENGTH_DOMAINS.map((domain) => ({
+    domain,
+    items: [...byTheme.entries()].filter(([theme]) => domainOfTheme(theme) === domain),
+  })).filter((group) => group.items.length > 0);
 
   return (
     <section className="flex flex-col gap-7">
       <div className="sd-fade flex max-w-[820px] flex-col gap-2">
-        <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#5b36d4]">{t("discover.interim.eyebrow")}</p>
+        <p className="text-[13px] font-semibold uppercase tracking-[0.12em] text-[#5b36d4]">{t("discover.result.eyebrow")}</p>
         <h2 className="font-brand text-[clamp(34px,4vw,50px)] font-normal leading-[1.05] tracking-[-0.01em] text-[#14152b]">
-          {t("discover.interim.title")}
+          {t("discover.result.title")}
         </h2>
-        <p className="text-[17px] leading-relaxed text-[#4a4d68]">{t("discover.interim.text")}</p>
+        <p className="text-[17px] leading-relaxed text-[#4a4d68]">{t("discover.result.text")}</p>
+        <p className="text-sm text-[#4a4d68]">{t("levelNoteShort")}</p>
       </div>
 
-      <ol aria-label={t("discover.interim.scenesLabel")} className="m-0 grid list-none gap-3.5 p-0 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
-        {scenes.map((turn, index) => (
-          <li
-            key={turn.id}
-            className={`sd-slide-left flex flex-col gap-3 rounded-[18px] p-[18px] ${
-              turn.answer !== null ? "border border-[#e6e4f2] bg-white shadow-[0_12px_30px_-24px_rgba(46,30,120,0.5)]" : "border border-dashed border-[#c9c6dd]"
-            }`}
-            style={{ animationDelay: `${(0.1 + index * 0.1).toFixed(2)}s` }}
-          >
-            <div className="flex items-center gap-3">
-              <span className="flex size-7 flex-none items-center justify-center rounded-full bg-[#efeafd] text-[13px] font-semibold text-[#4b2bb8]">{index + 1}</span>
-              <span className="font-medium">{t(`interview.questions.${turn.questionId}.short`)}</span>
-              {turn.answer === null ? <span className="ml-auto text-xs text-[#4a4d68]">{t("discover.interim.skipped")}</span> : null}
+      {groups.length === 0 ? (
+        <p className="max-w-[640px] rounded-2xl bg-[#f4f1fe] p-5 text-[16px] text-[#2b2d47]">{t("discover.result.empty")}</p>
+      ) : (
+        groups.map(({ domain, items }) => (
+          <div key={domain} className="flex flex-col gap-3.5">
+            <div className="flex flex-col">
+              <h3 className="font-brand text-[28px] font-normal text-[#14152b]">{t(`themes.domains.${domain}.title`)}</h3>
+              <p className="text-sm text-[#4a4d68]">{t(`themes.domains.${domain}.text`)}</p>
             </div>
-            {turn.answer !== null ? (
-              <p className="font-brand text-base italic leading-snug text-[#2b2d47]">
-                »<UserText text={keySentence(turn)} />«
-              </p>
-            ) : null}
-          </li>
-        ))}
-      </ol>
+            <div className="grid gap-3.5 [grid-template-columns:repeat(auto-fit,minmax(300px,1fr))]">
+              {items.map(([theme, sources]) => (
+                <StrengthThemeCard
+                  key={theme}
+                  theme={theme}
+                  level={evidenceLevelFor(sources.length)}
+                  quote={keySentence({ parts: { action: sources[0]!.parts.story }, answer: sources[0]!.answer })}
+                  confirmed={confirmedThemes.includes(theme)}
+                />
+              ))}
+            </div>
+          </div>
+        ))
+      )}
 
       <div className="sd-fade flex flex-wrap items-center gap-8 rounded-3xl bg-[#14152b] p-7 text-white">
         <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-2.5">

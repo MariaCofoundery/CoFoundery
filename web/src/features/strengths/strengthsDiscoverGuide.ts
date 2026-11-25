@@ -21,6 +21,7 @@
  */
 
 import type { StrengthsQuestionKind } from "@/features/strengths/strengthsInterviewGuide";
+import { isStrengthTheme, type StrengthThemeId } from "@/features/strengths/strengthThemes";
 
 /** Die Fassung dieses Leitfadens. Fassung 2 ist das frühere Stärken-Interview. */
 export const DISCOVER_GUIDE_VERSION = 3;
@@ -41,6 +42,38 @@ export const FOLLOW_UP_BELOW = 60;
 /** Stichworte aus dem Intro: wie viele, wie lang. */
 export const INTRO_NOTES_MAX = 8;
 export const INTRO_NOTE_MAX_LENGTH = 60;
+
+/** Nach jeder Szene: höchstens zwei Themen, die zu dem passen, was die Person geschrieben hat (25.11.2026). */
+export const THEMES_PER_SCENE_MAX = 2;
+
+/**
+ * Vier Themen, die zu einer Szene naheliegen - nur ein Vorschlag zum Anklicken. Die Person kann jedes der 28 Themen
+ * wählen; nichts davon wird aus ihrem Text berechnet.
+ */
+export const SCENE_THEME_SUGGESTIONS = {
+  sc_unsure: ["keep_going", "experiment", "decide", "move_fast"],
+  sc_nobody: ["take_ownership", "kick_off", "build_structure", "keep_going"],
+  sc_fast_decision: ["decide", "move_fast", "spot_opportunities", "take_ownership"],
+  sc_stuck_problem: ["break_down", "spot_patterns", "generate_ideas", "keep_going"],
+  sc_from_zero: ["kick_off", "build_structure", "envision_future", "keep_going"],
+  sc_convinced: ["convince", "listen", "build_trust", "negotiate"],
+  sc_uncomfortable: ["speak_plainly", "resolve_conflict", "build_trust", "take_ownership"],
+  sc_helped_grow: ["develop_others", "empathize", "listen", "build_trust"],
+  sc_connected: ["connect", "build_cohesion", "empathize", "build_trust"],
+  sc_learned_fast: ["learn_fast", "thorough", "hold_focus", "experiment"],
+  sc_order: ["build_structure", "break_down", "thorough", "hold_focus"],
+  sc_asked_for: ["reliable", "listen", "develop_others", "spot_patterns"],
+} as const satisfies Record<string, readonly StrengthThemeId[]>;
+
+/** Gewählte Themen: nur bekannte, ohne Doppelte, höchstens zwei. */
+export function cleanSceneThemes(values: readonly unknown[]): StrengthThemeId[] {
+  const result: StrengthThemeId[] = [];
+  for (const value of values) {
+    if (isStrengthTheme(value) && !result.includes(value)) result.push(value);
+    if (result.length >= THEMES_PER_SCENE_MAX) break;
+  }
+  return result;
+}
 
 export const SCENE_IDS = [
   "sc_unsure",
@@ -176,7 +209,16 @@ export function appendNoteToText(current: string, note: string, maxLength: numbe
 // Wo steht die Person? Aus den Fragen des Gesprächs, nicht aus einem eigenen Zähler.
 // ---------------------------------------------------------------------------
 
-export type DiscoverTurn = { questionId: string; answered: boolean; skipped: boolean };
+/**
+ * `themed`: false = die Szene ist geschrieben, aber die Themen sind noch nicht gewählt. Fehlt die Angabe (frühere
+ * Gespräche, Runde 3), gilt die Szene als fertig, sobald sie beantwortet ist.
+ */
+export type DiscoverTurn = { questionId: string; answered: boolean; skipped: boolean; themed?: boolean };
+
+/** Ob zu einer Szene noch Themen zu wählen sind: nur bei dem einen Text der Fassung vom 25.11.2026. */
+export function sceneThemed(turn: { parts: SceneParts; themes: readonly unknown[] | null }) {
+  return turn.parts.story === undefined || turn.themes !== null;
+}
 
 export type DiscoverPhase =
   | { phase: "pick" }
@@ -185,7 +227,7 @@ export type DiscoverPhase =
   | { phase: "round3"; index: number }
   | { phase: "finish" };
 
-const resolved = (turn: DiscoverTurn) => turn.answered || turn.skipped;
+const resolved = (turn: DiscoverTurn) => turn.skipped || (turn.answered && turn.themed !== false);
 
 /**
  * `pick`     noch keine Szene gewählt.

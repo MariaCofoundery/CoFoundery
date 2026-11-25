@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { redirect } from "next/navigation";
 import { STRENGTHS_INTERVIEW } from "@/features/interviews/interviewKinds";
 import { createClient } from "@/lib/supabase/server";
@@ -13,11 +14,14 @@ import {
   DISCOVER_MAX_LENGTH,
   DISCOVER_MIN_LENGTH,
   isSceneWhen,
+  cleanSceneThemes,
   isValidSceneSelection,
+  sceneThemed,
   ROUND_THREE,
   STORY_MAX_LENGTH,
   type DiscoverTurn,
 } from "@/features/strengths/strengthsDiscoverGuide";
+import { evidenceLevelFor, isStrengthTheme } from "@/features/strengths/strengthThemes";
 import { getActiveStrengthsInterview, type StrengthsInterviewState } from "@/features/strengths/strengthsInterviewData";
 
 /**
@@ -56,7 +60,7 @@ async function requireUser() {
 type Client = Awaited<ReturnType<typeof createClient>>;
 
 const toDiscoverTurns = (state: StrengthsInterviewState): DiscoverTurn[] =>
-  state.turns.map((turn) => ({ questionId: turn.questionId, answered: turn.answer !== null, skipped: turn.skipped }));
+  state.turns.map((turn) => ({ questionId: turn.questionId, answered: turn.answer !== null, skipped: turn.skipped, themed: sceneThemed(turn) }));
 
 async function activeV3(client: Client) {
   const state = await getActiveStrengthsInterview(client);
@@ -309,4 +313,104 @@ export async function skipRoundThreeAction(formData: FormData) {
     .is("answer", null);
   if (error) back("save");
   return afterRoundThree(client, state.sessionId);
+}
+
+/**
+ * Nach dem Schreiben einer Szene: die Themen dazu festhalten (höchstens zwei, auch keines ist erlaubt). Sie stehen neben dem
+ * Text der Szene in `answer_parts`. Die Person wählt sie selbst; nichts wird aus ihrem Text berechnet.
+ */
+export async function saveSceneThemesAction(formData: FormData) {
+  const { client } = await requireUser();
+  const state = await activeV3(client);
+  if (!state) onward();
+  const turn = currentSceneTurn(state, String(formData.get("turnId") ?? ""));
+  if (!turn || turn.answer === null || turn.parts.story === undefined) onward();
+
+  const themes = cleanSceneThemes(formData.getAll("theme").map(String));
+  const { error } = await client
+    .from("capability_interview_turns")
+    .update({ answer_parts: { story: turn.parts.story, themes } })
+    .eq("id", turn.id)
+    .eq("kind", STRENGTHS_INTERVIEW);
+  if (error) back("save");
+  onward();
+}
+
+/** Zum Text der Szene zurück: die Themen werden wieder offen, der Text bleibt. */
+export async function reopenSceneAction(formData: FormData) {
+  const { client } = await requireUser();
+  const state = await activeV3(client);
+  if (!state) onward();
+  const turn = currentSceneTurn(state, String(formData.get("turnId") ?? ""));
+  if (!turn || turn.answer === null) onward();
+  const { error } = await client
+    .from("capability_interview_turns")
+    .update({ answer: null, answered_at: null, answer_parts: { story: turn.parts.story ?? "" } })
+    .eq("id", turn.id)
+    .eq("kind", STRENGTHS_INTERVIEW);
+  if (error) back("save");
+  onward();
+}
+
+/** Aus den Szenen eines laufenden Gesprächs: in wie vielen verschiedenen Szenen ein Thema gewählt wurde. */
+function scenesWithTheme(state: StrengthsInterviewState, theme: string) {
+  return state.turns.filter((turn) => turn.answer !== null && turn.themes?.some((value) => value === theme));
+}
+
+/**
+ * Ein Thema ins eigene Stärkenbild übernehmen - unverändert oder umgeschrieben. Wie belegt es ist, rechnet der Server aus
+ * den Szenen (nicht aus dem, was das Formular schickt): drei Szenen deutlich, zwei „zeigt sich“, eine Hinweis.
+ */
+export async function confirmThemeStrengthAction(formData: FormData) {
+  const { client, userId } = await requireUser();
+  const state = await activeV3(client);
+  if (!state || state.phase.phase !== "interim") onward();
+
+  const theme = String(formData.get("theme") ?? "");
+  if (!isStrengthTheme(theme)) onward();
+  const scenes = scenesWithTheme(state, theme);
+  if (scenes.length === 0) onward();
+
+  const t = await getTranslations("strengths");
+  const proposed = t(`themes.items.${theme}.shows`);
+  const typed = String(formData.get("statement") ?? "").replace(/\s+/g, " ").trim();
+  const statement = typed || proposed;
+  if (statement.length < 3 || statement.length > 200) back("short");
+  const label = t(`themes.items.${theme}.name`);
+
+  const { data: existing } = await client.from("person_strengths").select("id").eq("user_id", userId).eq("theme", theme).limit(1);
+  if (existing && existing.length > 0) onward();
+
+  const { error } = await client.from("person_strengths").insert({
+    user_id: userId,
+    statement,
+    label,
+    origin: statement === proposed ? "confirmed_proposal" : "edited_proposal",
+    theme,
+    evidence_level: evidenceLevelFor(scenes.length),
+    source_turn_id: scenes[0]!.id,
+  });
+  if (error) back("save");
+  revalidatePath("/profile");
+  revalidatePath("/me/profile");
+  onward();
+}
+
+/** Ein Thema aus dem Stärkenbild nehmen: es wird bei allen Szenen abgewählt. Ins Profil kommt nichts. */
+export async function dismissThemeAction(formData: FormData) {
+  const { client } = await requireUser();
+  const state = await activeV3(client);
+  if (!state || state.phase.phase !== "interim") onward();
+  const theme = String(formData.get("theme") ?? "");
+  if (!isStrengthTheme(theme)) onward();
+
+  for (const turn of scenesWithTheme(state, theme)) {
+    const { error } = await client
+      .from("capability_interview_turns")
+      .update({ answer_parts: { story: turn.parts.story ?? "", themes: (turn.themes ?? []).filter((value) => value !== theme) } })
+      .eq("id", turn.id)
+      .eq("kind", STRENGTHS_INTERVIEW);
+    if (error) back("save");
+  }
+  onward();
 }

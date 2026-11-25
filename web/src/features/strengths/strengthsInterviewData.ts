@@ -3,11 +3,14 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { STRENGTHS_INTERVIEW } from "@/features/interviews/interviewKinds";
 import {
+  cleanSceneThemes,
   discoverPhase,
+  sceneThemed,
   type DiscoverPhase,
   type SceneParts,
   type SceneWhen,
 } from "@/features/strengths/strengthsDiscoverGuide";
+import type { StrengthThemeId } from "@/features/strengths/strengthThemes";
 import {
   nextStrengthsQuestion,
   strengthsProgress,
@@ -31,6 +34,8 @@ export type StrengthsTurn = {
   answer: string | null;
   /** Fassung 3: die drei Teile einer Szene. */
   parts: SceneParts;
+  /** Die gewählten Themen der Szene; null = noch nicht gewählt. */
+  themes: StrengthThemeId[] | null;
   when: SceneWhen | null;
   /** Fassung 3: ausdrücklich übersprungen (`answer_parts = {"skipped": true}`). */
   skipped: boolean;
@@ -76,6 +81,7 @@ const toTurn = (row: TurnRow): StrengthsTurn => ({
   answer: row.answer,
   parts: partsOf(row.answer_parts),
   when: row.happened_when === "year" || row.happened_when === "few" || row.happened_when === "long" ? row.happened_when : null,
+  themes: Array.isArray(row.answer_parts?.themes) ? cleanSceneThemes(row.answer_parts.themes as unknown[]) : null,
   skipped: row.answer_parts?.skipped === true,
   draft: typeof row.answer_parts?.draft === "string" ? row.answer_parts.draft : "",
 });
@@ -112,7 +118,7 @@ export async function getActiveStrengthsInterview(
     sessionId: session.id as string,
     guideVersion: Number(session.guide_version ?? 2),
     introNotes: Array.isArray(session.intro_notes) ? (session.intro_notes as string[]) : [],
-    phase: discoverPhase(turns.map((turn) => ({ questionId: turn.questionId, answered: turn.answer !== null, skipped: turn.skipped }))),
+    phase: discoverPhase(turns.map((turn) => ({ questionId: turn.questionId, answered: turn.answer !== null, skipped: turn.skipped, themed: sceneThemed(turn) }))),
     turns,
     current,
     nextQuestionId: nextStrengthsQuestion(askedIds)?.id ?? null,
