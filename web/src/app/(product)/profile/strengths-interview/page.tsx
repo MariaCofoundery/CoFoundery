@@ -245,7 +245,7 @@ export default async function StrengthsInterviewPage({
             <h2 className="mt-3 text-xl font-semibold leading-8 text-slate-950">{t(`interview.questions.${currentTurn.questionId}.title`)}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t(`interview.questions.${currentTurn.questionId}.hint`)}</p>
             <div className="mt-4">
-              <IntroNotesStrip notes={state.introNotes} title={t("discover.pick.yourNotes")} hint={t("discover.round3.notesHint")} tone="light" />
+              <IntroNotesStrip notes={state.introNotes} copy={{ title: t("discover.pick.yourNotes"), hint: t("discover.round3.notesHint") }} tone="light" />
             </div>
             {findStrengthsQuestion(currentTurn.questionId)?.kind === "counter" ? (
               <p className="mt-1 text-sm font-medium text-slate-700">{t("discover.round3.counterNote")}</p>

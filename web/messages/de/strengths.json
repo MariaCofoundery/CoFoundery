@@ -703,7 +703,11 @@
       "tooShort": "Schreib mindestens ein paar Wörter zu „Was war los?“ oder „Was hast du getan?“.",
       "private": "Deine Antworten siehst nur du.",
       "changePick": "Szenen sind gewählt",
-      "notesHint": "Passt eines davon zu dieser Szene? Du musst es nicht verwenden."
+      "notesHint": "Passt eines davon zu dieser Szene? Tippe es an, dann steht es in deinem Textfeld. Du musst es nicht verwenden.",
+      "notesTake": "„{note}“ ins Textfeld übernehmen",
+      "notesAddLabel": "Weiteres Stichwort",
+      "notesAddPlaceholder": "Weiteres Stichwort …",
+      "notesAdd": "Hinzufügen"
     },
     "interim": {
       "eyebrow": "Zwischenstand",

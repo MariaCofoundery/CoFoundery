@@ -703,7 +703,11 @@
       "tooShort": "Write at least a few words for \"What was going on?\" or \"What did you do?\".",
       "private": "Only you see your answers.",
       "changePick": "Scenes are chosen",
-      "notesHint": "Does one of them fit this scene? You do not have to use it."
+      "notesHint": "Does one of them fit this scene? Tap it and it goes into your text field. You do not have to use it.",
+      "notesTake": "Put “{note}” into the text field",
+      "notesAddLabel": "Another keyword",
+      "notesAddPlaceholder": "Another keyword …",
+      "notesAdd": "Add"
     },
     "interim": {
       "eyebrow": "Interim view",

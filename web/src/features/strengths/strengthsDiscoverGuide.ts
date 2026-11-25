@@ -149,6 +149,18 @@ export function cleanIntroNotes(values: readonly unknown[]): string[] {
   return result;
 }
 
+/**
+ * Ein Stichwort an den Text im Feld anhängen (die Person tippt es in der Szene an): mit einem Leerzeichen dazwischen,
+ * außer das Feld ist leer oder endet schon mit Leerraum, und auf die erlaubte Länge gekürzt. Der vorhandene Text geht
+ * nie verloren; ist kein Platz mehr, bleibt er unverändert.
+ */
+export function appendNoteToText(current: string, note: string, maxLength: number): string {
+  const text = note.replace(/\s+/g, " ").trim();
+  if (!text) return current;
+  const glue = current === "" || /\s$/.test(current) ? "" : " ";
+  return `${current}${glue}${text}`.slice(0, Math.max(maxLength, current.length));
+}
+
 // ---------------------------------------------------------------------------
 // Wo steht die Person? Aus den Fragen des Gesprächs, nicht aus einem eigenen Zähler.
 // ---------------------------------------------------------------------------

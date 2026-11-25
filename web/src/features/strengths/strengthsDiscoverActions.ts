@@ -112,6 +112,27 @@ export async function startDiscoverAction(formData: FormData) {
   onward();
 }
 
+/**
+ * Ein weiteres Stichwort zum Gespräch ergänzen, während man die Szenen durchgeht (25.11.2026). Gedacht für den Fall, dass am
+ * Anfang keine oder zu wenige festgehalten wurden. Kehrt ohne Weiterleitung zurück: Die Szene bleibt offen, die Seite
+ * aktualisiert sich nur. Doppelte, leere und zu viele Stichworte filtert `cleanIntroNotes` wie beim Start.
+ */
+export async function addIntroNoteAction(note: string): Promise<{ ok: boolean }> {
+  const { client } = await requireUser();
+  const state = await activeV3(client);
+  if (!state) return { ok: false };
+  const next = cleanIntroNotes([...state.introNotes, String(note ?? "")]);
+  if (next.length === state.introNotes.length) return { ok: true };
+  const { error } = await client
+    .from("capability_interview_sessions")
+    .update({ intro_notes: next })
+    .eq("id", state.sessionId)
+    .eq("kind", STRENGTHS_INTERVIEW);
+  if (error) return { ok: false };
+  revalidatePath(PATH);
+  return { ok: true };
+}
+
 /** Die Szenen wählen: fünf oder sechs, in der Reihenfolge der Person. */
 export async function pickScenesAction(formData: FormData) {
   const { client } = await requireUser();

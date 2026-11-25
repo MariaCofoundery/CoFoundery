@@ -1,13 +1,15 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useTransition } from "react";
 import { useTranslations } from "next-intl";
 
 import { DictatedTextarea } from "@/features/dictation/DictatedTextarea";
 import { clearDraft, draftKey, readDraft, writeDraft } from "@/features/interviews/interviewDrafts";
-import { saveSceneAction, skipSceneAction } from "@/features/strengths/strengthsDiscoverActions";
+import { addIntroNoteAction, saveSceneAction, skipSceneAction } from "@/features/strengths/strengthsDiscoverActions";
 import {
+  appendNoteToText,
+  INTRO_NOTE_MAX_LENGTH,
   needsFollowUp,
   PART_MAX_LENGTH,
   SCENE_WHENS,
@@ -62,6 +64,8 @@ export function SceneForm({
   const [values, setValues] = useState<SceneParts>(savedParts);
   const [exampleOpen, setExampleOpen] = useState(false);
   const [askedFollowUp, setAskedFollowUp] = useState(false);
+  const [addingNote, startAddNote] = useTransition();
+  const focusPart = useRef<StepKey | null>(null);
   const [followUpOpen, setFollowUpOpen] = useState(false);
   const loaded = useRef(false);
 
@@ -98,6 +102,29 @@ export function SceneForm({
       return next;
     });
   }
+
+  // Ein Stichwort aus dem Intro ins Textfeld übernehmen, in dem man gerade schreibt. Wie beim Wiederherstellen eines
+  // Browserstands wird der Abschnitt neu aufgebaut (`revision`); danach bekommt das Feld den Fokus zurück.
+  function takeNote(note: string) {
+    const part = STEP_KEYS[step];
+    const next: SceneParts = { ...values, [part]: appendNoteToText(values[part] ?? "", note, PART_MAX_LENGTH) };
+    setValues(next);
+    setInitial(next);
+    remember(next, when);
+    focusPart.current = part;
+    setRevision((value) => value + 1);
+  }
+
+  useEffect(() => {
+    const part = focusPart.current;
+    if (!part) return;
+    focusPart.current = null;
+    const field = document.getElementById(`scene-${part}`);
+    if (field instanceof HTMLTextAreaElement) {
+      field.focus();
+      field.setSelectionRange(field.value.length, field.value.length);
+    }
+  }, [revision]);
 
   function chooseWhen(next: SceneWhen) {
     setWhen(next);
@@ -152,7 +179,22 @@ export function SceneForm({
           </div>
         </div>
         <p className="font-brand relative text-[28px] leading-[1.2]">{sceneTitle}</p>
-        <IntroNotesStrip notes={introNotes} title={t("discover.pick.yourNotes")} hint={t("discover.scene.notesHint")} tone="onPurple" />
+        <IntroNotesStrip
+          notes={introNotes}
+          tone="onPurple"
+          onPick={takeNote}
+          onAdd={(note) => startAddNote(async () => { await addIntroNoteAction(note); })}
+          adding={addingNote}
+          maxLength={INTRO_NOTE_MAX_LENGTH}
+          copy={{
+            title: t("discover.pick.yourNotes"),
+            hint: t("discover.scene.notesHint"),
+            take: (note) => t("discover.scene.notesTake", { note }),
+            addLabel: t("discover.scene.notesAddLabel"),
+            addPlaceholder: t("discover.scene.notesAddPlaceholder"),
+            add: t("discover.scene.notesAdd"),
+          }}
+        />
         <fieldset className="relative m-0 flex flex-col gap-2.5 border-0 p-0">
           <legend className="mb-2.5 text-sm text-[#dcd3fb]">{t("discover.scene.whenLegend")}</legend>
           <div className="flex flex-wrap gap-2">
