@@ -25,9 +25,12 @@ import type { StrengthsQuestionKind } from "@/features/strengths/strengthsInterv
 /** Die Fassung dieses Leitfadens. Fassung 2 ist das frühere Stärken-Interview. */
 export const DISCOVER_GUIDE_VERSION = 3;
 
-export const SCENE_MIN = 5;
-export const SCENE_MAX = 6;
+/** Seit dem 25.11.2026: drei Szenen, je ein Text. Frühere Gespräche mit fünf oder sechs Szenen bleiben les- und beendbar. */
+export const SCENE_MIN = 3;
+export const SCENE_MAX = 3;
 
+/** Der eine Text einer Szene (Fassung vom 25.11.2026): höchstens so lang. */
+export const STORY_MAX_LENGTH = 1200;
 /** Jeder Teil höchstens so lang; drei Teile plus Leerzeilen bleiben unter den 2000 der Datenbank. */
 export const PART_MAX_LENGTH = 650;
 /** Die Grenze der Datenbank (`capability_interview_turns_answer_length`). */
@@ -85,7 +88,8 @@ export const STEP_KEYS: readonly StepKey[] = ["situation", "action", "outcome"];
 export type SceneWhen = "year" | "few" | "long";
 export const SCENE_WHENS: readonly SceneWhen[] = ["year", "few", "long"];
 
-export type SceneParts = Partial<Record<StepKey, string>>;
+/** `story` ist der eine Text der Fassung vom 25.11.2026; die drei Teile gibt es nur in früheren Gesprächen. */
+export type SceneParts = Partial<Record<StepKey | "story", string>>;
 
 export function isSceneWhen(value: string): value is SceneWhen {
   return (SCENE_WHENS as readonly string[]).includes(value);
@@ -93,6 +97,7 @@ export function isSceneWhen(value: string): value is SceneWhen {
 
 /** Die Teile ohne Überschriften, durch eine Leerzeile getrennt. Das ist die Antwort für die Auswertung. */
 export function composeAnswer(parts: SceneParts) {
+  if (parts.story !== undefined) return parts.story.trim();
   return STEP_KEYS.map((key) => (parts[key] ?? "").trim())
     .filter((text) => text.length > 0)
     .join("\n\n");
@@ -103,6 +108,12 @@ export type SceneCheck = { ok: true; answer: string; parts: SceneParts } | { ok:
 /** Prüft die drei Teile so, wie die Datenbank es später prüft - nur früher und mit einem Grund. */
 export function checkScene(input: SceneParts): SceneCheck {
   const parts: SceneParts = {};
+  if (input.story !== undefined) {
+    const story = input.story.trim();
+    if (story.length > DISCOVER_MAX_LENGTH) return { ok: false, reason: "long" };
+    if (story.length < DISCOVER_MIN_LENGTH) return { ok: false, reason: "short" };
+    return { ok: true, answer: story, parts: { story } };
+  }
   for (const key of STEP_KEYS) {
     const text = (input[key] ?? "").trim();
     if (text.length > PART_MAX_LENGTH) return { ok: false, reason: "long" };
@@ -214,7 +225,7 @@ const KEY_SENTENCE_MAX = 170;
 
 /** Der Satz, der zeigt, was die Person getan hat: „Was hast du getan?“, sonst der Anfang der Antwort. */
 export function keySentence(turn: { parts: SceneParts; answer: string | null }) {
-  const source = (turn.parts.action ?? turn.answer ?? "").replace(/\s+/g, " ").trim();
+  const source = (turn.parts.action ?? turn.parts.story ?? turn.answer ?? "").replace(/\s+/g, " ").trim();
   if (source.length <= KEY_SENTENCE_MAX) return source;
   const cut = source.slice(0, KEY_SENTENCE_MAX);
   const lastStop = Math.max(cut.lastIndexOf(". "), cut.lastIndexOf("! "), cut.lastIndexOf("? "));

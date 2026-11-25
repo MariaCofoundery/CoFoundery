@@ -62,7 +62,7 @@ type TurnRow = {
 
 function partsOf(value: Record<string, unknown> | null): SceneParts {
   const parts: SceneParts = {};
-  for (const key of ["situation", "action", "outcome"] as const) {
+  for (const key of ["situation", "action", "outcome", "story"] as const) {
     const text = value?.[key];
     if (typeof text === "string" && text.trim()) parts[key] = text;
   }

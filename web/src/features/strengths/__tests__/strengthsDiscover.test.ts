@@ -51,13 +51,13 @@ test("zwölf Szenen und fünf Fragen der dritten Runde, jede mit ihrer Art", () 
   for (const id of SCENE_IDS) assert.equal(findStrengthsQuestion(id)?.kind, "situation", id);
 });
 
-test("Auswahl: nur bekannte Szenen, ohne Doppelte, fünf oder sechs", () => {
+test("Auswahl: nur bekannte Szenen, ohne Doppelte, genau drei", () => {
   const picked = cleanSceneSelection(["sc_order", "gibt_es_nicht", "sc_order", "sc_unsure", "sc_nobody", "sc_convinced", "sc_from_zero"]);
   assert.deepEqual(picked, ["sc_order", "sc_unsure", "sc_nobody", "sc_convinced", "sc_from_zero"]);
-  assert.equal(isValidSceneSelection(picked), true);
-  assert.equal(isValidSceneSelection(picked.slice(0, 4)), false);
+  assert.equal(isValidSceneSelection(picked), false, "fünf sind zu viele");
+  assert.equal(isValidSceneSelection(picked.slice(0, 2)), false);
+  assert.equal(isValidSceneSelection(picked.slice(0, 3)), true);
   assert.equal(isValidSceneSelection(cleanSceneSelection([...SCENE_IDS])), false);
-  assert.equal(isValidSceneSelection(cleanSceneSelection(SCENE_IDS.slice(0, 6))), true);
 });
 
 test("Antwort: die Teile ohne Überschriften, getrennt durch eine Leerzeile", () => {
@@ -98,13 +98,18 @@ test("Wo steht die Person: aus den Fragen des Gesprächs", () => {
   assert.equal(answeredScenes(done), 5);
 });
 
-test("Überspringen geht nur, solange danach noch fünf Szenen beantwortbar bleiben", () => {
-  const five = ["sc_unsure", "sc_nobody", "sc_convinced", "sc_order", "sc_from_zero"].map((id) => turn(id));
-  assert.equal(canSkipScene(five), false, "bei fünf Szenen gibt es nichts zu überspringen");
-  const six = [...five, turn("sc_asked_for")];
-  assert.equal(canSkipScene(six), true);
-  // Eine ist schon übersprungen: Es bleiben genau fünf, also keine zweite.
-  assert.equal(canSkipScene([turn("sc_unsure", "skipped"), ...six.slice(1)]), false);
+test("Überspringen geht nur, solange danach noch drei Szenen beantwortbar bleiben", () => {
+  const three = ["sc_unsure", "sc_nobody", "sc_convinced"].map((id) => turn(id));
+  assert.equal(canSkipScene(three), false, "bei drei Szenen gibt es nichts zu überspringen");
+  // Frühere Gespräche mit fünf Szenen: zwei lassen sich überspringen, die dritte nicht.
+  const five = [...three, turn("sc_order"), turn("sc_from_zero")];
+  assert.equal(canSkipScene(five), true);
+  assert.equal(canSkipScene([turn("sc_unsure", "skipped"), ...five.slice(1)]), true);
+  assert.equal(canSkipScene([turn("sc_unsure", "skipped"), turn("sc_nobody", "skipped"), ...five.slice(2)]), false);
+  // Der eine Text einer Szene
+  const story = checkScene({ story: " Ich habe die Liste gemacht und alle eingeteilt. " });
+  assert.equal(story.ok && story.answer, "Ich habe die Liste gemacht und alle eingeteilt.");
+  assert.deepEqual(checkScene({ story: "kurz" }), { ok: false, reason: "short" });
 });
 
 test("Zwischenstand: der Satz, der zeigt, was die Person getan hat", () => {

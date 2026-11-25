@@ -6,27 +6,13 @@ import { useTranslations } from "next-intl";
 
 import { pickScenesAction } from "@/features/strengths/strengthsDiscoverActions";
 import { SCENE_IDS, SCENE_MAX, SCENE_MIN, type SceneId } from "@/features/strengths/strengthsDiscoverGuide";
+import { SceneVignette } from "@/features/strengths/SceneVignette";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import "@/features/align/align.css";
 
-const ICON: Record<SceneId, string> = {
-  sc_unsure: "M3 20l6-10 4 6 3-4 5 8z M9 10V4l5 2-5 2",
-  sc_nobody: "M7 11V6a1.5 1.5 0 0 1 3 0v5 M10 10V4.5a1.5 1.5 0 0 1 3 0V10 M13 10V6a1.5 1.5 0 0 1 3 0v7c0 4-2.5 8-6.5 8-3 0-4.5-2-6-5l-1-2a1.5 1.5 0 0 1 2.6-1.5L7 14",
-  sc_fast_decision: "M13 2L4 14h7l-1 8 9-12h-7z",
-  sc_stuck_problem: "M9 18h6 M10 22h4 M12 2a7 7 0 0 0-4 12.7V16h8v-1.3A7 7 0 0 0 12 2z",
-  sc_from_zero: "M3 21h18 M5 21V12h5v9 M10 21V7h5v14 M15 21V3h5v18",
-  sc_convinced: "M21 12a8 8 0 0 1-11.6 7.1L4 21l1.9-5.4A8 8 0 1 1 21 12z M8.5 12h7",
-  sc_uncomfortable: "M12 3l10 18H2z M12 10v4 M12 17v.5",
-  sc_helped_grow: "M12 22V11 M12 11C12 7 9 4 4 4c0 4 3 7 8 7z M12 13c0-3 2.5-6 7-6 0 3.5-2.5 6-7 6z",
-  sc_connected: "M3 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0 M15 6a3 3 0 1 0 6 0a3 3 0 1 0-6 0 M15 18a3 3 0 1 0 6 0a3 3 0 1 0-6 0 M8.7 10.7l6.6-3.4 M8.7 13.3l6.6 3.4",
-  sc_learned_fast: "M4 19V5a2 2 0 0 1 2-2h14v15H6a2 2 0 0 0-2 2 2 2 0 0 0 2 2h14 M9 7h7",
-  sc_order: "M4 6h16 M4 12h11 M4 18h6",
-  sc_asked_for: "M12 21s-8-5-8-11a4.5 4.5 0 0 1 8-2.8A4.5 4.5 0 0 1 20 10c0 6-8 11-8 11z",
-};
-
 /**
- * Runde 2: die Szenen wählen (Entwurf vom 12.11.2026). Zwölf Karten, fünf oder sechs davon.
- * „Weiter“ gibt es erst ab fünf. Die Reihenfolge der Auswahl ist die Reihenfolge der Fragen.
+ * Runde 2: die Szenen wählen (Entwurf vom 12.11.2026). Zwölf Szenen als ruhige Liste, drei davon.
+ * „Weiter“ gibt es erst bei drei. Die Reihenfolge der Auswahl ist die Reihenfolge der Fragen.
  * Die Stichworte aus dem Intro stehen oben, damit man sieht, welche Szene dazu passt.
  */
 export function SceneCards({ introNotes }: { introNotes: string[] }) {
@@ -66,8 +52,8 @@ export function SceneCards({ introNotes }: { introNotes: string[] }) {
         ) : null}
       </div>
 
-      <div role="group" aria-label={t("discover.pick.title")} className="grid gap-3.5 [grid-template-columns:repeat(auto-fill,minmax(230px,1fr))]">
-        {SCENE_IDS.map((id, index) => {
+      <div role="group" aria-label={t("discover.pick.title")} className="flex flex-col">
+        {SCENE_IDS.map((id) => {
           const on = picked.includes(id);
           const full = !on && count >= SCENE_MAX;
           return (
@@ -77,31 +63,21 @@ export function SceneCards({ introNotes }: { introNotes: string[] }) {
               aria-pressed={on}
               onClick={() => toggle(id)}
               title={full ? t("discover.pick.limit") : undefined}
-              className={`sd-card align-rise flex min-h-[178px] flex-col gap-2.5 rounded-[18px] border-2 p-4 text-left text-[#14152b] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6d49e0] ${
-                on
-                  ? "border-[#6d49e0] bg-white shadow-[0_10px_26px_-14px_rgba(109,73,224,0.6)]"
-                  : "border-[#e6e4f2] bg-white/90"
-              } ${full ? "opacity-60" : ""}`}
-              style={{ animationDelay: `${(index * 0.05).toFixed(2)}s` }}
+              className={`grid min-h-[88px] grid-cols-[64px_minmax(0,1fr)_28px] items-center gap-4 border-b px-3 py-3.5 text-left text-[#14152b] transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#6d49e0] ${
+                on ? "rounded-[18px] border-transparent bg-[#f1ecfe]" : "border-[#e6e4f2] hover:bg-[#6d49e0]/5"
+              } ${full ? "opacity-55" : ""}`}
             >
-              <span className="flex items-start justify-between">
-                <span className={`flex size-11 items-center justify-center rounded-[14px] transition-colors ${on ? "bg-[#6d49e0]" : "bg-[#efeafd]"}`}>
-                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={on ? "#fff" : "#5b36d4"} strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                    <path d={ICON[id]} />
-                  </svg>
-                </span>
-                {on ? (
-                  <span className="sd-check flex size-[26px] items-center justify-center rounded-full bg-[#6d49e0]" aria-hidden="true">
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12l5 5 9-10" /></svg>
-                  </span>
-                ) : null}
+              <SceneVignette id={id} selected={on} />
+              <span className="flex min-w-0 flex-col gap-0.5">
+                <span className="text-[16px] font-semibold leading-snug">{t(`interview.questions.${id}.scene`)}</span>
+                {on ? <span className="text-[13px] text-[#4a4d68]">{t(`interview.questions.${id}.hint`)}</span> : null}
               </span>
-              <span className="text-[15px] font-semibold leading-snug">{t(`interview.questions.${id}.scene`)}</span>
-              {on ? (
-                <span className="sd-fade text-[13px] text-[#4b2bb8]">{t("discover.pick.question", { question: t(`interview.questions.${id}.title`) })}</span>
-              ) : (
-                <span className="text-[13px] text-[#4a4d68]">{t(`interview.questions.${id}.hint`)}</span>
-              )}
+              <span
+                aria-hidden="true"
+                className={`flex size-[26px] items-center justify-center rounded-full border-[1.5px] text-[13px] ${on ? "border-[#6d49e0] bg-[#6d49e0] text-white" : "border-[#cfcde3] text-transparent"}`}
+              >
+                ✓
+              </span>
             </button>
           );
         })}

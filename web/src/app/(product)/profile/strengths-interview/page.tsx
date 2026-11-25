@@ -230,8 +230,7 @@ export default async function StrengthsInterviewPage({
             sceneId={currentTurn.questionId}
             index={sceneTurns.indexOf(currentTurn) + 1}
             total={sceneTurns.length}
-            savedParts={currentTurn.parts}
-            savedWhen={currentTurn.when}
+            savedText={currentTurn.parts.story ?? ""}
             introNotes={state.introNotes}
             canSkip={canSkipScene(state.turns.map((entry) => ({ questionId: entry.questionId, answered: entry.answer !== null, skipped: entry.skipped })))}
           />

@@ -19,12 +19,11 @@ test("the keywords from the intro stay visible while going through the scenes an
 
 test("in the scene a keyword can be tapped and goes into the text field the person is writing in", () => {
   assert.match(sceneForm, /onPick=\{takeNote\}/);
-  assert.match(sceneForm, /const part = STEP_KEYS\[step\]/);
   // angehaengt, nicht ersetzt: mit Leerzeichen dazwischen, auf die erlaubte Laenge gekuerzt
-  assert.match(sceneForm, /appendNoteToText\(values\[part\] \?\? "", note, PART_MAX_LENGTH\)/);
+  assert.match(sceneForm, /appendNoteToText\(value, note, STORY_MAX_LENGTH\)/);
   // wie beim Wiederherstellen eines Browserstands: Abschnitt neu aufbauen, danach Fokus zurueck ans Feld
   assert.match(sceneForm, /setInitial\(next\)/);
-  assert.match(sceneForm, /setRevision\(\(value\) => value \+ 1\)/);
+  assert.match(sceneForm, /setRevision\(\(current\) => current \+ 1\)/);
   assert.match(sceneForm, /field\.focus\(\)/);
 });
 

@@ -34,8 +34,8 @@
     "too_few": "You need at least three answers to finish.",
     "ask": "The analysis could not be requested. Please try again.",
     "proposal": "The suggestion could not be saved. Please try again.",
-    "scenes": "Choose five or six scenes.",
-    "too_few_scenes": "We need at least five scenes to analyze. You cannot skip this one."
+    "scenes": "Pick three scenes.",
+    "too_few_scenes": "We need three scenes to evaluate. You cannot skip this one."
   },
   "done": {
     "title": "You have discovered your strengths",
@@ -634,7 +634,7 @@
       "roundThree": "3 · Energy and an outside view",
       "warmup": "Settling in",
       "title": "Which of these scenes do you know from your life?",
-      "text": "Choose 5 or 6. Work, studies, a club, volunteering or family all count. After that we ask you one question about each scene.",
+      "text": "Pick three. Job, studies, club, volunteering or family count just as much. You write a few sentences for each.",
       "yourNotes": "Your keywords from the intro",
       "whichFits": "Which scene fits them?",
       "question": "Question: {question}",
@@ -642,14 +642,14 @@
       "need": "Choose {count} more",
       "go": "Continue with {count} scenes",
       "goPending": "Getting ready …",
-      "limit": "More than 6 scenes are not needed. Remove one to choose another.",
-      "tip": "About 2 to 3 minutes per scene. Your progress is saved after every step.",
+      "limit": "You do not need more than three. Remove one to pick another.",
+      "tip": "About 2 minutes per scene. Saved after each scene.",
       "pauseLink": "Take a break",
       "backToIntro": "← Intro"
     },
     "scene": {
       "counter": "Scene {index} of {total}",
-      "minutes": "about 2 to 3 minutes",
+      "minutes": "about 2 minutes",
       "whenLegend": "About when was that?",
       "when": {
         "year": "This year",
@@ -686,20 +686,28 @@
       "followUpKeep": "Leave it",
       "back": "Back",
       "next": "Next",
-      "save": "Save scene",
+      "save": "Next",
       "savePending": "Saving …",
       "skip": "Skip scene",
       "skipPending": "Skipping …",
       "whyTitle": "Why three steps?",
       "why": "First the situation, then your part, then the result. That makes visible what exactly you contributed. That is where the signs of your strengths are.",
-      "tooShort": "Write at least a few words for \"What was going on?\" or \"What did you do?\".",
+      "tooShort": "Please write a few more words about this scene.",
       "private": "Only you see your answers.",
       "changePick": "Scenes are chosen",
       "notesHint": "Does one of them fit this scene? Tap it and it goes into your text field. You do not have to use it.",
       "notesTake": "Put “{note}” into the text field",
       "notesAddLabel": "Another keyword",
       "notesAddPlaceholder": "Another keyword …",
-      "notesAdd": "Add"
+      "notesAdd": "Add",
+      "story": {
+        "label": "Tell it in your own words",
+        "placeholder": "Just start writing. Keywords are fine too.",
+        "guideTitle": "Three questions to help",
+        "situation": "What was going on?",
+        "action": "What did you do?",
+        "outcome": "What came of it?"
+      }
     },
     "interim": {
       "eyebrow": "Interim view",

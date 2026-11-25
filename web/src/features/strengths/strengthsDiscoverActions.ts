@@ -15,6 +15,7 @@ import {
   isSceneWhen,
   isValidSceneSelection,
   ROUND_THREE,
+  STORY_MAX_LENGTH,
   type DiscoverTurn,
 } from "@/features/strengths/strengthsDiscoverGuide";
 import { getActiveStrengthsInterview, type StrengthsInterviewState } from "@/features/strengths/strengthsInterviewData";
@@ -167,11 +168,14 @@ export async function saveSceneAction(formData: FormData) {
   const turn = currentSceneTurn(state, String(formData.get("turnId") ?? ""));
   if (!turn) onward();
 
-  const checked = checkScene({
-    situation: String(formData.get("situation") ?? ""),
-    action: String(formData.get("action") ?? ""),
-    outcome: String(formData.get("outcome") ?? ""),
-  });
+  // Seit dem 25.11.2026 ein Text je Szene (`story`); die drei Teile gibt es nur noch für alte Formulare.
+  const checked = formData.has("story")
+    ? checkScene({ story: String(formData.get("story") ?? "").slice(0, STORY_MAX_LENGTH + 1) })
+    : checkScene({
+        situation: String(formData.get("situation") ?? ""),
+        action: String(formData.get("action") ?? ""),
+        outcome: String(formData.get("outcome") ?? ""),
+      });
   if (!checked.ok) back(checked.reason);
 
   const when = String(formData.get("when") ?? "");
