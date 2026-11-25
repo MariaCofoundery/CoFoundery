@@ -584,27 +584,19 @@
       "soundOff": "Sound off"
     },
     "intro": {
-      "round": "Round 1 of 3 · Settling in",
+      "round": "Settling in",
       "steps": {
         "s1": {
           "title": "Take a moment.",
           "text": "About a minute. You do not need to write anything down. Take a breath."
         },
         "s2": {
-          "title": "Go back in your mind.",
-          "text": "A few weeks. A few months. Maybe a few years."
+          "title": "Where were you really strong?",
+          "text": "Think of a moment from the last months or years that you are proud of, even if hardly anyone saw it."
         },
         "s3": {
-          "title": "Where were you really strong?",
-          "text": "What do you like to look back on? What are you proud of, even if hardly anyone saw it?"
-        },
-        "s4": {
           "title": "What have others praised you for?",
-          "text": "When did people come to you because you simply can?"
-        },
-        "s5": {
-          "title": "In there is what you are really good at.",
-          "text": "Your superpower, if you like. These are exactly the moments we will look at together now."
+          "text": "When did people come to you because you simply can? These are exactly the moments we will look at now."
         }
       },
       "timeline": {
@@ -630,8 +622,8 @@
       "replay": "Replay intro",
       "outline": {
         "o1": "1 Settling in",
-        "o2": "2 Scenes: 5 to 6, 2 to 3 minutes each",
-        "o3": "3 Energy and an outside view, about 8 minutes"
+        "o2": "2 Three scenes, about 2 minutes each",
+        "o3": "3 Pick themes, your strengths picture"
       },
       "private": "Only you see your answers. They are only analyzed if you explicitly ask for it at the end.",
       "noTest": "This is not a test and not a typology. There are no points and no right answers."

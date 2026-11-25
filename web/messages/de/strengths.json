@@ -584,27 +584,19 @@
       "soundOff": "Ton aus"
     },
     "intro": {
-      "round": "Runde 1 von 3 · Einstimmen",
+      "round": "Einstimmen",
       "steps": {
         "s1": {
           "title": "Nimm dir einen Moment.",
           "text": "Etwa eine Minute. Du musst nichts aufschreiben. Atme einmal durch."
         },
         "s2": {
-          "title": "Geh in Gedanken zurück.",
-          "text": "Ein paar Wochen. Ein paar Monate. Vielleicht ein paar Jahre."
+          "title": "Wo warst du richtig stark?",
+          "text": "Denk an einen Moment der letzten Monate oder Jahre, auf den du stolz bist, auch wenn kaum jemand es gesehen hat."
         },
         "s3": {
-          "title": "Wo warst du richtig stark?",
-          "text": "Woran denkst du gern zurück? Worauf bist du stolz, auch wenn es kaum jemand gesehen hat?"
-        },
-        "s4": {
           "title": "Wofür haben andere dich gelobt?",
-          "text": "Wann kamen Leute zu dir, weil du es einfach kannst?"
-        },
-        "s5": {
-          "title": "Darin steckt, was du richtig gut kannst.",
-          "text": "Deine Superkraft, wenn du so willst. Genau diese Momente schauen wir uns jetzt gemeinsam an."
+          "text": "Wann kamen Leute zu dir, weil du es einfach kannst? Genau diese Momente schauen wir uns jetzt an."
         }
       },
       "timeline": {
@@ -630,8 +622,8 @@
       "replay": "Intro nochmal",
       "outline": {
         "o1": "1 Einstimmen",
-        "o2": "2 Szenen: 5 bis 6, je 2 bis 3 Minuten",
-        "o3": "3 Energie und Blick von außen, etwa 8 Minuten"
+        "o2": "2 Drei Szenen, je etwa 2 Minuten",
+        "o3": "3 Themen wählen, dein Stärkenbild"
       },
       "private": "Deine Antworten siehst nur du. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
       "noTest": "Das ist kein Test und keine Typologie. Es gibt keine Punkte und keine richtigen Antworten."

@@ -10,19 +10,18 @@ import { startDiscoverAction } from "@/features/strengths/strengthsDiscoverActio
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import "@/features/align/align.css";
 
-/** Wie lange jeder der fünf Teile steht (Millisekunden). Zusammen etwa eine halbe Minute. */
-const DURATIONS = [5000, 6500, 7000, 7000, 7500];
+/** Wie lange jeder der drei Teile steht (Millisekunden). Zusammen etwa 20 Sekunden. */
+const DURATIONS = [6000, 7000, 7000];
 const TICK = 250;
 /** Mit Ton: Zeit zum Nachdenken NACH dem gesprochenen Satz (Millisekunden) - je Teil, die fragenden etwas laenger. */
-const REFLECT_AFTER_SPEECH = [6000, 5000, 8000, 7000, 5000];
+const REFLECT_AFTER_SPEECH = [6000, 6000, 6000];
 const MOMENT_X = [190, 300, 450, 560, 700];
-const MOMENT_RAISED_Y = [120, 160, 80, 140, 100];
 const BUBBLE_X = [190, 450, 560, 700];
 
 /**
  * Runde 1 von „Stärken entdecken“: das Einstimmen (Entwurf vom 12.11.2026).
  *
- * Kein Video, sondern fünf kurze Bilder aus CSS und SVG - anhalten, zurück, überspringen und „Intro
+ * Kein Video, sondern drei kurze Bilder aus CSS und SVG - anhalten, zurück, überspringen und „Intro
  * nochmal“ gehen jederzeit. Am Ende können freiwillig Stichworte festgehalten werden; sie landen
  * nur am Gespräch der Person (`intro_notes`), tauchen beim Wählen der Szenen wieder auf und gehen
  * nicht in die Auswertung.
@@ -39,7 +38,7 @@ export function StrengthsIntro() {
   const [notes, setNotes] = useState<string[]>([]);
   const [draft, setDraft] = useState("");
 
-  const stepKeys = ["s1", "s2", "s3", "s4", "s5"] as const;
+  const stepKeys = ["s1", "s2", "s3"] as const;
   const bubbles = ["b1", "b2", "b3", "b4"].map((key) => t(`intro.bubbles.${key}`));
   const outline = ["o1", "o2", "o3"].map((key) => t(`intro.outline.${key}`));
   const atEnd = step >= DURATIONS.length;
@@ -175,7 +174,7 @@ export function StrengthsIntro() {
                   <circle className="sd-breathe" cx="480" cy="170" r="10" fill="#c9bbf7" />
                 </>
               ) : null}
-              <g style={{ transition: "opacity 1s", opacity: step >= 1 && step <= 4 ? 1 : 0 }}>
+              <g style={{ transition: "opacity 1s", opacity: step >= 1 ? 1 : 0 }}>
                 <line x1="80" y1="220" x2="880" y2="220" stroke="#3a3c66" strokeWidth="1.5" />
                 <g fontFamily="Inter, sans-serif" fontSize="14" fill="#8e90b8" textAnchor="middle">
                   <text x="140" y="258">{t("intro.timeline.years")}</text>
@@ -184,25 +183,16 @@ export function StrengthsIntro() {
                   <text x="840" y="258">{t("intro.timeline.today")}</text>
                 </g>
               </g>
-              {step === 1 ? (
-                <g className="sd-travel">
-                  <circle cx="840" cy="220" r="22" fill="#6d49e0" opacity="0.35" />
-                  <circle cx="840" cy="220" r="7" fill="#e6deff" />
-                </g>
-              ) : null}
-              {step === 4 ? <polyline className="sd-draw" points="190,120 300,160 450,80 560,140 700,100" fill="none" stroke="#9c86f0" strokeWidth="1.5" strokeLinejoin="round" /> : null}
-              {step >= 2 && step <= 4
+              {step >= 1
                 ? MOMENT_X.map((x, index) => (
-                    <g key={x} style={{ transition: "transform 1.4s cubic-bezier(.2,.8,.2,1)", transform: `translateY(${step >= 4 ? MOMENT_RAISED_Y[index] - 220 : 0}px)` }}>
-                      <g className="sd-pop" style={{ animationDelay: `${(index * 0.35).toFixed(2)}s` }}>
-                        <circle cx={x} cy="220" r="20" fill="#6d49e0" opacity="0.3" />
-                        <circle cx={x} cy="220" r="6" fill="#fff" />
-                      </g>
+                    <g key={x} className="sd-pop" style={{ animationDelay: `${(index * 0.35).toFixed(2)}s` }}>
+                      <circle cx={x} cy="220" r="20" fill="#6d49e0" opacity="0.3" />
+                      <circle cx={x} cy="220" r="6" fill="#fff" />
                     </g>
                   ))
                 : null}
             </svg>
-            {step === 3
+            {step === 2
               ? bubbles.slice(0, 4).map((text, index) => (
                   <div
                     key={text}
