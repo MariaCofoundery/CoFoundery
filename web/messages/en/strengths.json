@@ -702,7 +702,8 @@
       "why": "First the situation, then your part, then the result. That makes visible what exactly you contributed. That is where the signs of your strengths are.",
       "tooShort": "Write at least a few words for \"What was going on?\" or \"What did you do?\".",
       "private": "Only you see your answers.",
-      "changePick": "Scenes are chosen"
+      "changePick": "Scenes are chosen",
+      "notesHint": "Does one of them fit this scene? You do not have to use it."
     },
     "interim": {
       "eyebrow": "Interim view",
@@ -725,7 +726,8 @@
       "title": "Energy and an outside view",
       "text": "Short and honest. A few sentences are enough.",
       "counterNote": "This question is not analyzed.",
-      "skip": "Skip this question"
+      "skip": "Skip this question",
+      "notesHint": "Maybe something comes to mind. You do not have to use it."
     }
   }
 }

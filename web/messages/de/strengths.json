@@ -633,7 +633,7 @@
         "o2": "2 Szenen: 5 bis 6, je 2 bis 3 Minuten",
         "o3": "3 Energie und Blick von außen, etwa 8 Minuten"
       },
-      "private": "Deine Antworten sieht nur du. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
+      "private": "Deine Antworten siehst nur du. Ausgewertet werden sie nur, wenn du das am Ende ausdrücklich anforderst.",
       "noTest": "Das ist kein Test und keine Typologie. Es gibt keine Punkte und keine richtigen Antworten."
     },
     "pick": {
@@ -701,8 +701,9 @@
       "whyTitle": "Warum drei Schritte?",
       "why": "Erst die Lage, dann dein Anteil, dann das Ergebnis. So wird sichtbar, was genau du beigetragen hast. Darin liegen die Hinweise auf deine Stärken.",
       "tooShort": "Schreib mindestens ein paar Wörter zu „Was war los?“ oder „Was hast du getan?“.",
-      "private": "Deine Antworten sieht nur du.",
-      "changePick": "Szenen sind gewählt"
+      "private": "Deine Antworten siehst nur du.",
+      "changePick": "Szenen sind gewählt",
+      "notesHint": "Passt eines davon zu dieser Szene? Du musst es nicht verwenden."
     },
     "interim": {
       "eyebrow": "Zwischenstand",
@@ -725,7 +726,8 @@
       "title": "Energie und Blick von außen",
       "text": "Kurz und ehrlich. Ein paar Sätze reichen.",
       "counterNote": "Diese Frage wird nicht ausgewertet.",
-      "skip": "Diese Frage überspringen"
+      "skip": "Diese Frage überspringen",
+      "notesHint": "Vielleicht fällt dir dazu etwas ein. Du musst es nicht verwenden."
     }
   }
 }

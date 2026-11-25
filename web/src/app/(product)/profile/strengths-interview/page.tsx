@@ -8,6 +8,7 @@ import { getSectionMarks } from "@/features/profile/aboutYouData";
 import { ProposalWatcher } from "@/features/capability/ProposalWatcher";
 import { getAiAvailability } from "@/features/direction/directionProposalData";
 import { InterviewAnswerForm } from "@/features/interviews/InterviewAnswerForm";
+import { IntroNotesStrip } from "@/features/strengths/IntroNotesStrip";
 import { SceneCards } from "@/features/strengths/SceneCards";
 import { SceneForm } from "@/features/strengths/SceneForm";
 import { StrengthsInterim } from "@/features/strengths/StrengthsInterim";
@@ -232,6 +233,7 @@ export default async function StrengthsInterviewPage({
             total={sceneTurns.length}
             savedParts={currentTurn.parts}
             savedWhen={currentTurn.when}
+            introNotes={state.introNotes}
             canSkip={canSkipScene(state.turns.map((entry) => ({ questionId: entry.questionId, answered: entry.answer !== null, skipped: entry.skipped })))}
           />
         ) : phase?.phase === "interim" ? (
@@ -243,6 +245,9 @@ export default async function StrengthsInterviewPage({
             </p>
             <h2 className="mt-3 text-xl font-semibold leading-8 text-slate-950">{t(`interview.questions.${currentTurn.questionId}.title`)}</h2>
             <p className="mt-2 text-sm leading-6 text-slate-600">{t(`interview.questions.${currentTurn.questionId}.hint`)}</p>
+            <div className="mt-4">
+              <IntroNotesStrip notes={state.introNotes} title={t("discover.pick.yourNotes")} hint={t("discover.round3.notesHint")} tone="light" />
+            </div>
             {findStrengthsQuestion(currentTurn.questionId)?.kind === "counter" ? (
               <p className="mt-1 text-sm font-medium text-slate-700">{t("discover.round3.counterNote")}</p>
             ) : null}

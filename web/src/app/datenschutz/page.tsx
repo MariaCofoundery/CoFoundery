@@ -654,7 +654,7 @@ export default function DatenschutzPage() {
               (Titel, Zeit, Ort, Veranstalter, Link zur offiziellen Seite), aus Quellen, die wir nutzen dürfen,
               oder von Mitgliedern einer Organisation eingetragen und von uns vor der Veröffentlichung geprüft.
               Bei einem Vorschlag speichern wir, wer ihn eingereicht hat und für welche Organisation; den Namen
-              der Person sieht niemand außer dir und den Plattform-Admins. Was du dir merkst, sieht nur du. Mit
+              der Person sieht niemand außer dir und den Plattform-Admins. Was du dir merkst, siehst nur du. Mit
               dem Konto geht das Gemerkte; eingereichte Termine bleiben ohne Bezug zu dir stehen. Termine, die
               länger als 60 Tage vorbei sind, löschen wir automatisch.
             </p>

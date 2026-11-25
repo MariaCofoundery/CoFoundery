@@ -16,6 +16,7 @@ import {
   type SceneWhen,
   type StepKey,
 } from "@/features/strengths/strengthsDiscoverGuide";
+import { IntroNotesStrip } from "@/features/strengths/IntroNotesStrip";
 import { SubmitButton } from "@/features/ui/SubmitButton";
 import "@/features/align/align.css";
 
@@ -39,6 +40,7 @@ export function SceneForm({
   savedParts,
   savedWhen,
   canSkip,
+  introNotes,
 }: {
   sessionId: string;
   turnId: string;
@@ -48,6 +50,8 @@ export function SceneForm({
   savedParts: SceneParts;
   savedWhen: SceneWhen | null;
   canSkip: boolean;
+  /** Die Stichworte aus dem Intro: stehen bei jeder Szene dabei. */
+  introNotes: string[];
 }) {
   const t = useTranslations("strengths");
   const key = draftKey(sessionId, turnId);
@@ -148,6 +152,7 @@ export function SceneForm({
           </div>
         </div>
         <p className="font-brand relative text-[28px] leading-[1.2]">{sceneTitle}</p>
+        <IntroNotesStrip notes={introNotes} title={t("discover.pick.yourNotes")} hint={t("discover.scene.notesHint")} tone="onPurple" />
         <fieldset className="relative m-0 flex flex-col gap-2.5 border-0 p-0">
           <legend className="mb-2.5 text-sm text-[#dcd3fb]">{t("discover.scene.whenLegend")}</legend>
           <div className="flex flex-wrap gap-2">
