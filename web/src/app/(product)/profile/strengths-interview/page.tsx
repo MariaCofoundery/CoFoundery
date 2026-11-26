@@ -63,7 +63,6 @@ export default async function StrengthsInterviewPage({
   if (!user) redirect("/login?next=/profile/strengths-interview");
 
   const client = await createClient();
-  const tShort = await getTranslations("strengths.shortProfile");
   const [t, tProfile, activeState, completed, aiAvailable, strengths, marks] = await Promise.all([
     getTranslations("strengths"),
     getTranslations("capability"),
@@ -106,15 +105,12 @@ export default async function StrengthsInterviewPage({
         >
           ← {t("backToMe")}
         </Link>
-        <header className="brand-panel mt-3 rounded-[28px] p-6 sm:p-8">
-          <h1 className="text-3xl font-semibold leading-tight sm:text-4xl">{t("title")}</h1>
-        </header>
+        <h1 className="sr-only">{t("end.title")}</h1>
         {error ? <p role="alert" className="mt-5 rounded-xl bg-amber-50 px-4 py-3 text-sm text-amber-950">{t(`errors.${error}`)}</p> : null}
         {notice ? <p role="status" className="mt-5 rounded-xl bg-violet-50 px-4 py-3 text-sm text-violet-950">{t(`notice.${notice}`)}</p> : null}
 
-        <section className="mt-8 rounded-3xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6">
-          <h2 className="text-xl font-semibold">{t("done.title")}</h2>
-          <p className="mt-2 text-sm leading-7 text-slate-700">{t("done.text", { count: completed.answers.length })}</p>
+        {completed.job === "open" || completed.job === "failed" || (completed.job === "done" && proposals.length === 0 && decided === 0) || (completed.job !== "done" && completed.answers.length > 0 && aiAvailable) ? (
+        <section className="mt-6 rounded-3xl border border-violet-200 bg-violet-50/40 p-5 sm:p-6">
           {completed.job === "open" ? (
             <p role="status" className="mt-4 text-sm font-medium text-violet-900">{t("done.reading")}</p>
           ) : completed.job === "done" ? (
@@ -138,17 +134,22 @@ export default async function StrengthsInterviewPage({
                darauf (Maria, 25.11.2026: Die Auswertung soll nur erscheinen, wenn sie läuft). Die Antworten bleiben
                gespeichert und sind unten zum Nachlesen da. */ null}
         </section>
+        ) : null}
 
         {completed.job === "open" ? <ProposalWatcher>{null}</ProposalWatcher> : null}
 
         {/* Vorschläge, bestätigte Stärken (bewerten, entfernen) - alles an einer Stelle. */}
         <StrengthsSection strengths={strengths} proposals={proposals} />
         {strengths.length > 0 ? (
-          <p className="mt-6">
-            <Link href="/profile/kurzprofil" className="inline-flex min-h-11 items-center rounded-xl bg-slate-950 px-5 text-sm font-semibold text-white">
-              {tShort("openLink")}
+          <section className="mt-10 flex flex-wrap items-center gap-x-8 gap-y-4 rounded-3xl bg-[#14152b] p-6 text-white">
+            <div className="min-w-0 flex-[1_1_340px]">
+              <p className="font-brand text-[26px] leading-[1.2]">{t("end.kpTitle")}</p>
+              <p className="mt-2 text-[15px] text-[#b9bbd6]">{t("end.kpText")}</p>
+            </div>
+            <Link href="/profile/kurzprofil" className="inline-flex min-h-12 items-center rounded-[14px] bg-white px-6 font-semibold text-[#14152b]">
+              {t("end.kpCta")}
             </Link>
-          </p>
+          </section>
         ) : null}
         <SectionMarkToggle
           section="staerken"

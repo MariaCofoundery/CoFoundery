@@ -753,7 +753,8 @@
       "taken": "Taken",
       "rewrite": "Rewrite",
       "rewriteLabel": "Your wording",
-      "remove": "Remove"
+      "remove": "Remove",
+      "nothingTaken": "You have not taken a theme yet. “Done” puts nothing in your profile. Take what fits you above."
     }
   },
   "shortProfile": {
@@ -786,5 +787,16 @@
     "seeks": "I seek",
     "offers": "I offer",
     "openLink": "View me in brief"
+  },
+  "end": {
+    "title": "Your strengths picture",
+    "intro": "These are the strengths you have taken. They stand side by side: no ranking, no number, no type.",
+    "empty": "You have not taken a strength yet. Start again, pick three scenes and take the themes that fit you.",
+    "emptyCta": "Discover again",
+    "other": "Others",
+    "assess": "Rate, optional",
+    "kpTitle": "Turn it into a card for the network",
+    "kpText": "“Me in brief”: one sentence, up to five strengths and, if you like, what you seek and offer. Only in the Made2Found network, only if you switch it on.",
+    "kpCta": "Open Me in brief"
   }
 }

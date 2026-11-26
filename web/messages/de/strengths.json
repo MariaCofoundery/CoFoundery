@@ -753,7 +753,8 @@
       "taken": "Übernommen",
       "rewrite": "Umschreiben",
       "rewriteLabel": "Deine Formulierung",
-      "remove": "Entfernen"
+      "remove": "Entfernen",
+      "nothingTaken": "Du hast noch kein Thema übernommen. Mit „Fertig“ landet nichts in deinem Profil. Übernimm oben, was zu dir passt."
     }
   },
   "shortProfile": {
@@ -786,5 +787,16 @@
     "seeks": "Ich suche",
     "offers": "Ich biete",
     "openLink": "Ich in Kürze ansehen"
+  },
+  "end": {
+    "title": "Dein Stärkenbild",
+    "intro": "Das sind die Stärken, die du übernommen hast. Sie stehen gleichwertig nebeneinander: keine Rangfolge, keine Zahl, kein Typ.",
+    "empty": "Du hast noch keine Stärke übernommen. Starte noch einmal, wähle drei Szenen und übernimm die Themen, die zu dir passen.",
+    "emptyCta": "Noch einmal entdecken",
+    "other": "Weitere",
+    "assess": "Einschätzen, freiwillig",
+    "kpTitle": "Daraus eine Karte für das Netzwerk machen",
+    "kpText": "„Ich in Kürze“: ein Satz, bis zu fünf Stärken und, wenn du willst, was du suchst und bietest. Nur im Made2Found-Netzwerk, nur wenn du es einschaltest.",
+    "kpCta": "Ich in Kürze öffnen"
   }
 }

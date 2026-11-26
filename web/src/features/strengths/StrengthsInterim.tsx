@@ -65,6 +65,10 @@ export async function StrengthsInterim({ turns, confirmedThemes }: { turns: Stre
         ))
       )}
 
+      {groups.length > 0 && !groups.some(({ items }) => items.some(([theme]) => confirmedThemes.includes(theme))) ? (
+        <p role="status" className="rounded-2xl bg-amber-50 px-5 py-4 text-[15px] text-amber-950">{t("discover.result.nothingTaken")}</p>
+      ) : null}
+
       <div className="sd-fade flex flex-wrap items-center gap-8 rounded-3xl bg-[#14152b] p-7 text-white">
         <div className="flex min-w-0 flex-[1_1_380px] flex-col gap-2.5">
           <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c9bbf7]">{t("discover.interim.nextEyebrow")}</p>
